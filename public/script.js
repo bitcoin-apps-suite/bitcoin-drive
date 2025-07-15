@@ -982,7 +982,7 @@ class NoteApp {
         }
         
         // Initialize currentStepIndex if not set
-        if (!this.currentStepIndex) {
+        if (this.currentStepIndex == null) {
             this.currentStepIndex = 0;
         }
         
