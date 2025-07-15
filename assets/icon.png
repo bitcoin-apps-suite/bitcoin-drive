@@ -1,0 +1,8 @@
+# This is a placeholder for the app icon
+# In a real deployment, you would replace this with:
+# - icon.png (256x256 or higher for Linux)
+# - icon.ico (for Windows)
+# - icon.icns (for macOS)
+#
+# You can create these icons from a PNG image using online converters
+# or tools like electron-icon-builder 

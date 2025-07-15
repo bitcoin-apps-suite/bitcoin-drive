@@ -1,0 +1,72 @@
+{
+  "name": "character-notepad",
+  "version": "1.0.0",
+  "description": "A character-focused desktop app for organizing notes and images by character with auto-save",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-mac": "electron-builder --mac",
+    "build-mac-arm64": "electron-builder --mac --arm64",
+    "build-win": "electron-builder --win",
+    "build-linux": "electron-builder --linux",
+    "server": "node server.js"
+  },
+  "keywords": [
+    "notepad",
+    "images",
+    "prompts",
+    "auto-save",
+    "electron",
+    "desktop",
+    "dark-theme"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "nodemon": "^3.0.2"
+  },
+  "build": {
+    "appId": "com.imagesequence.notepad",
+    "productName": "Character Notepad",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}
