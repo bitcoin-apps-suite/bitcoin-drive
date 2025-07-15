@@ -1239,9 +1239,15 @@ class NoteApp {
         if (this.currentNote.isSequential) {
             // Convert standard note to sequential
             if (!this.currentNote.sequenceSteps || this.currentNote.sequenceSteps.length === 0) {
+                // Get current text from textarea instead of stored property
+                const currentText = document.getElementById('note-text')?.value || this.currentNote.text || '';
+                
+                // Update the stored text property to keep it in sync
+                this.currentNote.text = currentText;
+                
                 this.currentNote.sequenceSteps = [{
                     id: 'step_1',
-                    prompt: this.currentNote.text || '',
+                    prompt: currentText,
                     images: this.currentNote.images || []
                 }];
             }
