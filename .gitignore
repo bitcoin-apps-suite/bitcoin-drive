@@ -88,4 +88,10 @@ Thumbs.db
 
 # Local configuration
 config.local.js
-config.local.json 
+config.local.json
+
+# Exported data (contains sensitive content)
+Volumes/
+exported-data.json
+export-localStorage.html
+extract-old-data.js 

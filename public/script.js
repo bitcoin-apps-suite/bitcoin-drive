@@ -1,368 +1,57 @@
-// Password Authentication Manager
-class AuthManager {
-    constructor() {
-        this.sessionLength = 24 * 60 * 60 * 1000; // 24 hours
-        this.authData = {};
-        this.init();
-    }
-
-    async init() {
-        this.bindAuthEvents();
-        await this.loadAuthData();
-        await this.migrateFromLocalStorage();
-        // Add a small delay to ensure auth data is loaded
-        setTimeout(() => {
-            this.checkAuthStatus();
-        }, 100);
-    }
-
-    async loadAuthData() {
-        try {
-            if (window.electronAPI) {
-                this.authData = await window.electronAPI.loadAuth();
-            }
-        } catch (error) {
-            console.error('Error loading auth data:', error);
-            this.authData = {};
-        }
-    }
-
-    async saveAuthData() {
-        try {
-            if (window.electronAPI) {
-                await window.electronAPI.saveAuth(this.authData);
-            }
-        } catch (error) {
-            console.error('Error saving auth data:', error);
-        }
-    }
-
-    async migrateFromLocalStorage() {
-        // Check if we need to migrate from localStorage
-        const oldPassword = localStorage.getItem('imageSequenceNotepadPassword');
-        const oldAuth = localStorage.getItem('imageSequenceNotepadAuth');
-        const oldNotes = localStorage.getItem('imageSequenceNotes');
-        const oldCharacters = localStorage.getItem('imageSequenceCharacters');
-
-        if (oldPassword || oldAuth || oldNotes || oldCharacters) {
-            console.log('Migrating data from localStorage to file system...');
-            
-            const migrationData = {
-                auth: {},
-                notes: {},
-                characters: {}
-            };
-
-            // Migrate auth data
-            if (oldPassword) {
-                migrationData.auth.passwordHash = oldPassword;
-            }
-            if (oldAuth) {
-                try {
-                    const authToken = JSON.parse(oldAuth);
-                    migrationData.auth.authToken = authToken;
-                } catch (e) {
-                    console.error('Error parsing old auth token:', e);
-                }
-            }
-
-            // Migrate notes
-            if (oldNotes) {
-                try {
-                    migrationData.notes = JSON.parse(oldNotes);
-                } catch (e) {
-                    console.error('Error parsing old notes:', e);
-                }
-            }
-
-            // Migrate characters
-            if (oldCharacters) {
-                try {
-                    migrationData.characters = JSON.parse(oldCharacters);
-                } catch (e) {
-                    console.error('Error parsing old characters:', e);
-                }
-            }
-
-            // Perform migration
-            if (window.electronAPI) {
-                const migrated = await window.electronAPI.migrateLocalStorage(migrationData);
-                if (migrated) {
-                    // Clear localStorage after successful migration
-                    localStorage.removeItem('imageSequenceNotepadPassword');
-                    localStorage.removeItem('imageSequenceNotepadAuth');
-                    localStorage.removeItem('imageSequenceNotes');
-                    localStorage.removeItem('imageSequenceCharacters');
-                    
-                    // Reload auth data
-                    await this.loadAuthData();
-                    
-                    console.log('Migration completed successfully!');
-                    this.showMigrationNotification();
-                }
-            }
-        }
-    }
-
-    showMigrationNotification() {
-        const notification = document.createElement('div');
-        notification.className = 'migration-notification';
-        notification.innerHTML = `
-            <div class="migration-content">
-                <h3>✅ Data Migration Complete</h3>
-                <p>Your notes and settings have been migrated to persistent storage.</p>
-                <p>Your data will now be preserved across app updates!</p>
-                <button onclick="this.parentElement.parentElement.remove()">OK</button>
-            </div>
-        `;
-        document.body.appendChild(notification);
-        
-        // Auto-remove after 10 seconds
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.remove();
-            }
-        }, 10000);
-    }
-
-    bindAuthEvents() {
-        // Setup password
-        document.getElementById('setup-password-btn').addEventListener('click', () => {
-            this.setupPassword();
-        });
-
-        // Login
-        document.getElementById('login-btn').addEventListener('click', () => {
-            this.login();
-        });
-
-        // Enter key for password fields
-        document.getElementById('login-password-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.login();
-        });
-
-        document.getElementById('setup-password-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('setup-password-confirm').focus();
-        });
-
-        document.getElementById('setup-password-confirm').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.setupPassword();
-        });
-
-        // Settings
-        document.getElementById('settings-btn').addEventListener('click', () => {
-            this.openSettings();
-        });
-
-        document.getElementById('close-settings').addEventListener('click', () => {
-            this.closeSettings();
-        });
-
-        document.getElementById('change-password-btn').addEventListener('click', () => {
-            this.changePassword();
-        });
-
-        // Modal close on outside click
-        document.getElementById('settings-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'settings-modal') {
-                this.closeSettings();
-            }
-        });
-    }
-
-    // Simple hash function (for demo - in production use proper crypto)
-    async hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password + 'salt_string_for_notepad');
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    checkAuthStatus() {
-        const passwordHash = this.authData.passwordHash;
-        const authToken = this.authData.authToken;
-        
-        if (!passwordHash) {
-            // No password set, show setup
-            this.showPasswordSetup();
-        } else if (this.isValidAuthToken(authToken)) {
-            // Valid session, show app
-            this.showApp();
-        } else {
-            // Need to login
-            this.showLogin();
-        }
-    }
-
-    isValidAuthToken(token) {
-        if (!token) {
-            return false;
-        }
-        
-        try {
-            // Token is already an object in the new system
-            const tokenObj = typeof token === 'string' ? JSON.parse(token) : token;
-            const timeDiff = Date.now() - tokenObj.timestamp;
-            const isValid = timeDiff < this.sessionLength;
-            
-            return isValid;
-        } catch (error) {
-            console.error('Auth token validation error:', error);
-            return false;
-        }
-    }
-
-    showPasswordSetup() {
-        document.getElementById('setup-password').style.display = 'block';
-        document.getElementById('enter-password').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app-container').style.display = 'none';
-    }
-
-    showLogin() {
-        document.getElementById('setup-password').style.display = 'none';
-        document.getElementById('enter-password').style.display = 'block';
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app-container').style.display = 'none';
-        document.getElementById('login-error').style.display = 'none';
-    }
-
-    showApp() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'flex';
-        // Initialize the main app
-        if (!window.noteApp) {
-            window.noteApp = new NoteApp();
-        }
-    }
-
-    async setupPassword() {
-        const password = document.getElementById('setup-password-input').value;
-        const confirmPassword = document.getElementById('setup-password-confirm').value;
-
-        if (!password || password.length < 4) {
-            alert('Password must be at least 4 characters long');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match');
-            return;
-        }
-
-        const hashedPassword = await this.hashPassword(password);
-        this.authData.passwordHash = hashedPassword;
-        
-        // Set auth token
-        this.authData.authToken = { timestamp: Date.now() };
-        
-        await this.saveAuthData();
-
-        this.showApp();
-    }
-
-    async login() {
-        const password = document.getElementById('login-password-input').value;
-        const storedPassword = this.authData.passwordHash;
-
-        if (!password) return;
-
-        const hashedPassword = await this.hashPassword(password);
-        
-        if (hashedPassword === storedPassword) {
-            // Set auth token
-            this.authData.authToken = { timestamp: Date.now() };
-            await this.saveAuthData();
-            this.showApp();
-        } else {
-            document.getElementById('login-error').style.display = 'block';
-            document.getElementById('login-password-input').value = '';
-        }
-    }
-
-    openSettings() {
-        document.getElementById('settings-modal').style.display = 'flex';
-        // Clear previous inputs
-        document.getElementById('current-password').value = '';
-        document.getElementById('new-password').value = '';
-        document.getElementById('confirm-new-password').value = '';
-        document.getElementById('password-change-message').style.display = 'none';
-    }
-
-    closeSettings() {
-        document.getElementById('settings-modal').style.display = 'none';
-    }
-
-    async changePassword() {
-        const currentPassword = document.getElementById('current-password').value;
-        const newPassword = document.getElementById('new-password').value;
-        const confirmNewPassword = document.getElementById('confirm-new-password').value;
-        const messageEl = document.getElementById('password-change-message');
-
-        if (!currentPassword || !newPassword || !confirmNewPassword) {
-            this.showMessage(messageEl, 'Please fill all fields', 'error');
-            return;
-        }
-
-        if (newPassword.length < 4) {
-            this.showMessage(messageEl, 'New password must be at least 4 characters long', 'error');
-            return;
-        }
-
-        if (newPassword !== confirmNewPassword) {
-            this.showMessage(messageEl, 'New passwords do not match', 'error');
-            return;
-        }
-
-        // Verify current password
-        const storedPassword = this.authData.passwordHash;
-        const hashedCurrentPassword = await this.hashPassword(currentPassword);
-
-        if (hashedCurrentPassword !== storedPassword) {
-            this.showMessage(messageEl, 'Current password is incorrect', 'error');
-            return;
-        }
-
-        // Set new password
-        const hashedNewPassword = await this.hashPassword(newPassword);
-        this.authData.passwordHash = hashedNewPassword;
-        await this.saveAuthData();
-        
-        this.showMessage(messageEl, 'Password changed successfully!', 'success');
-        
-        // Clear form after success
-        setTimeout(() => {
-            this.closeSettings();
-        }, 1500);
-    }
-
-    showMessage(element, message, type) {
-        element.textContent = message;
-        element.className = `message ${type}`;
-        element.style.display = 'block';
-    }
-}
-
-// Character Note Taking App
+// NoteApp class - Main application
 class NoteApp {
     constructor() {
-        this.currentNote = null;
-        this.currentCharacter = 'all'; // Start with "All notes" selected
         this.notes = {};
         this.characters = {};
+        this.currentNote = null;
+        this.currentCharacter = 'all';
+        this.currentStepIndex = 0;
+        this.isFullscreen = false;
+        this.draggedNote = null;
         this.autoSaveTimeout = null;
         this.init();
     }
 
     async init() {
+        // Load data
         this.notes = await this.loadNotes();
         this.characters = await this.loadCharacters();
+        
+        // Log loaded data for debugging
+        console.log('Loaded notes:', Object.keys(this.notes || {}).length, 'notes');
+        console.log('Loaded characters:', Object.keys(this.characters || {}).length, 'characters');
+
+        // Try to migrate from Electron storage if in dev mode and no localStorage data
+        if (!window.electronAPI && (!this.notes || Object.keys(this.notes).length === 0)) {
+            await this.tryMigrateFromElectronStorage();
+        }
+
+        // Migrate data structure if needed
+        this.migrateDataStructure();
+
+        // Migrate "General" character to "All notes" if needed
         this.migrateGeneralToAll();
-        this.bindEvents();
+
+        // Render UI
         this.renderCharacterTabs();
         this.renderNotesList();
-        this.showEmptyState();
+        this.bindEvents();
+        this.checkFullscreenOnLoad();
+
+        // Set initial character
+        this.setCurrentCharacter('all');
+
+        // Only show empty state if there are truly no notes
+        const hasNotes = this.notes && Object.keys(this.notes).length > 0;
+        if (!hasNotes) {
+            this.showEmptyState();
+        } else {
+            // Auto-select the first note if there are notes
+            const firstNoteId = Object.keys(this.notes)[0];
+            if (firstNoteId) {
+                this.selectNote(firstNoteId);
+            }
+        }
     }
 
     migrateGeneralToAll() {
@@ -453,8 +142,6 @@ class NoteApp {
             if (e.key === 'Enter') this.createCharacter();
         });
 
-        // All Characters functionality is now handled by the "All notes" character tab
-
         // Drag and drop for files
         this.setupDragAndDrop();
         
@@ -464,6 +151,56 @@ class NoteApp {
         // Handle paste for images
         document.addEventListener('paste', (e) => {
             this.handlePaste(e);
+        });
+        
+        // Setup sidebar resize
+        this.setupSidebarResize();
+    }
+    
+    setupSidebarResize() {
+        const sidebar = document.getElementById('sidebar');
+        const resizeHandle = document.getElementById('sidebar-resize-handle');
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+        
+        // Get saved width from localStorage
+        const savedWidth = localStorage.getItem('sidebarWidth');
+        if (savedWidth) {
+            sidebar.style.width = savedWidth + 'px';
+        }
+        
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = sidebar.offsetWidth;
+            resizeHandle.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            
+            const newWidth = startWidth + (e.clientX - startX);
+            
+            // Respect min and max width
+            if (newWidth >= 200 && newWidth <= 500) {
+                sidebar.style.width = newWidth + 'px';
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                resizeHandle.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                
+                // Save the width to localStorage
+                localStorage.setItem('sidebarWidth', sidebar.offsetWidth);
+            }
         });
     }
 
@@ -491,8 +228,112 @@ class NoteApp {
 
         dropZone.addEventListener('drop', (e) => {
             const files = Array.from(e.dataTransfer.files);
-            this.handleFiles(files);
+            this.handleFiles(files, e);
         });
+        
+        // Also setup drag and drop directly on the note-text contenteditable div
+        this.setupNoteTextDragAndDrop();
+    }
+    
+    setupNoteTextDragAndDrop() {
+        // This will be called when the note editor is rendered
+        const noteTextDiv = document.getElementById('note-text');
+        if (!noteTextDiv) return;
+        
+        // Remove any existing drag and drop handlers to prevent duplicates
+        if (this.noteTextDropHandler) {
+            noteTextDiv.removeEventListener('drop', this.noteTextDropHandler);
+            noteTextDiv.removeEventListener('dragenter', this.noteTextDragEnterHandler);
+            noteTextDiv.removeEventListener('dragover', this.noteTextDragOverHandler);
+            noteTextDiv.removeEventListener('dragleave', this.noteTextDragLeaveHandler);
+        }
+        
+        // Create handlers that we can reference later for removal
+        this.noteTextDragEnterHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.dataTransfer.types.includes('Files')) {
+                noteTextDiv.classList.add('drag-over-text');
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        };
+        
+        this.noteTextDragOverHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.dataTransfer.types.includes('Files')) {
+                noteTextDiv.classList.add('drag-over-text');
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        };
+        
+        this.noteTextDragLeaveHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            noteTextDiv.classList.remove('drag-over-text');
+        };
+        
+        // Handle drop directly on the note text
+        this.noteTextDropHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const files = Array.from(e.dataTransfer.files);
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length > 0) {
+                // Store cursor position before processing files
+                const selection = window.getSelection();
+                let range = null;
+                
+                // Try to get drop position
+                if (document.caretRangeFromPoint) {
+                    range = document.caretRangeFromPoint(e.clientX, e.clientY);
+                } else if (selection.rangeCount > 0) {
+                    range = selection.getRangeAt(0);
+                } else {
+                    // Create range at the end if no selection
+                    range = document.createRange();
+                    range.selectNodeContents(noteTextDiv);
+                    range.collapse(false);
+                }
+                
+                // Clear selection and set to drop point
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                // Process image files
+                imageFiles.forEach(file => {
+                    this.addImageToNote(file);
+                });
+                
+                // Also handle any text that might be dragged with the images
+                const text = e.dataTransfer.getData('text/plain');
+                if (text && text.trim()) {
+                    // Insert text after images
+                    setTimeout(() => {
+                        const textNode = document.createTextNode('\n' + text + '\n');
+                        const currentSelection = window.getSelection();
+                        if (currentSelection.rangeCount > 0) {
+                            const currentRange = currentSelection.getRangeAt(0);
+                            currentRange.insertNode(textNode);
+                            currentRange.setStartAfter(textNode);
+                            currentRange.collapse(true);
+                            currentSelection.removeAllRanges();
+                            currentSelection.addRange(currentRange);
+                        }
+                        this.currentNote.content = noteTextDiv.innerHTML;
+                        this.autoSave();
+                    }, 50);
+                }
+            }
+        };
+        
+        // Add the event listeners
+        noteTextDiv.addEventListener('dragenter', this.noteTextDragEnterHandler);
+        noteTextDiv.addEventListener('dragover', this.noteTextDragOverHandler);
+        noteTextDiv.addEventListener('dragleave', this.noteTextDragLeaveHandler);
+        noteTextDiv.addEventListener('drop', this.noteTextDropHandler);
     }
 
     setupNoteDragAndDrop() {
@@ -592,10 +433,10 @@ class NoteApp {
         }, 3000);
     }
 
-    handleFiles(files) {
+    handleFiles(files, dropEvent) {
         files.forEach(file => {
             if (file.type.startsWith('image/')) {
-                this.addImageToNote(file);
+                this.addImageToNote(file, dropEvent);
             }
         });
     }
@@ -703,25 +544,39 @@ class NoteApp {
                 this.renderSequentialEditor();
             }
         } else {
-            // Standard mode - use textarea
-            const textarea = document.getElementById('note-text');
-            if (textarea) {
-                const currentText = textarea.value.trim();
-                
-                if (currentText === '') {
-                    // If textarea is empty, just set the text
-                    textarea.value = text;
+            // Standard mode - insert text into content-editable div
+            const noteTextDiv = document.getElementById('note-text');
+            if (noteTextDiv) {
+                // Insert text at cursor position or at the end
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(text));
+                    range.setStartAfter(range.endContainer);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
                 } else {
-                    // If there's existing text, append with a line break
-                    textarea.value = currentText + '\n\n' + text;
+                    // If no selection, append to end
+                    const textNode = document.createTextNode(text);
+                    noteTextDiv.appendChild(textNode);
                 }
                 
-                // Trigger auto-save
+                // Update the note content and auto-save
+                this.currentNote.content = noteTextDiv.innerHTML;
                 this.autoSave();
                 
-                // Focus textarea and move cursor to end
-                textarea.focus();
-                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+                // Focus the div and move cursor to end
+                noteTextDiv.focus();
+                
+                // Move cursor to end
+                const range = document.createRange();
+                range.selectNodeContents(noteTextDiv);
+                range.collapse(false);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
         }
     }
@@ -793,7 +648,7 @@ class NoteApp {
         }, 3000);
     }
 
-    addImageToNote(file) {
+    addImageToNote(file, dropEvent) {
         if (!this.currentNote) {
             this.createNewNote();
         }
@@ -809,26 +664,47 @@ class NoteApp {
                 addedAt: new Date().toISOString()
             };
 
-            if (this.currentNote.isSequential) {
-                // In sequential mode, add to first step
-                const firstStep = this.currentNote.sequenceSteps[0];
-                if (firstStep) {
-                    if (!firstStep.images) firstStep.images = [];
-                    firstStep.images.push(imageData);
+            // All notes are sequential - add to current step
+            if (this.currentNote.sequenceSteps && this.currentNote.sequenceSteps.length > 0) {
+                const currentStep = this.currentNote.sequenceSteps[this.currentStepIndex || 0];
+                if (currentStep) {
+                    if (!currentStep.images) currentStep.images = [];
+                    currentStep.images.push(imageData);
                     this.currentNote.updatedAt = new Date().toISOString();
                     this.autoSaveSequence();
                     this.renderSequentialEditor();
                 }
             } else {
-                // Standard mode
-                if (!this.currentNote.images) {
-                    this.currentNote.images = [];
+                // Standard mode - insert image inline
+                const noteTextDiv = document.getElementById('note-text');
+                if (noteTextDiv) {
+                    // Create image wrapper with remove button
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.className = 'image-wrapper';
+                    imageWrapper.innerHTML = `
+                        <img src="${imageData.data}" alt="${imageData.name}" title="${imageData.name}" data-image-id="${imageData.id}">
+                        <button class="image-remove" onclick="noteApp.removeInlineImage('${imageData.id}')" title="Remove image">×</button>
+                    `;
+                    
+                    // Insert at cursor position or at the end
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        range.insertNode(imageWrapper);
+                        range.setStartAfter(imageWrapper);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else {
+                        noteTextDiv.appendChild(imageWrapper);
+                    }
+                    
+                    // Update the note content
+                    this.currentNote.content = noteTextDiv.innerHTML;
+                    this.currentNote.updatedAt = new Date().toISOString();
+                    this.hideDropMessage();
+                    this.autoSave();
                 }
-                
-                this.currentNote.images.push(imageData);
-                this.renderImages();
-                this.hideDropMessage();
-                this.autoSave();
             }
         };
         
@@ -836,46 +712,36 @@ class NoteApp {
         reader.readAsDataURL(file);
     }
 
-    renderImages() {
-        const container = document.getElementById('images-container');
-        if (!this.currentNote || !this.currentNote.images) {
-            container.innerHTML = '';
-            return;
+    removeInlineImage(imageId) {
+        const noteTextDiv = document.getElementById('note-text');
+        if (!noteTextDiv) return;
+        
+        const imageWrapper = noteTextDiv.querySelector(`img[data-image-id="${imageId}"]`)?.closest('.image-wrapper');
+        if (imageWrapper) {
+            imageWrapper.remove();
+            
+            // Update the note content
+            this.currentNote.content = noteTextDiv.innerHTML;
+            this.currentNote.updatedAt = new Date().toISOString();
+            
+            // Show drop message if content is empty
+            if (noteTextDiv.innerHTML.trim() === '') {
+                this.showDropMessage();
+            }
+            
+            this.autoSave();
         }
-
-        container.innerHTML = this.currentNote.images.map(image => `
-            <div class="image-item" data-image-id="${image.id}">
-                <img src="${image.data}" alt="${image.name}" title="${image.name}">
-                <button class="image-remove" onclick="noteApp.removeImage('${image.id}')" title="Remove image">×</button>
-            </div>
-        `).join('');
-    }
-
-    removeImage(imageId) {
-        if (!this.currentNote || !this.currentNote.images) return;
-        
-        this.currentNote.images = this.currentNote.images.filter(img => img.id !== imageId);
-        this.renderImages();
-        
-        if (this.currentNote.images.length === 0) {
-            this.showDropMessage();
-        }
-        
-        this.autoSave();
     }
 
     generateTitleFromText(text) {
-        if (!text || text.trim() === '') {
+        const words = text.trim().split(/\s+/);
+        if (words.length === 0 || words[0] === '') {
             return 'Untitled Note';
         }
         
-        // Get first 4-6 words, remove extra whitespace and newlines
-        const cleanText = text.trim().replace(/\s+/g, ' ');
-        const words = cleanText.split(' ').slice(0, 5);
-        const title = words.join(' ');
-        
-        // Truncate if too long
-        return title.length > 50 ? title.substring(0, 47) + '...' : title;
+        // Take first 6 words to create title
+        const title = words.slice(0, 6).join(' ');
+        return title.length > 40 ? title.substring(0, 40) + '...' : title;
     }
 
     createNewNote() {
@@ -891,24 +757,30 @@ class NoteApp {
         const note = {
             id: 'note_' + Date.now(),
             title: 'Untitled Note',
-            text: '',
-            images: [],
+            content: '',
             characterId: characterId,
             isPriority: false,
             sequenceSteps: [{ id: 'step_1', prompt: '', images: [] }],
-            isSequential: false,
+            isSequential: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
 
         this.notes[note.id] = note;
         this.currentNote = note;
+        
+        // Clear any existing editor content first
+        const existingNoteText = document.getElementById('note-text');
+        if (existingNoteText) {
+            existingNoteText.innerHTML = '';
+        }
+        
         this.saveNotes();
         this.renderNotesList();
         this.showNoteEditor();
         this.loadNoteInEditor(note);
 
-        // Focus on textarea
+        // Focus on content-editable div
         setTimeout(() => {
             document.getElementById('note-text').focus();
         }, 100);
@@ -951,38 +823,49 @@ class NoteApp {
                         <p>Drag and drop images, then paste or type your prompts below</p>
                     </div>
                     
-                    <div class="images-container" id="images-container">
-                        <!-- Images will appear here -->
-                    </div>
-                    
-                    <textarea 
+                    <div 
                         id="note-text" 
-                        placeholder="Paste or type your prompts and notes here..."
-                        class="note-textarea"
-                    ></textarea>
+                        contenteditable="true"
+                        class="note-editor-content"
+                        data-placeholder="Paste or type your prompts and notes here..."
+                    ></div>
                 </div>
             `;
         }
         
-        document.getElementById('note-text').value = this.currentNote.text || '';
-        this.renderImages();
+        // Load the note content (HTML)
+        const noteTextDiv = document.getElementById('note-text');
+        noteTextDiv.innerHTML = this.currentNote.content || '';
         
-        if (this.currentNote.images && this.currentNote.images.length > 0) {
+        // Show/hide drop message based on content
+        if (this.currentNote.content && this.currentNote.content.trim() !== '') {
             this.hideDropMessage();
         } else {
             this.showDropMessage();
         }
+        
+        // Set up auto-save on content changes
+        noteTextDiv.addEventListener('input', () => {
+            this.autoSave();
+        });
+        
+        // Setup drag and drop for this specific note text div
+        this.setupNoteTextDragAndDrop();
     }
 
     renderSequentialEditor() {
         const noteContent = document.getElementById('note-content');
         
-        if (!this.currentNote.sequenceSteps || this.currentNote.sequenceSteps.length === 0) {
+        // Only initialize sequenceSteps if it doesn't exist at all - never reset if it exists but is empty
+        if (!this.currentNote.sequenceSteps) {
             this.currentNote.sequenceSteps = [{ id: 'step_1', prompt: '', images: [] }];
+        } else if (this.currentNote.sequenceSteps.length === 0) {
+            // If array exists but is empty, add one step (but this shouldn't happen in normal usage)
+            this.currentNote.sequenceSteps.push({ id: 'step_1', prompt: '', images: [] });
         }
         
-        // Initialize currentStepIndex if not set
-        if (this.currentStepIndex == null) {
+        // Initialize currentStepIndex if not set or invalid
+        if (this.currentStepIndex === null || this.currentStepIndex === undefined) {
             this.currentStepIndex = 0;
         }
         
@@ -1016,12 +899,12 @@ class NoteApp {
                     </div>
                     
                     <div class="images-container" id="images-container">
-                        ${(currentStep.images || []).map(img => `
+                        ${currentStep.images ? currentStep.images.map(img => `
                             <div class="image-item">
                                 <img src="${img.data}" alt="${img.name}" title="${img.name}">
                                 <button class="image-remove" onclick="noteApp.removeSequenceImage('${currentStep.id}', '${img.id}')">×</button>
                             </div>
-                        `).join('')}
+                        `).join('') : ''}
                     </div>
                     
                     <textarea 
@@ -1089,8 +972,32 @@ class NoteApp {
         
         if (stepIndex < 0 || stepIndex >= this.currentNote.sequenceSteps.length) return;
         
+        console.log('🔄 NAVIGATE FROM STEP', this.currentStepIndex, 'TO STEP', stepIndex);
+        console.log('🔄 BEFORE NAV - Step 0 images:', this.currentNote.sequenceSteps[0]?.images?.length || 0);
+        
+        // Save current step's data before navigating away
+        this.saveCurrentSequenceStep();
+        
+        console.log('🔄 AFTER SAVE - Step 0 images:', this.currentNote.sequenceSteps[0]?.images?.length || 0);
+        
         this.currentStepIndex = stepIndex;
         this.renderSequentialEditor();
+        
+        console.log('🔄 AFTER RENDER - Step 0 images:', this.currentNote.sequenceSteps[0]?.images?.length || 0);
+    }
+    
+    saveCurrentSequenceStep() {
+        if (!this.currentNote || !this.currentNote.isSequential) return;
+        
+        const textarea = document.getElementById('note-text');
+        if (textarea && textarea.tagName === 'TEXTAREA') {
+            const currentStep = this.currentNote.sequenceSteps[this.currentStepIndex];
+            if (currentStep) {
+                currentStep.prompt = textarea.value;
+                this.currentNote.updatedAt = new Date().toISOString();
+                this.saveNotes();
+            }
+        }
     }
 
     setupSequenceDragDrop() {
@@ -1113,9 +1020,60 @@ class NoteApp {
         dropZone.ondragenter = (event) => {
             event.preventDefault();
         };
+        
+        // Also setup drag and drop on the textarea for sequential mode
+        const textarea = document.getElementById('note-text');
+        if (textarea && textarea.tagName === 'TEXTAREA') {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                textarea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+            
+            // Visual feedback
+            ['dragenter', 'dragover'].forEach(eventName => {
+                textarea.addEventListener(eventName, (e) => {
+                    if (e.dataTransfer.types.includes('Files')) {
+                        textarea.classList.add('drag-over-textarea');
+                    }
+                });
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                textarea.addEventListener(eventName, () => {
+                    textarea.classList.remove('drag-over-textarea');
+                });
+            });
+            
+            // Handle drop on textarea
+            textarea.addEventListener('drop', (e) => {
+                const files = Array.from(e.dataTransfer.files);
+                const imageFiles = files.filter(file => file.type.startsWith('image/'));
+                
+                if (imageFiles.length > 0) {
+                    const currentStep = this.currentNote.sequenceSteps[this.currentStepIndex];
+                    imageFiles.forEach(file => {
+                        this.handleSequenceImageFile(file, currentStep.id);
+                    });
+                }
+                
+                // Handle text
+                const text = e.dataTransfer.getData('text/plain');
+                if (text && text.trim()) {
+                    const cursorPos = textarea.selectionStart;
+                    const textBefore = textarea.value.substring(0, cursorPos);
+                    const textAfter = textarea.value.substring(cursorPos);
+                    textarea.value = textBefore + text + textAfter;
+                    textarea.setSelectionRange(cursorPos + text.length, cursorPos + text.length);
+                    
+                    // Trigger update
+                    const currentStep = this.currentNote.sequenceSteps[this.currentStepIndex];
+                    this.updateSequenceStep(currentStep.id, textarea.value);
+                }
+            });
+        }
     }
-
-
 
     toggleFullsizeStep(stepId) {
         const dropZone = document.getElementById('drop-zone');
@@ -1239,50 +1197,96 @@ class NoteApp {
         if (this.currentNote.isSequential) {
             // Convert standard note to sequential
             if (!this.currentNote.sequenceSteps || this.currentNote.sequenceSteps.length === 0) {
-                // Get current text from textarea instead of stored property
-                const currentText = document.getElementById('note-text')?.value || this.currentNote.text || '';
+                // Get current content from content-editable div
+                const noteTextDiv = document.getElementById('note-text');
+                const currentContent = noteTextDiv ? noteTextDiv.innerHTML : this.currentNote.content || '';
                 
-                // Update the stored text property to keep it in sync
-                this.currentNote.text = currentText;
+                // Extract images from the HTML content
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = currentContent;
                 
+                // Find all images and extract their data
+                const images = [];
+                const imgElements = tempDiv.querySelectorAll('img');
+                imgElements.forEach((img, index) => {
+                    if (img.src) {
+                        // Create proper image object structure
+                        images.push({
+                            id: img.dataset.imageId || 'img_converted_' + Date.now() + '_' + index,
+                            name: img.alt || 'Image',
+                            data: img.src,
+                            size: 0, // Size not available from HTML
+                            type: 'image/jpeg', // Default type
+                            addedAt: new Date().toISOString()
+                        });
+                    }
+                });
+                
+                // Get text content (keeping line breaks)
+                const textContent = tempDiv.textContent || tempDiv.innerText || '';
+                
+                // Update the stored content property to keep it in sync
+                this.currentNote.content = currentContent;
+                
+                // Create the first step with both text and images preserved
                 this.currentNote.sequenceSteps = [{
                     id: 'step_1',
-                    prompt: currentText,
-                    images: this.currentNote.images || []
+                    prompt: textContent,
+                    images: images
                 }];
+                
             }
             
-            // Start at step 1 (index 0) to show the original content
-            this.currentStepIndex = 0;
+            // Add step 2 immediately
+            const step2Id = 'step_' + Date.now();
+            this.currentNote.sequenceSteps.push({
+                id: step2Id,
+                prompt: '',
+                images: []
+            });
             
-            // Automatically add step 2 but stay on step 1
+            // Start at step 2 (index 1) - the new blank step
+            this.currentStepIndex = 1;
+            
             this.currentNote.updatedAt = new Date().toISOString();
             this.saveNotes();
             this.updateSequenceButton();
             this.loadNoteInEditor(this.currentNote);
-            
-            // Add step 2 after a short delay to ensure the sequential editor is rendered
-            setTimeout(() => {
-                this.addSequenceStepWithoutNavigation();
-            }, 100);
         } else {
             // Convert sequential note to standard
             if (this.currentNote.sequenceSteps && this.currentNote.sequenceSteps.length > 0) {
-                // Combine all prompts into one text
-                const combinedText = this.currentNote.sequenceSteps
-                    .map((step, index) => `Step ${index + 1}: ${step.prompt || ''}`)
-                    .join('\n\n');
+                // Build HTML content with both text and images from all steps
+                let htmlContent = '';
                 
-                this.currentNote.text = combinedText;
-                
-                // Combine all images
-                const combinedImages = [];
-                this.currentNote.sequenceSteps.forEach(step => {
-                    if (step.images) {
-                        combinedImages.push(...step.images);
+                this.currentNote.sequenceSteps.forEach((step, index) => {
+                    // Add step header if there are multiple steps
+                    if (this.currentNote.sequenceSteps.length > 1) {
+                        htmlContent += `<strong>Step ${index + 1}:</strong><br>`;
+                    }
+                    
+                    // Add the prompt text
+                    if (step.prompt) {
+                        htmlContent += step.prompt.replace(/\n/g, '<br>') + '<br>';
+                    }
+                    
+                    // Add all images from this step
+                    if (step.images && step.images.length > 0) {
+                        step.images.forEach(img => {
+                            // Handle both image objects and plain strings
+                            const imgSrc = typeof img === 'string' ? img : img.data;
+                            const imgId = typeof img === 'object' && img.id ? img.id : 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                            htmlContent += `<div class="image-wrapper"><img src="${imgSrc}" alt="Image" data-image-id="${imgId}"></div>`;
+                        });
+                    }
+                    
+                    // Add spacing between steps
+                    if (index < this.currentNote.sequenceSteps.length - 1) {
+                        htmlContent += '<br><br>';
                     }
                 });
-                this.currentNote.images = combinedImages;
+                
+                // Store the combined content
+                this.currentNote.content = htmlContent;
             }
             
             this.currentNote.updatedAt = new Date().toISOString();
@@ -1345,9 +1349,15 @@ class NoteApp {
             images: []
         };
         
+        // Store current step index to preserve position
+        const currentIndex = this.currentStepIndex;
+        
         this.currentNote.sequenceSteps.push(newStep);
         this.currentNote.updatedAt = new Date().toISOString();
         this.saveNotes();
+        
+        // Restore the step index to stay on the same step
+        this.currentStepIndex = currentIndex;
         
         // Re-render to update the step counter, but don't navigate
         this.renderSequentialEditor();
@@ -1420,6 +1430,12 @@ class NoteApp {
             }
         });
     }
+    
+    handleSequenceImageFile(file, stepId) {
+        if (file.type.startsWith('image/')) {
+            this.addImageToSequenceStep(file, stepId);
+        }
+    }
 
     addImageToSequenceStep(file, stepId) {
         const reader = new FileReader();
@@ -1488,28 +1504,41 @@ class NoteApp {
     }
 
     autoSave() {
+        // Don't save if there's no current note
         if (!this.currentNote) return;
+        
+        const noteTextDiv = document.getElementById('note-text');
+        if (!noteTextDiv) return;
+        
+        // Don't save if the note editor is hidden (empty state)
+        const noteEditor = document.getElementById('note-editor');
+        if (noteEditor && noteEditor.classList.contains('hidden')) return;
+        
+        const content = noteTextDiv.innerHTML;
+        
+        // Update note data
+        this.currentNote.content = content;
+        this.currentNote.title = this.generateTitleFromContent(content);
+        this.currentNote.updatedAt = new Date().toISOString();
+        
+        this.saveNotes();
+        this.renderNotesList();
+    }
 
-        // Clear existing timeout
-        if (this.autoSaveTimeout) {
-            clearTimeout(this.autoSaveTimeout);
+    generateTitleFromContent(content) {
+        // Extract plain text from HTML content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        const text = tempDiv.textContent || tempDiv.innerText || '';
+        
+        const words = text.trim().split(/\s+/);
+        if (words.length === 0 || words[0] === '') {
+            return 'Untitled Note';
         }
         
-        // Auto-save after 300ms of no typing (faster response)
-        this.autoSaveTimeout = setTimeout(() => {
-            const text = document.getElementById('note-text').value || '';
-            
-            // Update note data
-            this.currentNote.text = text;
-            this.currentNote.title = this.generateTitleFromText(text);
-            this.currentNote.updatedAt = new Date().toISOString();
-
-            // Save to localStorage
-            this.saveNotes();
-            
-            // Update the notes list to show new title
-            this.renderNotesList();
-        }, 300);
+        // Take first 6 words to create title
+        const title = words.slice(0, 6).join(' ');
+        return title.length > 40 ? title.substring(0, 40) + '...' : title;
     }
 
     deleteCurrentNote() {
@@ -1523,6 +1552,30 @@ class NoteApp {
             this.currentNote = null;
             this.showEmptyState();
         }
+    }
+    
+    deleteNoteFromSidebar(noteId) {
+        const note = this.notes[noteId];
+        if (!note) return;
+        
+        // Get note title for confirmation message
+        const noteTitle = note.title || 'Untitled Note';
+        
+        if (confirm(`Are you sure you want to delete "${noteTitle}"?`)) {
+            // Delete the note
+            delete this.notes[noteId];
+            this.saveNotes();
+            this.renderNotesList();
+            
+            // If this was the current note, clear the editor
+            if (this.currentNote && this.currentNote.id === noteId) {
+                this.currentNote = null;
+                this.showEmptyState();
+            }
+        }
+        
+        // Prevent event bubbling to avoid selecting the note
+        event.stopPropagation();
     }
 
     selectNote(noteId) {
@@ -1552,59 +1605,104 @@ class NoteApp {
 
     renderNotesList() {
         const container = document.getElementById('notes-list');
-        const filteredNotes = this.getNotesForCurrentCharacter();
-        
-        // Update sidebar header to show character context
-        const sidebarHeader = document.querySelector('.sidebar-header h1');
-        if (this.currentCharacter === 'all') {
-            sidebarHeader.textContent = '📝 All Notes';
-        } else {
-            const character = this.characters[this.currentCharacter];
-            const emoji = character ? character.emoji || '👤' : '👤';
-            const name = character ? character.name : 'Unknown';
-            sidebarHeader.textContent = `${emoji} ${name}`;
-        }
-        
-        if (filteredNotes.length === 0) {
-            if (this.currentCharacter === 'all') {
-                container.innerHTML = '<div class="no-notes">No notes yet. Create your first note!</div>';
-            } else {
-                const character = this.characters[this.currentCharacter];
-                const characterName = character ? character.name : 'this character';
-                container.innerHTML = `<div class="no-notes">No notes for ${characterName} yet. Create their first note!</div>`;
-            }
+        if (!this.notes) {
+            container.innerHTML = '';
             return;
         }
 
-        // Sort notes by priority first, then by update time (most recent first)
+        // Filter notes based on current character
+        const filteredNotes = Object.values(this.notes).filter(note => {
+            if (this.currentCharacter === 'all') {
+                return true;
+            }
+            return note.characterId === this.currentCharacter;
+        });
+
+        // Sort notes: priority first, then by date
         const sortedNotes = filteredNotes.sort((a, b) => {
             // Priority notes first
-            if (a.isPriority && !b.isPriority) return -1;
-            if (!a.isPriority && b.isPriority) return 1;
-            
-            // Then by update time (most recent first)
+            if (a.isPriority !== b.isPriority) {
+                return a.isPriority ? -1 : 1;
+            }
+            // Then by date (newest first)
             return new Date(b.updatedAt) - new Date(a.updatedAt);
         });
 
         container.innerHTML = sortedNotes.map(note => {
-            const preview = note.text.length > 60 ? note.text.substring(0, 60) + '...' : note.text || 'No content';
+            // Extract first image from note for thumbnail
+            let thumbnailHtml = '';
+            let firstImage = null;
+            
+            // ALWAYS use first step (step 0) as thumbnail - every note is sequential
+            if (note.sequenceSteps && note.sequenceSteps.length > 0) {
+                const firstStep = note.sequenceSteps[0];
+                if (firstStep.images && firstStep.images.length > 0) {
+                    firstImage = firstStep.images[0].data;
+                }
+            }
+            
+            if (firstImage) {
+                thumbnailHtml = `<div class="note-thumbnail">
+                    <img src="${firstImage}" alt="Note thumbnail">
+                </div>`;
+            }
+            
+            // Extract text for preview - handle both sequential and regular notes
+            let textContent = '';
+            if (note.isSequential && note.sequenceSteps && note.sequenceSteps.length > 0) {
+                // For sequential notes, get text from all steps
+                const allStepsText = note.sequenceSteps
+                    .map((step, index) => step.prompt ? `Step ${index + 1}: ${step.prompt}` : '')
+                    .filter(text => text)
+                    .join(' ');
+                textContent = allStepsText || 'No content';
+            } else {
+                // For regular notes, extract from HTML content
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = note.content || '';
+                textContent = tempDiv.textContent || tempDiv.innerText || '';
+            }
+            const preview = textContent.length > 60 ? textContent.substring(0, 60) + '...' : textContent || 'No content';
+            
             const date = new Date(note.updatedAt).toLocaleDateString();
-            const imageCount = note.images ? note.images.length : 0;
+            
+            // Count images - handle both sequential and regular notes
+            let imageCount = 0;
+            if (note.isSequential && note.sequenceSteps) {
+                // Count images in all sequence steps
+                note.sequenceSteps.forEach(step => {
+                    if (step.images) {
+                        imageCount += step.images.length;
+                    }
+                });
+            } else {
+                // Count images in HTML content
+                imageCount = (note.content || '').split('<img').length - 1;
+            }
             
             return `
-                <div class="note-item ${this.currentNote && this.currentNote.id === note.id ? 'active' : ''} ${note.isPriority ? 'priority' : ''}" 
+                <div class="note-item ${this.currentNote && this.currentNote.id === note.id ? 'active' : ''} ${note.isPriority ? 'priority' : ''} ${firstImage ? 'has-thumbnail' : ''}" 
                      data-note-id="${note.id}" 
-                     draggable="true"
-                     onclick="noteApp.selectNote('${note.id}')">
-                    <div class="note-item-title">
-                        ${note.isPriority ? '<span class="priority-indicator">⭐</span>' : ''}
-                        ${note.title}
+                     draggable="true">
+                    <div class="note-item-main" onclick="noteApp.selectNote('${note.id}')">
+                        ${thumbnailHtml}
+                        <div class="note-item-content">
+                            <div class="note-item-title">
+                                ${note.isPriority ? '<span class="priority-indicator">⭐</span>' : ''}
+                                ${note.title}
+                            </div>
+                            <div class="note-item-preview">${preview}</div>
+                            <div class="note-item-meta">
+                                <span class="note-item-date">${date}</span>
+                                ${imageCount > 0 ? `<span class="note-item-images">📷 ${imageCount}</span>` : ''}
+                            </div>
+                        </div>
                     </div>
-                    <div class="note-item-preview">${preview}</div>
-                    <div class="note-item-meta">
-                        <span class="note-item-date">${date}</span>
-                        ${imageCount > 0 ? `<span class="note-item-images">📷 ${imageCount}</span>` : ''}
-                    </div>
+                    <button class="note-item-delete" onclick="noteApp.deleteNoteFromSidebar('${note.id}')" title="Delete note">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/>
+                        </svg>
+                    </button>
                 </div>
             `;
         }).join('');
@@ -1619,6 +1717,12 @@ class NoteApp {
     }
 
     showEmptyState() {
+        // Clear any editor content to prevent it from being saved to new notes
+        const noteTextDiv = document.getElementById('note-text');
+        if (noteTextDiv) {
+            noteTextDiv.innerHTML = '';
+        }
+        
         document.getElementById('note-editor').classList.add('hidden');
         document.getElementById('empty-state').classList.remove('hidden');
     }
@@ -1649,7 +1753,7 @@ class NoteApp {
                 notes.forEach(note => {
                     // Assign old notes to "all" or create a default character
                     if (!note.characterId) {
-                        note.characterId = 'legacy'; // Will be handled by migration
+                        note.characterId = 'all';
                     }
                     migratedNotes[note.id] = note;
                 });
@@ -1707,6 +1811,72 @@ class NoteApp {
         } catch (error) {
             console.error('Error saving characters:', error);
         }
+    }
+
+    async tryMigrateFromElectronStorage() {
+        try {
+            // Try to load data from the Electron storage location
+            const response = await fetch('/api/migrate-data', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Migration data received:', data);
+
+                if (data.notes && Object.keys(data.notes).length > 0) {
+                    this.notes = data.notes;
+                    localStorage.setItem('imageSequenceNotes', JSON.stringify(this.notes));
+                    console.log(`Migrated ${Object.keys(data.notes).length} notes from Electron storage`);
+                }
+
+                if (data.characters && Object.keys(data.characters).length > 0) {
+                    this.characters = data.characters;
+                    localStorage.setItem('imageSequenceCharacters', JSON.stringify(this.characters));
+                    console.log(`Migrated ${Object.keys(data.characters).length} characters from Electron storage`);
+                }
+
+                // Show success message
+                this.showMigrationSuccess();
+            }
+        } catch (error) {
+            console.error('Failed to migrate data:', error);
+        }
+    }
+
+    showMigrationSuccess() {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            max-width: 300px;
+        `;
+        notification.innerHTML = `
+            <strong>✅ Data Migrated!</strong><br>
+            Your notes have been loaded from the Electron app storage.
+        `;
+
+        document.body.appendChild(notification);
+
+        // Remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
     }
 
     renderCharacterTabs() {
@@ -1771,6 +1941,12 @@ class NoteApp {
         if (filteredNotes.length === 0) {
             this.showEmptyState();
         }
+    }
+
+    setCurrentCharacter(characterId) {
+        this.currentCharacter = characterId;
+        this.updateActiveCharacterTab();
+        this.renderNotesList();
     }
 
     getNotesForCurrentCharacter() {
@@ -1883,10 +2059,50 @@ class NoteApp {
         element.className = `message ${type}`;
         element.style.display = 'block';
     }
+
+    migrateDataStructure() {
+        // Migrate old data structure to new format
+        const notes = this.notes;
+        let needsSave = false;
+        
+        Object.values(notes).forEach(note => {
+            // Migrate old text/images structure to new content structure
+            if (note.text !== undefined && note.content === undefined) {
+                note.content = note.text || '';
+                delete note.text;
+                needsSave = true;
+            }
+            
+            // Remove old images array if it exists (images are now inline)
+            if (note.images && Array.isArray(note.images)) {
+                // Convert old separate images to inline content
+                if (note.images.length > 0) {
+                    const imageHtml = note.images.map(img => 
+                        `<div class="image-wrapper">
+                            <img src="${img.data}" alt="${img.name}" title="${img.name}" data-image-id="${img.id}">
+                            <button class="image-remove" onclick="noteApp.removeInlineImage('${img.id}')" title="Remove image">×</button>
+                        </div>`
+                    ).join('');
+                    
+                    note.content = imageHtml + (note.content || '');
+                }
+                delete note.images;
+                needsSave = true;
+            }
+        });
+        
+        if (needsSave) {
+            this.saveNotes();
+        }
+    }
+
+    checkFullscreenOnLoad() {
+        // Check if any fullscreen elements need to be restored
+        // This is a placeholder for future functionality
+    }
 }
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', async () => {
-    const authManager = new AuthManager();
-    // Auth manager will handle initialization automatically
+// Initialize the app when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    window.noteApp = new NoteApp();
 }); 

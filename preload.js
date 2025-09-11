@@ -9,9 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     loadCharacters: () => ipcRenderer.invoke('load-characters'),
     saveCharacters: (characters) => ipcRenderer.invoke('save-characters', characters),
     
-    loadAuth: () => ipcRenderer.invoke('load-auth'),
-    saveAuth: (auth) => ipcRenderer.invoke('save-auth', auth),
-    
     // Migration from localStorage
     migrateLocalStorage: (data) => ipcRenderer.invoke('migrate-localStorage', data),
     

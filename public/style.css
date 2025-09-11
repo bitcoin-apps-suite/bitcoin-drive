@@ -161,10 +161,34 @@ body {
 /* Sidebar */
 .sidebar {
     width: 280px;
+    min-width: 200px;
+    max-width: 500px;
     background: #111111;
     border-right: 1px solid #333333;
     display: flex;
     flex-direction: column;
+    position: relative;
+    resize: horizontal;
+    overflow: auto;
+}
+
+.sidebar-resize-handle {
+    position: absolute;
+    right: -3px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 10;
+}
+
+.sidebar-resize-handle:hover {
+    background: rgba(0, 123, 255, 0.3);
+}
+
+.sidebar-resize-handle.dragging {
+    background: rgba(0, 123, 255, 0.5);
 }
 
 .sidebar-header {
@@ -235,10 +259,61 @@ body {
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 8px;
-    cursor: pointer;
     border: 1px solid transparent;
     transition: all 0.2s;
     background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.note-item.has-thumbnail {
+    align-items: flex-start;
+}
+
+.note-item-main {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    align-items: center;
+}
+
+.note-item.has-thumbnail .note-item-main {
+    align-items: flex-start;
+}
+
+.note-item-delete {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #666666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.note-item:hover .note-item-delete {
+    opacity: 1;
+}
+
+.note-item-delete:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.note-item-delete svg {
+    width: 14px;
+    height: 14px;
 }
 
 .note-item:hover {
@@ -249,6 +324,27 @@ body {
 .note-item.active {
     background: #2d2d2d;
     border-color: #007bff;
+}
+
+.note-thumbnail {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #111111;
+}
+
+.note-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.note-item-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .note-item.dragging {
@@ -277,6 +373,43 @@ body {
     color: #ffc107;
     margin-right: 6px;
     font-size: 12px;
+}
+
+.note-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-item-preview {
+    font-size: 12px;
+    color: #888888;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.note-item-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: #666666;
+}
+
+.note-item-date {
+    flex-shrink: 0;
+}
+
+.note-item-images {
+    color: #007bff;
 }
 
 /* Sequential Editor Styles */
@@ -762,6 +895,12 @@ body {
     background: #001122;
 }
 
+.note-editor-content.drag-over-text {
+    background: rgba(0, 123, 255, 0.05);
+    box-shadow: inset 0 0 20px rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+}
+
 .drop-message {
     text-align: center;
     padding: 60px 20px;
@@ -778,31 +917,46 @@ body {
     display: none;
 }
 
-.images-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
-    min-height: 0;
+.note-editor-content {
+    width: 100%;
+    min-height: 300px;
+    border: none;
+    background: #000000;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 0;
+    font-family: inherit;
+    outline: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
-.image-item {
-    position: relative;
+.note-editor-content:empty:before {
+    content: attr(data-placeholder);
+    color: #666666;
+    font-style: italic;
+    pointer-events: none;
+}
+
+.note-editor-content img {
+    max-width: 100%;
+    height: auto;
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
-    background: #111111;
-}
-
-.image-item img {
-    max-width: 200px;
-    max-height: 200px;
-    object-fit: cover;
+    margin: 10px 0;
     display: block;
-    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
-.image-remove {
+.note-editor-content .image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.note-editor-content .image-wrapper .image-remove {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -820,9 +974,10 @@ body {
     justify-content: center;
     transition: background 0.2s;
     backdrop-filter: blur(4px);
+    z-index: 10;
 }
 
-.image-remove:hover {
+.note-editor-content .image-wrapper .image-remove:hover {
     background: rgba(220, 53, 69, 1);
 }
 
@@ -843,6 +998,12 @@ body {
 .note-textarea::placeholder {
     color: #666666;
     font-style: italic;
+}
+
+.note-textarea.drag-over-textarea {
+    background: rgba(0, 123, 255, 0.05);
+    box-shadow: inset 0 0 20px rgba(0, 123, 255, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.3);
 }
 
 /* Empty State */
@@ -923,125 +1084,7 @@ body {
     }
 } 
 
-/* Login Screen */
-.login-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.login-container {
-    background: #111111;
-    border: 1px solid #333333;
-    border-radius: 12px;
-    padding: 40px;
-    width: 400px;
-    max-width: 90vw;
-    text-align: center;
-}
-
-.login-container h1 {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    color: #ffffff;
-}
-
-.auth-form h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #ffffff;
-}
-
-.auth-form p {
-    color: #888888;
-    margin-bottom: 25px;
-    font-size: 14px;
-}
-
-.auth-input {
-    width: 100%;
-    padding: 12px 16px;
-    background: #222222;
-    border: 1px solid #333333;
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 14px;
-    margin-bottom: 15px;
-    transition: border-color 0.2s;
-}
-
-.auth-input:focus {
-    outline: none;
-    border-color: #007bff;
-}
-
-.auth-input::placeholder {
-    color: #666666;
-}
-
-.auth-btn {
-    width: 100%;
-    padding: 12px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 10px;
-}
-
-.auth-btn:hover {
-    background: #0056b3;
-}
-
-.auth-btn:disabled {
-    background: #333333;
-    cursor: not-allowed;
-}
-
-.error-message {
-    color: #ff4444;
-    font-size: 14px;
-    margin-top: 10px;
-    padding: 8px;
-    background: rgba(255, 68, 68, 0.1);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 68, 68, 0.3);
-}
-
-.message {
-    font-size: 14px;
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid;
-}
-
-.message.success {
-    color: #44ff44;
-    background: rgba(68, 255, 68, 0.1);
-    border-color: rgba(68, 255, 68, 0.3);
-}
-
-.message.error {
-    color: #ff4444;
-    background: rgba(255, 68, 68, 0.1);
-    border-color: rgba(255, 68, 68, 0.3);
-}
-
-/* Settings Modal */
+/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -1109,6 +1152,70 @@ body {
     font-weight: 600;
     margin-bottom: 15px;
     color: #ffffff;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #222222;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.auth-input::placeholder {
+    color: #666666;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.auth-btn:hover {
+    background: #0056b3;
+}
+
+.auth-btn:disabled {
+    background: #333333;
+    cursor: not-allowed;
+}
+
+.message {
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid;
+}
+
+.message.success {
+    color: #44ff44;
+    background: rgba(68, 255, 68, 0.1);
+    border-color: rgba(68, 255, 68, 0.3);
+}
+
+.message.error {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+    border-color: rgba(255, 68, 68, 0.3);
 } 
 
 /* Migration notification styles */

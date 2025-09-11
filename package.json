@@ -12,7 +12,9 @@
     "build-mac-arm64": "electron-builder --mac --arm64",
     "build-win": "electron-builder --win",
     "build-linux": "electron-builder --linux",
-    "server": "node server.js"
+    "server": "node server.js",
+    "migrate": "node migrate-data.js && echo 'Migration file created. Run: npm run server'",
+    "dev-server": "node server.js"
   },
   "keywords": [
     "notepad",
@@ -48,7 +50,7 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns",
+      "icon": "blue-icon.png",
       "target": [
         {
           "target": "dmg",
@@ -60,6 +62,7 @@
         }
       ]
     },
+    "asar": false,
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico"

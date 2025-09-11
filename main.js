@@ -68,14 +68,6 @@ function setupIpcHandlers() {
         return writeDataFile(CHARACTERS_FILE, characters);
     });
 
-    ipcMain.handle('load-auth', () => {
-        return readDataFile(AUTH_FILE, {});
-    });
-
-    ipcMain.handle('save-auth', (event, auth) => {
-        return writeDataFile(AUTH_FILE, auth);
-    });
-
     ipcMain.handle('migrate-localStorage', (event, data) => {
         // Migrate data from localStorage to file system
         let migrated = false;
@@ -87,11 +79,6 @@ function setupIpcHandlers() {
         
         if (data.characters && Object.keys(data.characters).length > 0) {
             writeDataFile(CHARACTERS_FILE, data.characters);
-            migrated = true;
-        }
-        
-        if (data.auth && Object.keys(data.auth).length > 0) {
-            writeDataFile(AUTH_FILE, data.auth);
             migrated = true;
         }
         
@@ -133,6 +120,7 @@ function findAvailablePort(startPort = 3001) {
 }
 
 function createWindow() {
+    console.log('Creating window...');
     // Create the browser window
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -151,11 +139,13 @@ function createWindow() {
         show: false // Don't show until ready
     });
 
+    console.log('Window created, loading URL...');
     // Load the app
     mainWindow.loadURL(`http://localhost:${SERVER_PORT}`);
 
     // Show window when ready to prevent visual flash
     mainWindow.once('ready-to-show', () => {
+        console.log('Window is ready to show, displaying...');
         mainWindow.show();
         
         // Focus on window
@@ -166,6 +156,7 @@ function createWindow() {
 
     // Handle window closed
     mainWindow.on('closed', () => {
+        console.log('Window closed event fired');
         mainWindow = null;
     });
 
@@ -363,20 +354,27 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
+    console.log('All windows closed');
     // On macOS, keep app running even when all windows are closed
     if (process.platform !== 'darwin') {
+        console.log('Not on macOS, quitting app');
         app.quit();
+    } else {
+        console.log('On macOS, keeping app running');
     }
 });
 
 app.on('activate', () => {
+    console.log('App activated');
     // On macOS, re-create window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
+        console.log('No windows, creating new one');
         createWindow();
     }
 });
 
 app.on('before-quit', () => {
+    console.log('App is about to quit');
     // Close the server when quitting
     if (server) {
         console.log('Closing server...');

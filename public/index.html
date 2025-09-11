@@ -10,46 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="login-screen">
-        <div class="login-container">
-            <h1>🔒 Image Sequence Notepad</h1>
-            <div id="setup-password" class="auth-form">
-                <h2>Set Your Password</h2>
-                <p>Create a password to secure your notes</p>
-                <input type="password" id="setup-password-input" placeholder="Enter a new password" class="auth-input">
-                <input type="password" id="setup-password-confirm" placeholder="Confirm password" class="auth-input">
-                <button id="setup-password-btn" class="auth-btn">Set Password</button>
-            </div>
-            <div id="enter-password" class="auth-form" style="display: none;">
-                <h2>Enter Password</h2>
-                <p>Enter your password to access your notes</p>
-                <input type="password" id="login-password-input" placeholder="Enter your password" class="auth-input">
-                <button id="login-btn" class="auth-btn">Login</button>
-                <div id="login-error" class="error-message" style="display: none;">Incorrect password</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚙️ Settings</h2>
-                <button id="close-settings" class="close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <h3>Change Password</h3>
-                <input type="password" id="current-password" placeholder="Current password" class="auth-input">
-                <input type="password" id="new-password" placeholder="New password" class="auth-input">
-                <input type="password" id="confirm-new-password" placeholder="Confirm new password" class="auth-input">
-                <button id="change-password-btn" class="auth-btn">Change Password</button>
-                <div id="password-change-message" class="message" style="display: none;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-container" id="app-container" style="display: none;">
+    <div class="app-container" id="app-container">
         <!-- Character Bar -->
         <div class="character-bar">
             <div class="character-bar-content">
@@ -78,11 +39,11 @@
 
         <div class="app-main">
             <!-- Sidebar -->
-            <div class="sidebar">
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
             <div class="sidebar-header">
                 <h1>📝 Notes</h1>
                 <div class="header-buttons">
-                    <button id="settings-btn" class="btn-settings">⚙️</button>
                     <button id="new-note-btn" class="btn-new-note">+ New Note</button>
                 </div>
             </div>
@@ -110,15 +71,12 @@
                             <p>Drag and drop images, then paste or type your prompts below</p>
                         </div>
                         
-                        <div class="images-container" id="images-container">
-                            <!-- Images will appear here -->
-                        </div>
-                        
-                        <textarea 
+                        <div 
                             id="note-text" 
-                            placeholder="Paste or type your prompts and notes here..."
-                            class="note-textarea"
-                        ></textarea>
+                            contenteditable="true"
+                            class="note-editor-content"
+                            data-placeholder="Paste or type your prompts and notes here..."
+                        ></div>
                     </div>
                 </div>
             </div>
