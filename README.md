@@ -1,165 +1,155 @@
-# Character Notepad
+# Bitcoin Drive
 
-A character-focused desktop application for organizing notes and images by character with automatic saving and a beautiful dark interface. Perfect for writers, game developers, storytellers, and creative professionals who need to organize content by character or persona.
+Decentralized file storage platform built on the Bitcoin SV blockchain with NFT tokenization capabilities.
 
 ## Features
 
-👥 **Character-Based Organization**
-- **Character tabs** across the top for easy switching between characters
-- **Character creation** with custom names and emojis
-- **Character-specific notes** - each note belongs to a specific character
-- **"All Characters" view** to see notes from all characters at once
-- **Character deletion** with confirmation (removes character and all their notes)
-
-✨ **Simple & Clean Interface**
-- Beautiful dark theme with black background and white text
-- Character-aware sidebar that updates based on selected character
-- Clean, distraction-free design with horizontal character bar
-- Custom app icon
-
-🔐 **Security & Privacy**
-- **Password protection** - set your password within the app
-- Secure local authentication with 24-hour sessions
-- In-app password management and settings
-- All data stored locally on your device
-
-🖼️ **Image Management**
-- Drag and drop images directly into notes
-- Paste images from clipboard (Ctrl/Cmd + V)
-- **Mixed content paste** - copy/paste images and text together from websites, documents, or other apps
-- High-quality image storage locally
-- Visual preview with easy removal
-
-📝 **Smart Note Taking**
-- **Auto-generated titles** from your note content (no manual titling!)
-- **Automatic saving** - no save button needed
-- Real-time auto-save as you type
-- Large, comfortable textarea for writing
-
-📋 **Advanced Paste Features**
-- **Rich content paste** - copy from any app (websites, documents, etc.) and paste both images and text at once
-- Smart text extraction from HTML content
-- Automatic note creation when pasting without an active note
-- Visual notifications for successful paste operations
-- Seamless integration with existing text
-
-⚡ **Instant Features**
-- Creates new notes instantly
-- Fast search and navigation
-- Keyboard shortcuts (Cmd/Ctrl + N for new note)
-- Settings panel with gear icon (⚙️)
-- Local storage - all data stays on your device
+- 🔐 **Secure Storage**: Files stored on BSV blockchain with AES-256 encryption
+- 💎 **NFT Tokenization**: Convert any file into a tradeable NFT
+- 💰 **Multiple Storage Methods**: Choose between Quick Save, Full Storage, Smart Storage, or NFT Mode
+- 🤝 **HandCash Integration**: Simple authentication and payments via HandCash
+- 📊 **BAPS Compatible**: Part of the Bitcoin Application Protocol Schema ecosystem
+- 🎨 **Modern UI**: Clean, responsive interface with green Bitcoin theme
 
 ## Quick Start
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+### Prerequisites
+- Node.js v14 or higher
+- npm or yarn
+- HandCash account (optional, demo mode available)
 
-2. **Run the application:**
-   ```bash
-   npm start
-   ```
+### Installation
 
-3. **Set up your first character:**
-   - On first launch, you'll be prompted to set a password
-   - Click "+ Add Character" to create your first character
-   - Enter a name and optional emoji
-   - The character tab will appear at the top
-
-4. **Start creating notes:**
-   - Select a character from the character bar
-   - Click "New Note" or press Cmd/Ctrl + N  
-   - Drag images into the drop zone
-   - Start typing your notes
-   - Everything saves automatically!
-
-## How It Works
-
-### Character Management
-- **Character Tabs**: Horizontal bar at the top shows all characters with their emojis
-- **Active Character**: Selected character is highlighted in blue
-- **Character Context**: Sidebar header shows the current character's name and emoji
-- **Note Assignment**: New notes are automatically assigned to the currently selected character
-- **Character Switching**: Click any character tab to filter notes for that character
-- **All Characters View**: Click "👥 All Characters" to see notes from all characters
-
-### Auto-Generated Titles
-- Note titles are automatically created from the first few words of your content
-- No need to think of titles - just start writing
-- Titles update automatically as you edit
-
-### Enhanced Copy/Paste
-- **Mixed Content**: Copy content from any app (Safari, Chrome, Word, etc.) that contains both images and text
-- **Smart Handling**: Images are automatically added to the note, text goes to the textarea
-- **Auto-Creation**: If no note is open, a new note is created automatically
-- **Text Integration**: New text is appended to existing content with proper spacing
-- **Visual Feedback**: Notifications show what was pasted successfully
-
-**Example Use Cases:**
-- Copy a blog post with images from a website
-- Copy research content from documents
-- Copy product listings with photos
-- Copy social media posts with images
-
-### Auto-Save
-- Every change is saved automatically after 300ms of inactivity
-- No save buttons or manual saving required
-- Never lose your work
-
-### Dark Theme
-- Optimized for comfortable viewing
-- Black background with white text
-- Modern, clean design
-
-## Building Executables
-
-### For macOS Apple Silicon (ARM64):
 ```bash
-npm run build-mac-arm64
+# Clone the repository
+git clone https://github.com/b0ase/bitcoin-drive.git
+cd bitcoin-drive
+
+# Install dependencies
+npm install
+
+# Create .env file (optional for HandCash integration)
+cp .env.example .env
+# Edit .env with your HandCash credentials
 ```
 
-### For other platforms:
+### Running the Application
+
 ```bash
-npm run build-mac      # macOS (all architectures)
-npm run build-win      # Windows
-npm run build-linux    # Linux
+# Start the backend server (port 4003)
+npm start
+
+# In another terminal, start the frontend (port 3003)
+npm run client
+
+# Open in browser
+open http://localhost:3003/drive.html
 ```
 
-Built files will be in the `dist/` directory.
+## Usage
 
-## File Structure
+1. **Connect HandCash**: Click "Connect HandCash" and choose demo mode or real authentication
+2. **Upload Files**: Drag and drop files or click the upload button
+3. **Choose Storage Method**:
+   - Quick Save: Metadata only (cheapest)
+   - Full Storage: Complete file on-chain (most secure)
+   - Smart Storage: Balanced cost/security
+   - NFT Mode: Create tradeable NFT
+4. **Manage Files**: View, download, share, or tokenize your files
+5. **Create NFTs**: Convert any file into an NFT with customizable royalties
+
+## Architecture
 
 ```
-image-sequence-notepad/
-├── main.js           # Electron main process
-├── server.js         # Local server for static files
-├── public/           # Frontend files
-│   ├── index.html    # Main interface
-│   ├── style.css     # Dark theme styles
-│   └── script.js     # App logic
-├── dist/             # Built executables
-└── package.json      # Project configuration
+bitcoin-drive/
+├── backend-server.js     # Express API server
+├── public/
+│   ├── drive.html       # Main application
+│   ├── drive-app.js     # Frontend JavaScript
+│   └── drive-styles.css # Styling
+├── PRD.md              # Product Requirements Document
+├── EPIC.md             # Development roadmap
+└── nft_drive_spec.md   # NFT file format specification
 ```
 
-## Storage
+## Storage Methods
 
-- All notes and images are stored locally using localStorage
-- No cloud sync or external dependencies
-- Your data stays private on your device
-- Images stored at full quality as base64
+| Method | Description | Use Case | Cost |
+|--------|-------------|----------|------|
+| OP_RETURN | Metadata only (80 bytes) | Large files with external storage | ~$0.01 |
+| OP_PUSHDATA4 | Full file on-chain | Critical documents | ~$0.001/KB |
+| Multisig P2SH | Script-based storage | Balanced approach | ~$0.0005/KB |
+| NFT Mode | Tokenized storage | Monetizable content | ~$1.00 |
 
-## Keyboard Shortcuts
+## API Endpoints
 
-- `Cmd/Ctrl + N` - Create new note
-- `Cmd/Ctrl + V` - Paste image from clipboard (when focused in app)
+- `GET /api/health` - Health check
+- `GET /api/handcash-profile` - Get user profile
+- `POST /api/files/upload` - Upload file
+- `GET /api/files` - List user files
+- `GET /api/files/:id/download` - Download file
+- `DELETE /api/files/:id` - Delete file
+- `POST /api/files/:id/tokenize` - Create NFT from file
+- `GET /api/storage-methods` - Get available storage methods
 
-## Requirements
+## BAPS Integration
 
-- Node.js 16+ for development
-- No additional requirements for built executables
+Bitcoin Drive is part of the Bitcoin Application Protocol Schema (BAPS) ecosystem:
+
+- Shared authentication via HandCash
+- Compatible `.nft` file format
+- Cross-app token compatibility
+- Unified marketplace for digital assets
+
+## Development
+
+```bash
+# Run in development mode with auto-reload
+npm run dev
+
+# Run tests (when available)
+npm test
+
+# Build for production (when configured)
+npm run build
+```
+
+## Security
+
+- Client-side encryption before upload
+- User-specific encryption keys derived from HandCash profile
+- Secure token storage in localStorage
+- HTTPS enforcement in production
+- Input sanitization and validation
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License - feel free to use and modify! 
+MIT License - see LICENSE file for details
+
+## Acknowledgments
+
+- Built on Bitcoin SV
+- Powered by HandCash Connect
+- Part of the BAPS ecosystem
+- Inspired by Bitcoin Spreadsheet and Bitcoin Writer
+
+## Contact
+
+- Twitter: [@BitcoinDrive](https://x.com/BitcoinDrive)
+- GitHub: [b0ase/bitcoin-drive](https://github.com/b0ase/bitcoin-drive)
+
+## Roadmap
+
+See [EPIC.md](EPIC.md) for detailed development roadmap and upcoming features.
+
+---
+
+**Bitcoin Drive** - Your files, your ownership, forever on the blockchain.

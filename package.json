@@ -1,75 +1,37 @@
 {
-  "name": "character-notepad",
+  "name": "bitcoin-drive",
   "version": "1.0.0",
-  "description": "A character-focused desktop app for organizing notes and images by character with auto-save",
-  "main": "main.js",
-  "homepage": "./",
+  "description": "Decentralized file storage platform on BSV blockchain with NFT tokenization",
+  "main": "backend-server.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "electron-builder",
-    "build-mac": "electron-builder --mac",
-    "build-mac-arm64": "electron-builder --mac --arm64",
-    "build-win": "electron-builder --win",
-    "build-linux": "electron-builder --linux",
-    "server": "node server.js",
-    "migrate": "node migrate-data.js && echo 'Migration file created. Run: npm run server'",
-    "dev-server": "node server.js"
+    "start": "node backend-server.js",
+    "dev": "nodemon backend-server.js",
+    "client": "npx http-server public -p 3003"
   },
   "keywords": [
-    "notepad",
-    "images",
-    "prompts",
-    "auto-save",
-    "electron",
-    "desktop",
-    "dark-theme"
+    "bitcoin",
+    "bsv",
+    "blockchain",
+    "storage",
+    "nft",
+    "decentralized",
+    "handcash",
+    "baps"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "@handcash/handcash-connect": "^0.8.11",
+    "body-parser": "^2.2.0",
+    "bsv": "^2.0.10",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
-    "electron": "^28.3.3",
-    "electron-builder": "^24.13.3",
     "nodemon": "^3.0.2"
   },
-  "build": {
-    "appId": "com.imagesequence.notepad",
-    "productName": "Character Notepad",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "main.js",
-      "public/**/*",
-      "node_modules/**/*",
-      "package.json",
-      "assets/**/*"
-    ],
-    "mac": {
-      "category": "public.app-category.productivity",
-      "icon": "blue-icon.png",
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["arm64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["arm64"]
-        }
-      ]
-    },
-    "asar": false,
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "assets/icon.png"
-    }
-  }
+  "type": "commonjs"
 }

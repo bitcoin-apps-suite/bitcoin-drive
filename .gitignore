@@ -34,16 +34,7 @@ dist/
 build/
 out/
 
-# Electron specific
-*.app
-*.dmg
-*.exe
-*.deb
-*.rpm
-*.AppImage
-
 # Application data
-data.json
 uploads/
 *.sqlite
 *.db
@@ -90,8 +81,3 @@ Thumbs.db
 config.local.js
 config.local.json
 
-# Exported data (contains sensitive content)
-Volumes/
-exported-data.json
-export-localStorage.html
-extract-old-data.js 
