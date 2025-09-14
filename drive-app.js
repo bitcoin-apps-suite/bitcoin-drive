@@ -544,14 +544,37 @@ class BitcoinDrive {
         try {
             if (!this.authToken) return;
             
-            // This would normally fetch from HandCash API
-            // For now, show a placeholder
             document.getElementById('userBalance').textContent = 'Loading...';
             
-            // Simulate balance check
-            setTimeout(() => {
-                document.getElementById('userBalance').textContent = '$2.50 BSV';
-            }, 1000);
+            // Fetch REAL balance from HandCash
+            const response = await fetch(`${this.apiUrl}/handcash-balance`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`
+                }
+            });
+            
+            if (response.ok) {
+                const balance = await response.json();
+                
+                // Store balance for later checks
+                this.userBalance = balance;
+                
+                // Display balance
+                const balanceEl = document.getElementById('userBalance');
+                if (balance.error) {
+                    balanceEl.textContent = '0 BSV (Not connected)';
+                    balanceEl.style.color = '#ff4444';
+                } else if (balance.satoshis < 10000) {
+                    // Less than minimum required
+                    balanceEl.textContent = `${balance.formatted.bsv} (Insufficient)`;
+                    balanceEl.style.color = '#ff9900';
+                } else {
+                    balanceEl.textContent = `${balance.formatted.bsv} (${balance.formatted.usd})`;
+                    balanceEl.style.color = '#00d632';
+                }
+            } else {
+                document.getElementById('userBalance').textContent = 'Balance unavailable';
+            }
         } catch (error) {
             console.error('Failed to load balance:', error);
             document.getElementById('userBalance').textContent = 'Error loading balance';
@@ -615,6 +638,38 @@ class BitcoinDrive {
 
     async uploadFiles() {
         if (this.selectedFiles.length === 0) return;
+        
+        // Check balance first
+        if (this.userBalance && this.userBalance.satoshis !== undefined) {
+            // Calculate required satoshis (rough estimate)
+            let totalSize = 0;
+            this.selectedFiles.forEach(file => totalSize += file.size);
+            const requiredSatoshis = Math.ceil(totalSize * 0.5); // 0.5 sats per byte
+            
+            if (this.userBalance.satoshis < requiredSatoshis) {
+                const requiredBSV = (requiredSatoshis / 100000000).toFixed(8);
+                const currentBSV = (this.userBalance.satoshis / 100000000).toFixed(8);
+                
+                this.showToast(
+                    `❌ Insufficient balance! You have ${currentBSV} BSV but need ${requiredBSV} BSV. ` +
+                    `Please top up your HandCash wallet or files will be stored locally.`,
+                    'error'
+                );
+                
+                // Ask user if they want to continue with local storage
+                const continueLocal = confirm(
+                    `Insufficient BSV balance!\n\n` +
+                    `Required: ${requiredBSV} BSV\n` +
+                    `Your balance: ${currentBSV} BSV\n\n` +
+                    `Do you want to continue with LOCAL storage instead?\n` +
+                    `(Files will be saved locally, not on blockchain)`
+                );
+                
+                if (!continueLocal) {
+                    return; // Cancel upload
+                }
+            }
+        }
         
         // Collect all upload options
         const options = {

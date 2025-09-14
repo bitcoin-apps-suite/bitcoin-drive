@@ -67,6 +67,56 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Get real HandCash balance
+app.get('/api/handcash-balance', async (req, res) => {
+  try {
+    const authToken = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!authToken) {
+      return res.status(401).json({ error: 'No auth token provided' });
+    }
+
+    const account = handCashConnect.getAccountFromAuthToken(authToken);
+    
+    // Get real balance from HandCash
+    const balance = await account.wallet.getSpendableBalance();
+    
+    // Get current BSV price (approximate)
+    const BSV_PRICE_USD = 50;
+    
+    // Calculate USD value
+    const bsvAmount = balance.spendableSatoshis / 100000000;
+    const usdValue = bsvAmount * BSV_PRICE_USD;
+    
+    res.json({
+      satoshis: balance.spendableSatoshis,
+      bsv: bsvAmount,
+      usd: usdValue,
+      formatted: {
+        satoshis: balance.spendableSatoshis.toLocaleString(),
+        bsv: `${bsvAmount.toFixed(8)} BSV`,
+        usd: `$${usdValue.toFixed(2)} USD`
+      }
+    });
+
+  } catch (error) {
+    console.error('Balance fetch error:', error);
+    
+    // If balance fetch fails, return zero balance
+    res.json({
+      satoshis: 0,
+      bsv: 0,
+      usd: 0,
+      formatted: {
+        satoshis: '0',
+        bsv: '0 BSV',
+        usd: '$0.00 USD'
+      },
+      error: 'Unable to fetch balance. Check HandCash connection.'
+    });
+  }
+});
+
 // HandCash OAuth callback route
 app.get('/auth/handcash/callback', async (req, res) => {
   try {
