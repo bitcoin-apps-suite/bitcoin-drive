@@ -1,52 +1,22 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api"
     },
     {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "source": "/",
+      "destination": "/public/bitcoin-drive-landing.html"
+    },
+    {
+      "source": "/drive",
+      "destination": "/public/drive.html"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/drive.html",
-      "dest": "/public/drive.html"
-    },
-    {
-      "src": "/bitcoin-drive-landing.html",
-      "dest": "/public/bitcoin-drive-landing.html"
-    },
-    {
-      "src": "/drive-app.js",
-      "dest": "/public/drive-app.js"
-    },
-    {
-      "src": "/drive-styles.css",
-      "dest": "/public/drive-styles.css"
-    },
-    {
-      "src": "/",
-      "dest": "/public/bitcoin-drive-landing.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "functions": {
     "api/index.js": {
-      "maxDuration": 30,
-      "includeFiles": "uploads/**"
+      "maxDuration": 30
     }
   }
 }
