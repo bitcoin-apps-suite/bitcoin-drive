@@ -9,6 +9,10 @@
   },
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/drive.html"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api"
     }
