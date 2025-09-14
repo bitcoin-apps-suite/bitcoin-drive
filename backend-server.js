@@ -33,8 +33,30 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const filesDb = new Map();
-const usersDb = new Map();
+// Use JSON file for persistence
+const dbPath = path.join(__dirname, 'uploads-db.json');
+let dbData = { files: {}, users: {} };
+
+// Load existing data
+if (fs.existsSync(dbPath)) {
+  try {
+    dbData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+  } catch (e) {
+    console.log('Creating new database...');
+  }
+}
+
+const filesDb = new Map(Object.entries(dbData.files));
+const usersDb = new Map(Object.entries(dbData.users));
+
+// Save database to file
+function saveDb() {
+  const data = {
+    files: Object.fromEntries(filesDb),
+    users: Object.fromEntries(usersDb)
+  };
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+}
 
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -142,6 +164,8 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
       usersDb.set(userHandle, []);
     }
     usersDb.get(userHandle).push(fileData);
+    
+    saveDb(); // Save to file
 
     res.json({
       success: true,
@@ -227,6 +251,8 @@ app.delete('/api/files/:fileId', async (req, res) => {
     const userFiles = usersDb.get(userHandle) || [];
     const updatedFiles = userFiles.filter(f => f.id !== fileId);
     usersDb.set(userHandle, updatedFiles);
+    
+    saveDb(); // Save to file
 
     const filePath = path.join(uploadDir, fileId);
     if (fs.existsSync(filePath)) {
@@ -279,6 +305,8 @@ app.post('/api/files/:fileId/tokenize', async (req, res) => {
 
     fileData.nft = nftData;
     filesDb.set(fileId, fileData);
+    
+    saveDb(); // Save to file
 
     res.json({
       success: true,
@@ -404,6 +432,8 @@ app.post('/api/bsv/upload', async (req, res) => {
       usersDb.set(userHandle, []);
     }
     usersDb.get(userHandle).push(fileRecord);
+    
+    saveDb(); // Save to file
 
     console.log(`✅ REAL BSV Upload complete! TX: ${uploadResult.txId}`);
 

@@ -36,6 +36,7 @@ out/
 
 # Application data
 uploads/
+uploads-db.json
 *.sqlite
 *.db
 
