@@ -234,7 +234,22 @@ class BitcoinDrive {
         document.getElementById('confirmUpload').addEventListener('click', () => this.uploadFiles());
         document.getElementById('cancelUpload').addEventListener('click', () => this.hideUploadModal());
         document.getElementById('closeUploadModal').addEventListener('click', () => this.hideUploadModal());
-        document.getElementById('searchInput').addEventListener('input', (e) => this.searchFiles(e.target.value));
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            this.searchFiles(e.target.value);
+            // Sync with mobile search
+            const mobileSearch = document.getElementById('mobileSearchInput');
+            if (mobileSearch) mobileSearch.value = e.target.value;
+        });
+
+        // Mobile search functionality
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                this.searchFiles(e.target.value);
+                // Sync with desktop search
+                document.getElementById('searchInput').value = e.target.value;
+            });
+        }
         
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {

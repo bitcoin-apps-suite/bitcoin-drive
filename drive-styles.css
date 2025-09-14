@@ -486,6 +486,32 @@ body {
     background: var(--bg-dark);
 }
 
+/* Hide mobile search by default */
+.mobile-search {
+    display: none;
+    position: relative;
+}
+
+.mobile-search input {
+    width: 100%;
+    padding: 4px 8px 4px 28px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+.mobile-search::before {
+    content: "🔍";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: 0.5;
+}
+
 .content-header {
     display: flex;
     justify-content: space-between;
@@ -1007,29 +1033,44 @@ body {
 @media (max-width: 768px) {
     .header {
         padding: 8px;
-        flex-direction: column;
+        flex-direction: row;
         gap: 8px;
-        height: auto;
+        height: 44px;
     }
 
     .header-left {
-        width: 100%;
+        flex: 1;
     }
 
     .header-center {
-        width: 100%;
-        margin: 0;
+        display: none; /* Hide search in header on mobile */
     }
 
     .header-right {
-        width: 100%;
-        justify-content: center;
+        flex: 0 0 auto;
+    }
+
+    /* Make logo smaller on mobile */
+    .logo span {
+        display: inline; /* Keep the text visible */
+        font-size: 14px;
+    }
+
+    .logo-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .btn-connect {
+        padding: 4px 8px;
+        font-size: 12px;
     }
 
     /* Main container */
     .main-container {
         flex-direction: column;
-        padding-top: 100px;
+        padding-top: 76px; /* 32px taskbar + 44px header */
     }
 
     /* Sidebar - make it overlay on mobile */
@@ -1087,14 +1128,36 @@ body {
 
     /* Content header */
     .content-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .content-header h1 {
+        font-size: 16px;
+        flex: 0 0 auto;
+    }
+
+    /* Mobile search bar in content area */
+    .mobile-search {
+        display: block;
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .mobile-search input {
+        width: 100%;
+        padding: 4px 8px 4px 28px;
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-size: 12px;
     }
 
     .view-toggles {
-        width: 100%;
-        justify-content: flex-start;
+        flex: 0 0 auto;
     }
 
     /* Toast notifications */
