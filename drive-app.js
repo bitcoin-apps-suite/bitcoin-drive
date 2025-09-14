@@ -180,6 +180,25 @@ class BitcoinDrive {
         document.getElementById('connectBtn').addEventListener('click', () => this.connectHandCash());
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('uploadBtn').addEventListener('click', () => this.showUploadModal());
+        
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('mobileSidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            });
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
         document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
         document.getElementById('confirmUpload').addEventListener('click', () => this.uploadFiles());
         document.getElementById('cancelUpload').addEventListener('click', () => this.hideUploadModal());

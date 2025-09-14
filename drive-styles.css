@@ -810,6 +810,318 @@ body {
     padding: 24px;
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Taskbar adjustments */
+    .bitcoin-taskbar {
+        padding: 8px;
+        height: auto;
+        min-height: 50px;
+    }
+
+    .taskbar-left {
+        gap: 8px;
+    }
+
+    .taskbar-center {
+        display: none; /* Hide clock on mobile */
+    }
+
+    .taskbar-right button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Hide developer menu on mobile */
+    .developer-menu-container {
+        display: none;
+    }
+
+    /* Header adjustments */
+    .header {
+        padding: 12px;
+        flex-direction: column;
+        gap: 12px;
+        height: auto;
+    }
+
+    .header-left {
+        width: 100%;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .search-container {
+        width: 100%;
+        margin: 0;
+    }
+
+    .search-container input {
+        width: 100%;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Main container */
+    .main-container {
+        flex-direction: column;
+        padding-top: 120px; /* Account for wrapped header */
+    }
+
+    /* Sidebar - make it overlay on mobile */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 50px;
+        height: calc(100vh - 50px);
+        z-index: 1000;
+        transition: left 0.3s;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        background: var(--bg-dark);
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Main content full width on mobile */
+    .content {
+        margin-left: 0;
+        padding: 16px;
+        width: 100%;
+    }
+
+    /* File grid adjustments */
+    .files-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .file-card {
+        padding: 12px;
+    }
+
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .file-name {
+        font-size: 12px;
+    }
+
+    /* Modal adjustments */
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 20px;
+        max-height: 90vh;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    /* Upload modal specific */
+    .upload-area {
+        padding: 24px;
+        min-height: 150px;
+    }
+
+    .selected-files {
+        max-height: 200px;
+    }
+
+    /* Documentation modal */
+    .docs-modal {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .upload-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .btn-connect {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+
+    /* View toggles - stack vertically */
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .view-toggles {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* Toast notifications */
+    .toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    /* Storage info */
+    .storage-info {
+        padding: 12px;
+    }
+
+    .storage-text {
+        font-size: 11px;
+    }
+}
+
+/* Mobile sidebar toggle button */
+.mobile-sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 16px;
+    z-index: 999;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
+
+.mobile-sidebar-toggle:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .mobile-sidebar-toggle {
+        display: block;
+    }
+}
+
+/* Overlay for mobile sidebar */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    /* Even smaller grid for phones */
+    .files-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .file-card {
+        padding: 8px;
+    }
+
+    .file-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .file-name {
+        font-size: 11px;
+    }
+
+    .file-size {
+        font-size: 10px;
+    }
+
+    /* Taskbar menus */
+    .bitcoin-menu,
+    .drive-menu {
+        width: calc(100vw - 20px);
+        max-width: none;
+        left: 10px !important;
+        right: 10px;
+    }
+
+    /* Bitcoin logo button smaller */
+    .bitcoin-logo-button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .bitcoin-logo {
+        font-size: 18px;
+    }
+
+    /* Search bar */
+    .search-container input {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    /* User section */
+    .user-handle {
+        font-size: 13px;
+    }
+
+    .btn-logout {
+        padding: 4px 12px;
+        font-size: 12px;
+    }
+
+    /* Upload button */
+    .upload-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 900;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .upload-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Hide upload button text, show only icon */
+    .upload-btn span {
+        display: none;
+    }
+}
+
 .upload-preview {
     margin-bottom: 24px;
 }
