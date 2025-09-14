@@ -137,14 +137,8 @@ class BitcoinDrive {
             item.addEventListener('click', () => {
                 const action = item.dataset.action;
                 switch(action) {
-                    case 'baps-docs':
-                        document.getElementById('docsModal').style.display = 'flex';
-                        toggleMenu('developerMenu');
-                        // Scroll to BAPS section
-                        setTimeout(() => {
-                            const bapsSection = document.querySelector('#docsModal h3:nth-of-type(3)');
-                            if (bapsSection) bapsSection.scrollIntoView({ behavior: 'smooth' });
-                        }, 100);
+                    case 'bap-docs':
+                        window.location.href = '/bap';
                         break;
                     case 'nft-spec':
                         document.getElementById('docsModal').style.display = 'flex';
