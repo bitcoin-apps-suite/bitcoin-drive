@@ -308,17 +308,28 @@ class BitcoinDrive {
     }
 
     async connectHandCash() {
-        // Direct connection to HandCash - no demo mode
-        const appId = '68c697fb5287127557e47739';
-        const redirectUrl = window.location.origin + '/auth/handcash/callback';
-        const authUrl = `https://app.handcash.io/#/authorizeApp?appId=${appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
-        
-        this.showToast('Redirecting to HandCash...', 'success');
-        
-        // Small delay to show the toast
-        setTimeout(() => {
-            window.location.href = authUrl;
-        }, 500);
+        try {
+            // Get configuration from backend
+            const response = await fetch(`${this.apiUrl}/auth/config`);
+            const config = await response.json();
+            
+            if (!config.appId) {
+                throw new Error('HandCash App ID not configured');
+            }
+            
+            const redirectUrl = window.location.origin + '/auth/handcash/callback';
+            const authUrl = `https://app.handcash.io/#/authorizeApp?appId=${config.appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+            
+            this.showToast('Redirecting to HandCash...', 'success');
+            
+            // Small delay to show the toast
+            setTimeout(() => {
+                window.location.href = authUrl;
+            }, 500);
+        } catch (error) {
+            console.error('Failed to get auth config:', error);
+            this.showToast('Unable to connect to HandCash. Please try again.', 'error');
+        }
     }
 
     logout() {

@@ -75,6 +75,14 @@ app.get('/auth/handcash/callback', async (req, res) => {
   }
 });
 
+// Get HandCash configuration
+app.get('/api/auth/config', (req, res) => {
+  res.json({
+    appId: process.env.HANDCASH_APP_ID,
+    redirectUrl: process.env.HANDCASH_REDIRECT_URL || `${req.protocol}://${req.get('host')}/auth/handcash/callback`
+  });
+});
+
 app.get('/api/handcash-profile', async (req, res) => {
   try {
     const authToken = req.headers.authorization?.replace('Bearer ', '');
