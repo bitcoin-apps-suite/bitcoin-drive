@@ -3,7 +3,7 @@
   "outputDirectory": ".",
   "framework": null,
   "functions": {
-    "api/index.js": {
+    "api/*.js": {
       "maxDuration": 30
     }
   },
@@ -15,10 +15,6 @@
     {
       "source": "/bap",
       "destination": "/bap.html"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
     }
   ]
 }
