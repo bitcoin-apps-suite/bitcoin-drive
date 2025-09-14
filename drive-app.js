@@ -178,6 +178,7 @@ class BitcoinDrive {
 
     setupEventListeners() {
         document.getElementById('connectBtn').addEventListener('click', () => this.connectHandCash());
+        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('uploadBtn').addEventListener('click', () => this.showUploadModal());
         document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
         document.getElementById('confirmUpload').addEventListener('click', () => this.uploadFiles());
@@ -250,11 +251,30 @@ class BitcoinDrive {
             await this.fetchUserProfile();
             this.showToast('Connected in demo mode', 'success');
         } else {
-            const appId = prompt('Enter your HandCash App ID:') || 'demo-app-id';
-            const redirectUrl = window.location.origin + '/drive.html';
+            // Use the configured HandCash App ID from .env
+            const appId = '68c697fb5287127557e47739';
+            const redirectUrl = window.location.origin + '/auth/handcash/callback';
             const authUrl = `https://app.handcash.io/#/authorizeApp?appId=${appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
             window.location.href = authUrl;
         }
+    }
+
+    logout() {
+        // Clear auth token and user data
+        this.authToken = null;
+        this.currentUser = null;
+        localStorage.removeItem('authToken');
+        
+        // Reset UI
+        document.getElementById('connectBtn').style.display = 'block';
+        document.getElementById('userProfile').style.display = 'none';
+        document.getElementById('userHandle').textContent = '';
+        
+        // Clear files
+        this.files = [];
+        this.renderFiles();
+        
+        this.showToast('Logged out successfully', 'success');
     }
 
     async checkAuth() {
@@ -294,18 +314,19 @@ class BitcoinDrive {
     }
 
     updateUserUI() {
-        const userSection = document.getElementById('userSection');
+        const connectBtn = document.getElementById('connectBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userHandle = document.getElementById('userHandle');
         
         if (this.currentUser) {
-            userSection.innerHTML = `
-                <div class="user-profile">
-                    <div class="user-avatar">${this.currentUser.handle ? this.currentUser.handle[0].toUpperCase() : 'U'}</div>
-                    <div>
-                        <div class="user-handle">$${this.currentUser.handle || 'user'}</div>
-                        <div class="user-balance">Balance: 0.00000000 BSV</div>
-                    </div>
-                </div>
-            `;
+            // Hide connect button, show user profile with logout
+            connectBtn.style.display = 'none';
+            userProfile.style.display = 'flex';
+            userHandle.textContent = `$${this.currentUser.handle || 'user'}`;
+        } else {
+            // Show connect button, hide user profile
+            connectBtn.style.display = 'block';
+            userProfile.style.display = 'none';
         }
     }
 

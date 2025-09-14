@@ -13,6 +13,10 @@
       "destination": "/drive.html"
     },
     {
+      "source": "/bap",
+      "destination": "/bap.html"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api"
     }

@@ -45,6 +45,36 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// HandCash OAuth callback route
+app.get('/auth/handcash/callback', async (req, res) => {
+  try {
+    const { authToken, error } = req.query;
+    
+    if (error) {
+      return res.redirect(`/drive.html?error=${error}`);
+    }
+    
+    if (authToken) {
+      // Validate the token with HandCash
+      try {
+        const account = handCashConnect.getAccountFromAuthToken(authToken);
+        await account.profile.getCurrentProfile(); // Test if token is valid
+        
+        // Redirect to frontend with valid token
+        res.redirect(`/drive.html?authToken=${authToken}`);
+      } catch (validationError) {
+        console.error('Token validation failed:', validationError);
+        res.redirect('/drive.html?error=invalid_token');
+      }
+    } else {
+      res.redirect('/drive.html?error=no_token');
+    }
+  } catch (error) {
+    console.error('HandCash callback error:', error);
+    res.redirect('/drive.html?error=callback_error');
+  }
+});
+
 app.get('/api/handcash-profile', async (req, res) => {
   try {
     const authToken = req.headers.authorization?.replace('Bearer ', '');
