@@ -313,7 +313,12 @@ function calculateStorageCost(method, size) {
   return costs[method] || costs['op_return'];
 }
 
-app.listen(PORT, () => {
-  console.log(`Bitcoin Drive backend server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/api/health`);
-});
+// For Vercel deployment
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`Bitcoin Drive backend server running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
+  });
+}

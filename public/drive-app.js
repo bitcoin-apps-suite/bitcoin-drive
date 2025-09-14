@@ -1,6 +1,9 @@
 class BitcoinDrive {
     constructor() {
-        this.apiUrl = 'http://localhost:4003/api';
+        // Use relative URL for production, localhost for development
+        this.apiUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:4003/api' 
+            : '/api';
         this.authToken = null;
         this.currentUser = null;
         this.files = [];
