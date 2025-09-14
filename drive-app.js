@@ -159,7 +159,13 @@ class BitcoinDrive {
                         window.open('https://github.com/b0ase/bitcoin-drive', '_blank');
                         break;
                     case 'handcash-docs':
-                        window.open('https://docs.handcash.io', '_blank');
+                        window.open('https://docs.handcash.dev', '_blank');
+                        break;
+                    case 'bsv-docs':
+                        window.open('https://wiki.bitcoinsv.io', '_blank');
+                        break;
+                    case 'whatsonchain':
+                        window.open('https://whatsonchain.com', '_blank');
                         break;
                     case 'debug':
                         console.log('Debug info:', {
