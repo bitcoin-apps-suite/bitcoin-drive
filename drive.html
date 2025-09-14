@@ -287,62 +287,199 @@
         <input type="file" id="fileInput" multiple style="display: none;">
 
         <div class="modal" id="uploadModal">
-            <div class="modal-content">
+            <div class="modal-content upload-modal">
                 <div class="modal-header">
-                    <h2>Upload Files</h2>
+                    <h2>Upload to BitcoinSV Blockchain</h2>
                     <button class="modal-close" id="closeUploadModal">&times;</button>
                 </div>
                 <div class="modal-body">
+                    <!-- File Preview -->
                     <div class="upload-preview" id="uploadPreview"></div>
                     
+                    <!-- Storage Method Selection -->
                     <div class="storage-method-section">
-                        <h3>Storage Method</h3>
+                        <h3>Storage Method & Pricing</h3>
+                        <div class="pricing-notice">
+                            <span class="price-icon">💰</span>
+                            <span>Costs are paid directly to BSV miners. bitcoin.drive takes 2% service fee.</span>
+                        </div>
+                        
                         <div class="storage-methods" id="storageMethods">
                             <label class="storage-method">
-                                <input type="radio" name="storageMethod" value="op_return">
-                                <div class="method-card">
-                                    <div class="method-name">Quick Save</div>
-                                    <div class="method-desc">Metadata only (80 bytes)</div>
-                                    <div class="method-cost">~$0.01</div>
-                                </div>
-                            </label>
-                            <label class="storage-method">
-                                <input type="radio" name="storageMethod" value="op_pushdata4" checked>
+                                <input type="radio" name="storageMethod" value="b_protocol" checked>
                                 <div class="method-card recommended">
-                                    <div class="method-name">Full Storage</div>
-                                    <div class="method-desc">Complete file on-chain</div>
-                                    <div class="method-cost" id="fullStorageCost">Calculating...</div>
+                                    <div class="method-header">
+                                        <div class="method-name">B:// Protocol</div>
+                                        <div class="method-badge">Recommended</div>
+                                    </div>
+                                    <div class="method-desc">Complete file stored on-chain permanently</div>
+                                    <div class="method-features">
+                                        <span>✓ Permanent storage</span>
+                                        <span>✓ Global CDN</span>
+                                        <span>✓ Instant access</span>
+                                    </div>
+                                    <div class="method-pricing">
+                                        <div class="storage-cost" id="bProtocolCost">Calculating...</div>
+                                        <div class="service-fee" id="bProtocolFee">+ service fee</div>
+                                    </div>
                                 </div>
                             </label>
+                            
                             <label class="storage-method">
-                                <input type="radio" name="storageMethod" value="multisig_p2sh">
+                                <input type="radio" name="storageMethod" value="bcat_protocol">
                                 <div class="method-card">
-                                    <div class="method-name">Smart Storage</div>
-                                    <div class="method-desc">Script-based storage</div>
-                                    <div class="method-cost" id="smartStorageCost">Calculating...</div>
-                                </div>
-                            </label>
-                            <label class="storage-method">
-                                <input type="radio" name="storageMethod" value="nft">
-                                <div class="method-card">
-                                    <div class="method-name">NFT Mode</div>
-                                    <div class="method-desc">Tokenized storage</div>
-                                    <div class="method-cost" id="nftStorageCost">~$1.00</div>
+                                    <div class="method-header">
+                                        <div class="method-name">BCAT:// Protocol</div>
+                                    </div>
+                                    <div class="method-desc">Large files split into chunks (>90KB)</div>
+                                    <div class="method-features">
+                                        <span>✓ Unlimited size</span>
+                                        <span>✓ Chunked upload</span>
+                                        <span>✓ Efficient storage</span>
+                                    </div>
+                                    <div class="method-pricing">
+                                        <div class="storage-cost" id="bcatCost">Calculating...</div>
+                                        <div class="service-fee" id="bcatFee">+ service fee</div>
+                                    </div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="upload-options">
+                    <!-- NFT & Publishing Options -->
+                    <div class="nft-section">
+                        <h3>NFT Container & Publishing</h3>
+                        
+                        <label class="checkbox-label nft-option">
+                            <input type="checkbox" id="createNFT">
+                            <span>Create .nft container (+$0.05)</span>
+                            <div class="option-desc">Wraps file in standardized NFT metadata format</div>
+                        </label>
+
+                        <div class="nft-options" id="nftOptions" style="display: none;">
+                            <div class="form-group">
+                                <label>NFT Name</label>
+                                <input type="text" id="nftName" placeholder="Enter NFT name">
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="nftDescription" placeholder="Describe your NFT..."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Royalty %</label>
+                                    <input type="number" id="royaltyPercent" value="10" min="0" max="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>Max Supply</label>
+                                    <input type="number" id="maxSupply" value="1" min="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publishing & Access Options -->
+                    <div class="publishing-section">
+                        <h3>Publishing & Access</h3>
+                        
+                        <div class="publishing-options">
+                            <label class="radio-label">
+                                <input type="radio" name="publishType" value="private" checked>
+                                <div class="publish-card">
+                                    <div class="publish-name">🔒 Private</div>
+                                    <div class="publish-desc">Only you can access</div>
+                                </div>
+                            </label>
+                            
+                            <label class="radio-label">
+                                <input type="radio" name="publishType" value="public">
+                                <div class="publish-card">
+                                    <div class="publish-name">🌐 Public</div>
+                                    <div class="publish-desc">Anyone can view and download</div>
+                                </div>
+                            </label>
+                            
+                            <label class="radio-label">
+                                <input type="radio" name="publishType" value="paywall">
+                                <div class="publish-card">
+                                    <div class="publish-name">💵 Paywall</div>
+                                    <div class="publish-desc">Charge for access</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="paywall-options" id="paywallOptions" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Access Price (USD)</label>
+                                    <input type="number" id="accessPrice" step="0.01" min="0.01" placeholder="1.00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Revenue Share</label>
+                                    <div class="revenue-split">
+                                        <span>You: <strong id="yourShare">95%</strong></span>
+                                        <span>bitcoin.drive: <strong>5%</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Options -->
+                    <div class="security-section">
+                        <h3>Security & Privacy</h3>
+                        
                         <label class="checkbox-label">
                             <input type="checkbox" id="encryptFiles" checked>
-                            <span>Encrypt files</span>
+                            <span>🔐 Encrypt files</span>
+                            <div class="option-desc">Files encrypted with your HandCash key</div>
                         </label>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableUpdates">
+                            <span>🔄 Allow updates</span>
+                            <div class="option-desc">Enable file updates via MAP protocol (+$0.02)</div>
+                        </label>
+                    </div>
+
+                    <!-- Total Cost Breakdown -->
+                    <div class="cost-breakdown">
+                        <h3>Cost Breakdown</h3>
+                        <div class="cost-table">
+                            <div class="cost-row">
+                                <span>Storage fee (to miners)</span>
+                                <span id="storageFeeDisplay">Calculating...</span>
+                            </div>
+                            <div class="cost-row" id="nftFeeRow" style="display: none;">
+                                <span>NFT container</span>
+                                <span>$0.05</span>
+                            </div>
+                            <div class="cost-row" id="updatesFeeRow" style="display: none;">
+                                <span>Update capability</span>
+                                <span>$0.02</span>
+                            </div>
+                            <div class="cost-row service-fee-row">
+                                <span>bitcoin.drive service fee (2%)</span>
+                                <span id="serviceFeeDisplay">$0.00</span>
+                            </div>
+                            <div class="cost-row total-row">
+                                <strong>Total Cost</strong>
+                                <strong id="totalCostDisplay">Calculating...</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="balance-check">
+                            <span>Your HandCash Balance: </span>
+                            <span id="userBalance" class="balance-amount">Loading...</span>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
-                        <button class="btn btn-primary" id="confirmUpload">Upload</button>
+                        <button class="btn btn-primary" id="confirmUpload">
+                            <span class="upload-btn-text">Upload to Blockchain</span>
+                            <span class="upload-btn-cost" id="uploadBtnCost"></span>
+                        </button>
                     </div>
                 </div>
             </div>

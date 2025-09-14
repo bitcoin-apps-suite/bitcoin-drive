@@ -1251,3 +1251,310 @@ body {
         font-size: 9px;
     }
 }
+
+/* Enhanced Upload Modal Styles */
+.upload-modal .modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.upload-modal h3 {
+    color: var(--text-primary);
+    margin: 20px 0 12px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Pricing Notice */
+.pricing-notice {
+    background: rgba(0, 214, 50, 0.1);
+    border: 1px solid rgba(0, 214, 50, 0.3);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-icon {
+    font-size: 16px;
+}
+
+.pricing-notice span {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Storage Methods */
+.storage-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.storage-method {
+    display: block;
+    cursor: pointer;
+}
+
+.method-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--bg-surface);
+    transition: all 0.2s;
+}
+
+.method-card:hover, .method-card.recommended {
+    border-color: var(--primary-green);
+    background: rgba(0, 214, 50, 0.05);
+}
+
+.method-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.method-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.method-badge {
+    background: var(--primary-green);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: auto;
+}
+
+.method-desc {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.method-features {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.method-features span {
+    font-size: 11px;
+    color: var(--primary-green);
+}
+
+.method-pricing {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.storage-cost {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.service-fee {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Publishing Options */
+.publishing-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.radio-label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.publish-card {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    background: var(--bg-surface);
+    transition: all 0.2s;
+}
+
+.publish-card:hover {
+    border-color: var(--primary-green);
+    background: rgba(0, 214, 50, 0.05);
+}
+
+.publish-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.publish-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Checkbox and Radio Labels */
+.checkbox-label, .nft-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"],
+.checkbox-label input[type="radio"] {
+    margin-top: 2px;
+}
+
+.option-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 20px;
+    margin-top: 2px;
+}
+
+/* NFT Options */
+.nft-options {
+    background: rgba(0, 214, 50, 0.05);
+    border: 1px solid rgba(0, 214, 50, 0.2);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+/* Paywall Options */
+.paywall-options {
+    background: rgba(255, 165, 0, 0.1);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+.revenue-split {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Cost Breakdown */
+.cost-breakdown {
+    background: var(--bg-dark);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.cost-table {
+    margin-bottom: 16px;
+}
+
+.cost-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+}
+
+.cost-row:not(.total-row) {
+    color: var(--text-secondary);
+}
+
+.total-row {
+    border-top: 1px solid var(--border-color);
+    margin-top: 8px;
+    padding-top: 12px;
+    color: var(--text-primary);
+}
+
+.service-fee-row {
+    color: var(--primary-green);
+}
+
+.balance-check {
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.balance-amount {
+    font-weight: 600;
+    color: var(--primary-green);
+}
+
+/* Upload Button */
+.upload-btn-cost {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-left: 8px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .publishing-options {
+        flex-direction: column;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .upload-modal .modal-content {
+        margin: 10px;
+        max-height: 95vh;
+    }
+}

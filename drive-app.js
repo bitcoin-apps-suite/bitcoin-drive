@@ -469,53 +469,249 @@ class BitcoinDrive {
         });
         
         this.updateStorageCosts(totalSize);
+        this.loadUserBalance();
+        this.setupUploadModalEventListeners();
     }
 
     updateStorageCosts(totalSize) {
-        const fullCost = (totalSize * 0.000001).toFixed(6);
-        const smartCost = (totalSize * 0.0000005).toFixed(6);
-        const nftCost = Math.max(0.001, totalSize * 0.000002).toFixed(6);
+        // BSV pricing: ~0.5 satoshis per byte, assuming $50 BSV
+        const BSV_PRICE_USD = 50;
+        const SATOSHIS_PER_BYTE = 0.5;
+        const SATOSHIS_PER_BSV = 100000000;
         
-        document.getElementById('fullStorageCost').textContent = `~$${fullCost}`;
-        document.getElementById('smartStorageCost').textContent = `~$${smartCost}`;
-        document.getElementById('nftStorageCost').textContent = `~$${nftCost}`;
+        // Calculate base storage cost
+        const baseSatoshis = totalSize * SATOSHIS_PER_BYTE;
+        const baseUSD = (baseSatoshis / SATOSHIS_PER_BSV) * BSV_PRICE_USD;
+        
+        // B:// Protocol (recommended for < 100KB)
+        const bProtocolCost = Math.max(0.001, baseUSD);
+        
+        // BCAT:// Protocol (chunked for large files)
+        const bcatCost = Math.max(0.002, baseUSD * 1.2); // 20% overhead for chunking
+        
+        // Update display
+        document.getElementById('bProtocolCost').textContent = `$${bProtocolCost.toFixed(4)}`;
+        document.getElementById('bcatCost').textContent = `$${bcatCost.toFixed(4)}`;
+        
+        this.calculateTotalCost();
+    }
+
+    calculateTotalCost() {
+        let storageCost = 0;
+        let additionalCosts = 0;
+        
+        // Get selected storage method cost
+        const selectedMethod = document.querySelector('input[name="storageMethod"]:checked')?.value;
+        const bProtocolCost = parseFloat(document.getElementById('bProtocolCost').textContent.replace('$', ''));
+        const bcatCost = parseFloat(document.getElementById('bcatCost').textContent.replace('$', ''));
+        
+        if (selectedMethod === 'b_protocol') {
+            storageCost = bProtocolCost;
+        } else if (selectedMethod === 'bcat_protocol') {
+            storageCost = bcatCost;
+        }
+        
+        // NFT container fee
+        if (document.getElementById('createNFT').checked) {
+            additionalCosts += 0.05;
+        }
+        
+        // Updates capability fee
+        if (document.getElementById('enableUpdates').checked) {
+            additionalCosts += 0.02;
+        }
+        
+        // Service fee (2% of storage cost)
+        const serviceFee = storageCost * 0.02;
+        
+        // Total cost
+        const totalCost = storageCost + additionalCosts + serviceFee;
+        
+        // Update display
+        document.getElementById('storageFeeDisplay').textContent = `$${storageCost.toFixed(4)}`;
+        document.getElementById('serviceFeeDisplay').textContent = `$${serviceFee.toFixed(4)}`;
+        document.getElementById('totalCostDisplay').textContent = `$${totalCost.toFixed(4)}`;
+        document.getElementById('uploadBtnCost').textContent = `($${totalCost.toFixed(3)})`;
+        
+        // Show/hide additional cost rows
+        document.getElementById('nftFeeRow').style.display = 
+            document.getElementById('createNFT').checked ? 'flex' : 'none';
+        document.getElementById('updatesFeeRow').style.display = 
+            document.getElementById('enableUpdates').checked ? 'flex' : 'none';
+    }
+
+    async loadUserBalance() {
+        try {
+            if (!this.authToken) return;
+            
+            // This would normally fetch from HandCash API
+            // For now, show a placeholder
+            document.getElementById('userBalance').textContent = 'Loading...';
+            
+            // Simulate balance check
+            setTimeout(() => {
+                document.getElementById('userBalance').textContent = '$2.50 BSV';
+            }, 1000);
+        } catch (error) {
+            console.error('Failed to load balance:', error);
+            document.getElementById('userBalance').textContent = 'Error loading balance';
+        }
+    }
+
+    setupUploadModalEventListeners() {
+        // NFT checkbox toggle
+        const nftCheckbox = document.getElementById('createNFT');
+        const nftOptions = document.getElementById('nftOptions');
+        
+        nftCheckbox.addEventListener('change', (e) => {
+            nftOptions.style.display = e.target.checked ? 'block' : 'none';
+            
+            // Auto-fill NFT name if empty
+            if (e.target.checked && this.selectedFiles.length > 0) {
+                const nameInput = document.getElementById('nftName');
+                if (!nameInput.value) {
+                    nameInput.value = this.selectedFiles[0].name.replace(/\.[^/.]+$/, '');
+                }
+            }
+            
+            this.calculateTotalCost();
+        });
+        
+        // Paywall toggle
+        const paywallRadio = document.querySelector('input[value="paywall"]');
+        const paywallOptions = document.getElementById('paywallOptions');
+        
+        document.querySelectorAll('input[name="publishType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                paywallOptions.style.display = 
+                    e.target.value === 'paywall' ? 'block' : 'none';
+            });
+        });
+        
+        // Storage method change
+        document.querySelectorAll('input[name="storageMethod"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.calculateTotalCost();
+            });
+        });
+        
+        // Other checkboxes
+        document.getElementById('enableUpdates').addEventListener('change', () => {
+            this.calculateTotalCost();
+        });
+        
+        // Access price change updates revenue split
+        const accessPriceInput = document.getElementById('accessPrice');
+        if (accessPriceInput) {
+            accessPriceInput.addEventListener('input', (e) => {
+                const price = parseFloat(e.target.value) || 0;
+                const userShare = price * 0.95;
+                const driveShare = price * 0.05;
+                
+                document.getElementById('yourShare').textContent = `$${userShare.toFixed(2)} (95%)`;
+            });
+        }
     }
 
     async uploadFiles() {
         if (this.selectedFiles.length === 0) return;
         
-        const storageMethod = document.querySelector('input[name="storageMethod"]:checked').value;
-        const encrypt = document.getElementById('encryptFiles').checked;
-        
-        for (const file of this.selectedFiles) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('storageMethod', storageMethod);
-            formData.append('encrypt', encrypt);
-            
-            try {
-                const response = await fetch(`${this.apiUrl}/files/upload`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.authToken}`
-                    },
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    this.showToast(`Uploaded ${file.name} successfully`, 'success');
-                } else {
-                    this.showToast(`Failed to upload ${file.name}`, 'error');
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                this.showToast(`Error uploading ${file.name}`, 'error');
+        // Collect all upload options
+        const options = {
+            storageMethod: document.querySelector('input[name="storageMethod"]:checked').value,
+            encrypt: document.getElementById('encryptFiles').checked,
+            createNFT: document.getElementById('createNFT').checked,
+            enableUpdates: document.getElementById('enableUpdates').checked,
+            publishType: document.querySelector('input[name="publishType"]:checked').value,
+            nftOptions: {
+                name: document.getElementById('nftName')?.value || '',
+                description: document.getElementById('nftDescription')?.value || '',
+                royaltyPercent: parseInt(document.getElementById('royaltyPercent')?.value || '10'),
+                maxSupply: parseInt(document.getElementById('maxSupply')?.value || '1')
+            },
+            paywallOptions: {
+                accessPrice: parseFloat(document.getElementById('accessPrice')?.value || '0')
             }
+        };
+
+        // Disable upload button and show progress
+        const uploadBtn = document.getElementById('confirmUpload');
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = 'Uploading to BSV...';
+
+        try {
+            for (const file of this.selectedFiles) {
+                await this.uploadSingleFile(file, options);
+            }
+            
+            this.showToast('All files uploaded successfully!', 'success');
+            this.hideUploadModal();
+            await this.loadFiles();
+            
+        } catch (error) {
+            console.error('Upload error:', error);
+            this.showToast('Upload failed: ' + error.message, 'error');
+        } finally {
+            // Re-enable upload button
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = `
+                <span class="upload-btn-text">Upload to Blockchain</span>
+                <span class="upload-btn-cost" id="uploadBtnCost"></span>
+            `;
         }
-        
-        this.hideUploadModal();
-        await this.loadFiles();
+    }
+
+    async uploadSingleFile(file, options) {
+        try {
+            this.showToast(`Uploading ${file.name} to BSV blockchain...`, 'info');
+            
+            // Create upload payload
+            const uploadData = {
+                file: {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: await this.fileToBase64(file)
+                },
+                options: options
+            };
+
+            const response = await fetch(`${this.apiUrl}/bsv/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(uploadData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                this.showToast(`✅ ${file.name} uploaded to BSV! TX: ${result.txId}`, 'success');
+                return result;
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || 'Upload failed');
+            }
+            
+        } catch (error) {
+            console.error(`Upload error for ${file.name}:`, error);
+            this.showToast(`❌ Failed to upload ${file.name}: ${error.message}`, 'error');
+            throw error;
+        }
+    }
+
+    async fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                // Remove the data:mime/type;base64, prefix
+                const base64 = reader.result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = reject;
+        });
     }
 
     async loadFiles() {
