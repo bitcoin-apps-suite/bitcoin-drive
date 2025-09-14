@@ -71,6 +71,10 @@
                         <div class="menu-item" data-action="stats">
                             <span>📊</span> Storage Statistics
                         </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="signout" id="driveMenuSignout">
+                            <span>🚪</span> Sign Out
+                        </div>
                     </div>
                 </div>
                 
@@ -140,9 +144,26 @@
             <div class="header-right">
                 <div class="user-section" id="userSection">
                     <button class="btn-connect" id="connectBtn">Connect HandCash</button>
-                    <div class="user-profile" id="userProfile" style="display: none;">
-                        <span class="user-handle" id="userHandle"></span>
-                        <button class="btn-logout" id="logoutBtn">Logout</button>
+                    <div class="user-profile-dropdown" id="userProfile" style="display: none;">
+                        <button class="user-profile-btn" id="userProfileBtn">
+                            <span class="user-handle" id="userHandle"></span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="user-dropdown-menu" id="userDropdown" style="display: none;">
+                            <div class="dropdown-user-info">
+                                <div class="dropdown-user-handle" id="dropdownUserHandle"></div>
+                                <div class="dropdown-user-balance">Balance: 0.00000000 BSV</div>
+                            </div>
+                            <div class="dropdown-separator"></div>
+                            <button class="dropdown-item" id="profileSettingsBtn">
+                                <span>⚙️</span> Settings
+                            </button>
+                            <button class="dropdown-item" id="logoutBtn">
+                                <span>🚪</span> Sign Out
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

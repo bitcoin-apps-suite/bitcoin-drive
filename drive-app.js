@@ -127,6 +127,10 @@ class BitcoinDrive {
                         const nftCount = this.files.filter(f => f.nft).length;
                         alert(`Storage Statistics:\n\nFiles: ${totalFiles}\nTotal Size: ${this.formatFileSize(totalSize)}\nNFTs Created: ${nftCount}`);
                         break;
+                    case 'signout':
+                        this.logout();
+                        toggleMenu('driveMenu');
+                        break;
                 }
                 toggleMenu('driveMenu');
             });
@@ -180,6 +184,33 @@ class BitcoinDrive {
         document.getElementById('connectBtn').addEventListener('click', () => this.connectHandCash());
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('uploadBtn').addEventListener('click', () => this.showUploadModal());
+        
+        // User profile dropdown
+        const userProfileBtn = document.getElementById('userProfileBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userProfileBtn) {
+            userProfileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (userDropdown) {
+                userDropdown.style.display = 'none';
+            }
+        });
+        
+        // Settings button (placeholder)
+        const profileSettingsBtn = document.getElementById('profileSettingsBtn');
+        if (profileSettingsBtn) {
+            profileSettingsBtn.addEventListener('click', () => {
+                this.showToast('Settings coming soon!', 'info');
+                userDropdown.style.display = 'none';
+            });
+        }
         
         // Mobile sidebar toggle
         const sidebarToggle = document.getElementById('mobileSidebarToggle');
