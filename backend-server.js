@@ -340,7 +340,11 @@ function calculateStorageCost(method, size) {
   return costs[method] || costs['op_return'];
 }
 
-// BSV Upload endpoint (mock for local development)
+// Import real BSV uploader
+const RealBSVUploader = require('./real-bsv-upload');
+const bsvUploader = new RealBSVUploader();
+
+// REAL BSV Upload endpoint - No more mocks!
 app.post('/api/bsv/upload', async (req, res) => {
   try {
     const authToken = req.headers.authorization?.replace('Bearer ', '');
@@ -355,45 +359,27 @@ app.post('/api/bsv/upload', async (req, res) => {
       return res.status(400).json({ error: 'No file data provided' });
     }
 
-    console.log('Mock BSV Upload received:', {
+    console.log('REAL BSV Upload starting:', {
       fileName: file.name,
       fileSize: file.size,
       options: options
     });
 
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Use REAL BSV uploader
+    const uploadResult = await bsvUploader.uploadToBSV(authToken, file, options);
+    
+    // Pay service fee (2% to bitcoin.drive)
+    const serviceFee = uploadResult.cost * 0.02;
+    if (serviceFee > 0.00001) {
+      await bsvUploader.payServiceFee(
+        bsvUploader.handCashConnect.getAccountFromAuthToken(authToken),
+        serviceFee
+      );
+    }
 
-    // Generate mock transaction ID
-    const mockTxId = Array.from({length: 64}, () => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-
-    const mockNftTxId = options.createNFT ? Array.from({length: 64}, () => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('') : null;
-    
-    // Calculate costs
-    const fileSize = file.size;
-    const BSV_PRICE_USD = 50;
-    const SATOSHIS_PER_BYTE = 0.5;
-    const SATOSHIS_PER_BSV = 100000000;
-    
-    const baseSatoshis = fileSize * SATOSHIS_PER_BYTE;
-    const baseUSD = (baseSatoshis / SATOSHIS_PER_BSV) * BSV_PRICE_USD;
-    
-    const storageCost = options.storageMethod === 'b_protocol' ? 
-      Math.max(0.001, baseUSD) : 
-      Math.max(0.002, baseUSD * 1.2);
-    
-    const nftCost = options.createNFT ? 0.05 : 0;
-    const updatesCost = options.enableUpdates ? 0.02 : 0;
-    const serviceFee = storageCost * 0.02;
-    const totalCost = storageCost + nftCost + updatesCost + serviceFee;
-
-    // Store file record
+    // Store file record in database
     const fileRecord = {
-      id: mockTxId,
+      id: uploadResult.txId,
       filename: file.name,
       mimeType: file.type,
       size: file.size,
@@ -401,15 +387,17 @@ app.post('/api/bsv/upload', async (req, res) => {
       encrypted: options.encrypt,
       uploadedAt: new Date().toISOString(),
       owner: 'user_' + authToken.substring(0, 8),
-      txId: mockTxId,
-      nftTxId: mockNftTxId,
-      downloadUrl: `https://bico.media/${mockTxId}`,
-      cost: totalCost,
+      txId: uploadResult.txId,
+      nftTxId: uploadResult.nftTxId || null,
+      downloadUrl: uploadResult.url,
+      viewUrl: uploadResult.viewUrl,
+      cost: uploadResult.cost + serviceFee,
+      protocol: uploadResult.protocol,
       publishType: options.publishType,
       paywallPrice: options.paywallOptions?.accessPrice || 0
     };
 
-    filesDb.set(mockTxId, fileRecord);
+    filesDb.set(uploadResult.txId, fileRecord);
     
     const userHandle = 'user_' + authToken.substring(0, 8);
     if (!usersDb.has(userHandle)) {
@@ -417,21 +405,25 @@ app.post('/api/bsv/upload', async (req, res) => {
     }
     usersDb.get(userHandle).push(fileRecord);
 
+    console.log(`✅ REAL BSV Upload complete! TX: ${uploadResult.txId}`);
+
     res.json({
       success: true,
-      txId: mockTxId,
-      fileUrl: `https://bico.media/${mockTxId}`,
-      nftTxId: mockNftTxId,
-      cost: totalCost,
-      protocol: options.storageMethod === 'b_protocol' ? 'B://' : 'BCAT://',
-      message: `Mock BSV upload successful! File "${file.name}" ready for blockchain.`
+      txId: uploadResult.txId,
+      fileUrl: uploadResult.url,
+      viewUrl: uploadResult.viewUrl,
+      nftTxId: uploadResult.nftTxId || null,
+      cost: uploadResult.cost + serviceFee,
+      protocol: uploadResult.protocol,
+      message: `🎉 REAL BSV upload successful! File "${file.name}" is now permanently stored on the Bitcoin SV blockchain!`
     });
 
   } catch (error) {
     console.error('BSV upload error:', error);
     res.status(500).json({ 
-      error: 'Mock BSV upload failed',
-      message: error.message
+      error: 'BSV upload failed',
+      message: error.message,
+      details: 'Check your HandCash wallet balance and permissions'
     });
   }
 });
