@@ -1,18 +1,4 @@
-import { HandCashConnect } from '@handcash/handcash-connect';
-
-const handCashConnect = new HandCashConnect({
-  appId: process.env.HANDCASH_APP_ID,
-  appSecret: process.env.HANDCASH_APP_SECRET
-});
-
-// BSV Protocol constants
-const BSV_PROTOCOLS = {
-  B_PROTOCOL: '19HxigV4QyBv3tHpQVcUEQyq1pzZVdoAut',
-  BCAT_PROTOCOL: '15DHFxWZJT58f9nhyGnsRBqrgwK4W6h4Up',
-  MAP_PROTOCOL: '1PuQa7K62MiKCtssSLKy1kh56WWU7MtUR5',
-  AIP_PROTOCOL: '15PciHG22SNLQJXMoSUaWVi7WSqc7hCfva'
-};
-
+// Mock BSV Upload for Testing
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,398 +28,84 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No file data provided' });
     }
 
-    // Get HandCash account
-    const account = handCashConnect.getAccountFromAuthToken(authToken);
-    const profile = await account.profile.getCurrentProfile();
-    
-    // Check balance
-    const balance = await account.wallet.getSpendableBalance();
-    if (balance.spendableSatoshis < 10000) { // Minimum 10k satoshis
-      return res.status(400).json({ 
-        error: 'Insufficient BSV balance',
-        required: '0.0001 BSV minimum',
-        current: `${balance.spendableSatoshis / 100000000} BSV`
-      });
-    }
+    // Simulate processing time
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Convert base64 to buffer
-    const fileBuffer = Buffer.from(file.data, 'base64');
+    // Mock successful BSV upload
+    const mockTxId = generateMockTxId();
+    const mockNftTxId = options.createNFT ? generateMockTxId() : null;
     
-    // Upload to BSV blockchain
-    const result = await uploadToBSV(account, profile, {
-      name: file.name,
-      type: file.type,
+    // Calculate costs
+    const fileSize = file.size;
+    const storageCost = calculateStorageCost(fileSize, options.storageMethod);
+    const nftCost = options.createNFT ? 0.05 : 0;
+    const updatesCost = options.enableUpdates ? 0.02 : 0;
+    const serviceFee = storageCost * 0.02;
+    const totalCost = storageCost + nftCost + updatesCost + serviceFee;
+
+    // Store file info (mock storage)
+    const fileRecord = {
+      id: mockTxId,
+      filename: file.name,
+      mimeType: file.type,
       size: file.size,
-      buffer: fileBuffer
-    }, options);
+      storageMethod: options.storageMethod,
+      encrypted: options.encrypt,
+      uploadedAt: new Date().toISOString(),
+      txId: mockTxId,
+      nftTxId: mockNftTxId,
+      downloadUrl: `https://bico.media/${mockTxId}`,
+      cost: totalCost,
+      publishType: options.publishType,
+      paywallPrice: options.paywallOptions?.accessPrice || 0
+    };
+
+    console.log('Mock BSV Upload:', {
+      file: file.name,
+      size: fileSize,
+      options: options,
+      cost: totalCost,
+      txId: mockTxId
+    });
 
     res.status(200).json({
       success: true,
-      txId: result.txId,
-      fileUrl: result.fileUrl,
-      nftTxId: result.nftTxId,
-      cost: result.cost,
-      message: 'File uploaded to BSV blockchain successfully'
+      txId: mockTxId,
+      fileUrl: `https://bico.media/${mockTxId}`,
+      nftTxId: mockNftTxId,
+      cost: totalCost,
+      protocol: options.storageMethod === 'b_protocol' ? 'B://' : 'BCAT://',
+      message: `Mock upload successful! File would be stored on BSV blockchain.`
     });
 
   } catch (error) {
-    console.error('BSV upload error:', error);
+    console.error('Mock BSV upload error:', error);
     res.status(500).json({ 
-      error: error.message || 'Failed to upload to BSV blockchain',
-      details: error.toString()
+      error: 'Mock upload failed',
+      message: error.message,
+      details: 'This is a mock endpoint for testing. Real BSV integration pending.'
     });
   }
 }
 
-async function uploadToBSV(account, profile, fileData, options) {
-  const { name, type, size, buffer } = fileData;
-  const {
-    storageMethod,
-    encrypt,
-    createNFT,
-    enableUpdates,
-    publishType,
-    nftOptions,
-    paywallOptions
-  } = options;
+function generateMockTxId() {
+  return Array.from({length: 64}, () => 
+    Math.floor(Math.random() * 16).toString(16)
+  ).join('');
+}
 
-  let uploadResult;
-  let totalCost = 0;
-
-  try {
-    // Step 1: Upload file using appropriate protocol
-    if (storageMethod === 'b_protocol' || size < 90000) {
-      uploadResult = await uploadViaBProtocol(account, fileData);
-    } else {
-      uploadResult = await uploadViaBCATProtocol(account, fileData);
-    }
-
-    totalCost += uploadResult.cost;
-
-    // Step 2: Create NFT container if requested
-    let nftResult = null;
-    if (createNFT) {
-      nftResult = await createNFTContainer(account, profile, fileData, uploadResult, nftOptions);
-      totalCost += nftResult.cost;
-    }
-
-    // Step 3: Set up paywall if requested
-    if (publishType === 'paywall' && paywallOptions.accessPrice > 0) {
-      await createPaywall(account, uploadResult.txId, paywallOptions);
-      totalCost += 0.01; // Paywall setup fee
-    }
-
-    // Step 4: Enable updates if requested
-    if (enableUpdates) {
-      await enableFileUpdates(account, uploadResult.txId);
-      totalCost += 0.02;
-    }
-
-    // Calculate bitcoin.drive service fee (2%)
-    const serviceFee = totalCost * 0.02;
-    if (serviceFee > 0.0001) { // Minimum service fee
-      await payServiceFee(account, serviceFee);
-    }
-
-    return {
-      txId: uploadResult.txId,
-      fileUrl: `https://bico.media/${uploadResult.txId}`,
-      nftTxId: nftResult?.txId,
-      cost: totalCost + serviceFee,
-      protocol: storageMethod,
-      chunks: uploadResult.chunks
-    };
-
-  } catch (error) {
-    console.error('BSV upload process error:', error);
-    throw new Error(`Upload failed: ${error.message}`);
+function calculateStorageCost(fileSize, storageMethod) {
+  // Mock BSV pricing calculation
+  const BSV_PRICE_USD = 50;
+  const SATOSHIS_PER_BYTE = 0.5;
+  const SATOSHIS_PER_BSV = 100000000;
+  
+  const baseSatoshis = fileSize * SATOSHIS_PER_BYTE;
+  const baseUSD = (baseSatoshis / SATOSHIS_PER_BSV) * BSV_PRICE_USD;
+  
+  if (storageMethod === 'b_protocol') {
+    return Math.max(0.001, baseUSD);
+  } else {
+    return Math.max(0.002, baseUSD * 1.2);
   }
-}
-
-async function uploadViaBProtocol(account, fileData) {
-  const { name, type, buffer } = fileData;
-  
-  try {
-    // Build B:// protocol transaction
-    const outputs = [{
-      script: buildBProtocolScript(buffer, type, name),
-      currencyCode: 'BSV'
-    }];
-
-    const payment = {
-      to: outputs,
-      description: `Upload ${name} via B:// protocol`
-    };
-
-    const result = await account.wallet.pay(payment);
-    
-    return {
-      txId: result.transactionId,
-      cost: result.fee / 100000000, // Convert satoshis to BSV
-      protocol: 'B://',
-      url: `b://${result.transactionId}`
-    };
-
-  } catch (error) {
-    throw new Error(`B:// protocol upload failed: ${error.message}`);
-  }
-}
-
-async function uploadViaBCATProtocol(account, fileData) {
-  const { name, type, buffer } = fileData;
-  const CHUNK_SIZE = 90000;
-  
-  try {
-    const chunks = [];
-    const chunkTxIds = [];
-    
-    // Split file into chunks
-    for (let i = 0; i < buffer.length; i += CHUNK_SIZE) {
-      chunks.push(buffer.slice(i, i + CHUNK_SIZE));
-    }
-
-    // Upload each chunk
-    for (let i = 0; i < chunks.length; i++) {
-      const chunkScript = buildBCATChunkScript(chunks[i]);
-      
-      const payment = {
-        to: [{
-          script: chunkScript,
-          currencyCode: 'BSV'
-        }],
-        description: `Upload chunk ${i + 1}/${chunks.length} of ${name}`
-      };
-      
-      const result = await account.wallet.pay(payment);
-      chunkTxIds.push(result.transactionId);
-    }
-
-    // Create BCAT manifest
-    const manifestScript = buildBCATManifestScript(chunkTxIds, type, name);
-    
-    const manifestPayment = {
-      to: [{
-        script: manifestScript,
-        currencyCode: 'BSV'
-      }],
-      description: `Create BCAT manifest for ${name}`
-    };
-    
-    const manifestResult = await account.wallet.pay(manifestPayment);
-
-    return {
-      txId: manifestResult.transactionId,
-      cost: 0.001 * chunks.length, // Estimate cost
-      protocol: 'BCAT://',
-      chunks: chunkTxIds,
-      url: `bcat://${manifestResult.transactionId}`
-    };
-
-  } catch (error) {
-    throw new Error(`BCAT:// protocol upload failed: ${error.message}`);
-  }
-}
-
-async function createNFTContainer(account, profile, fileData, uploadResult, nftOptions) {
-  try {
-    const nftMetadata = {
-      name: nftOptions.name || fileData.name,
-      description: nftOptions.description || `NFT of ${fileData.name}`,
-      image: uploadResult.url,
-      creator: profile.handle,
-      attributes: [
-        { trait_type: 'File Type', value: fileData.type },
-        { trait_type: 'File Size', value: `${(fileData.size / 1024).toFixed(2)} KB` },
-        { trait_type: 'Protocol', value: uploadResult.protocol },
-        { trait_type: 'Created', value: new Date().toISOString() }
-      ],
-      properties: {
-        files: [{
-          uri: uploadResult.url,
-          type: fileData.type
-        }]
-      },
-      royalty: {
-        percentage: nftOptions.royaltyPercent,
-        address: profile.publicProfile?.paymail
-      },
-      collection: {
-        name: 'Bitcoin Drive',
-        supply: nftOptions.maxSupply
-      }
-    };
-
-    // Upload NFT metadata using MAP protocol
-    const mapScript = buildMAPScript({
-      app: 'bitcoin-drive',
-      type: 'nft',
-      subType: 'metadata',
-      data: JSON.stringify(nftMetadata)
-    });
-
-    const payment = {
-      to: [{
-        script: mapScript,
-        currencyCode: 'BSV'
-      }],
-      description: `Create NFT metadata for ${fileData.name}`
-    };
-
-    const result = await account.wallet.pay(payment);
-
-    return {
-      txId: result.transactionId,
-      cost: 0.05,
-      metadata: nftMetadata
-    };
-
-  } catch (error) {
-    throw new Error(`NFT creation failed: ${error.message}`);
-  }
-}
-
-async function createPaywall(account, fileId, paywallOptions) {
-  // Create paywall entry using MAP protocol
-  const paywallData = {
-    fileId: fileId,
-    price: paywallOptions.accessPrice,
-    currency: 'USD',
-    created: new Date().toISOString()
-  };
-
-  const mapScript = buildMAPScript({
-    app: 'bitcoin-drive',
-    type: 'paywall',
-    fileId: fileId,
-    data: JSON.stringify(paywallData)
-  });
-
-  const payment = {
-    to: [{
-      script: mapScript,
-      currencyCode: 'BSV'
-    }],
-    description: `Create paywall for file ${fileId}`
-  };
-
-  await account.wallet.pay(payment);
-}
-
-async function enableFileUpdates(account, fileId) {
-  // Create update capability using MAP protocol
-  const updateData = {
-    fileId: fileId,
-    updatable: true,
-    created: new Date().toISOString()
-  };
-
-  const mapScript = buildMAPScript({
-    app: 'bitcoin-drive',
-    type: 'update-capability',
-    fileId: fileId,
-    data: JSON.stringify(updateData)
-  });
-
-  const payment = {
-    to: [{
-      script: mapScript,
-      currencyCode: 'BSV'
-    }],
-    description: `Enable updates for file ${fileId}`
-  };
-
-  await account.wallet.pay(payment);
-}
-
-async function payServiceFee(account, feeAmount) {
-  // Pay service fee to bitcoin.drive wallet
-  const BITCOIN_DRIVE_ADDRESS = '1BitcoinDriveServiceFeeAddress'; // Replace with actual address
-
-  const payment = {
-    to: [{
-      address: BITCOIN_DRIVE_ADDRESS,
-      currencyCode: 'BSV',
-      amount: feeAmount
-    }],
-    description: 'Bitcoin Drive service fee (2%)'
-  };
-
-  await account.wallet.pay(payment);
-}
-
-// Protocol script builders
-function buildBProtocolScript(data, mediaType, filename) {
-  const chunks = [
-    'OP_RETURN',
-    Buffer.from(BSV_PROTOCOLS.B_PROTOCOL, 'hex'),
-    data,
-    Buffer.from(mediaType, 'utf8'),
-    Buffer.from('binary', 'utf8'),
-    Buffer.from(filename, 'utf8')
-  ];
-  
-  return chunks.map(chunk => {
-    if (typeof chunk === 'string' && chunk === 'OP_RETURN') {
-      return '6a';
-    }
-    return chunk.toString('hex');
-  }).join('');
-}
-
-function buildBCATChunkScript(chunkData) {
-  const chunks = [
-    'OP_RETURN',
-    Buffer.from(BSV_PROTOCOLS.BCAT_PROTOCOL, 'hex'),
-    chunkData
-  ];
-  
-  return chunks.map(chunk => {
-    if (typeof chunk === 'string' && chunk === 'OP_RETURN') {
-      return '6a';
-    }
-    return chunk.toString('hex');
-  }).join('');
-}
-
-function buildBCATManifestScript(txIds, mediaType, filename) {
-  const manifest = {
-    info: 'BCAT',
-    mediaType: mediaType,
-    filename: filename,
-    chunks: txIds
-  };
-  
-  const chunks = [
-    'OP_RETURN',
-    Buffer.from(BSV_PROTOCOLS.BCAT_PROTOCOL, 'hex'),
-    Buffer.from(JSON.stringify(manifest), 'utf8')
-  ];
-  
-  return chunks.map(chunk => {
-    if (typeof chunk === 'string' && chunk === 'OP_RETURN') {
-      return '6a';
-    }
-    return chunk.toString('hex');
-  }).join('');
-}
-
-function buildMAPScript(data) {
-  const chunks = [
-    'OP_RETURN',
-    Buffer.from(BSV_PROTOCOLS.MAP_PROTOCOL, 'hex'),
-    Buffer.from('SET', 'utf8')
-  ];
-  
-  // Add key-value pairs
-  Object.entries(data).forEach(([key, value]) => {
-    chunks.push(Buffer.from(key, 'utf8'));
-    chunks.push(Buffer.from(value.toString(), 'utf8'));
-  });
-  
-  return chunks.map(chunk => {
-    if (typeof chunk === 'string' && chunk === 'OP_RETURN') {
-      return '6a';
-    }
-    return chunk.toString('hex');
-  }).join('');
 }

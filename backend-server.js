@@ -340,6 +340,102 @@ function calculateStorageCost(method, size) {
   return costs[method] || costs['op_return'];
 }
 
+// BSV Upload endpoint (mock for local development)
+app.post('/api/bsv/upload', async (req, res) => {
+  try {
+    const authToken = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!authToken) {
+      return res.status(401).json({ error: 'No auth token provided' });
+    }
+
+    const { file, options } = req.body;
+    
+    if (!file || !file.data) {
+      return res.status(400).json({ error: 'No file data provided' });
+    }
+
+    console.log('Mock BSV Upload received:', {
+      fileName: file.name,
+      fileSize: file.size,
+      options: options
+    });
+
+    // Simulate processing delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Generate mock transaction ID
+    const mockTxId = Array.from({length: 64}, () => 
+      Math.floor(Math.random() * 16).toString(16)
+    ).join('');
+
+    const mockNftTxId = options.createNFT ? Array.from({length: 64}, () => 
+      Math.floor(Math.random() * 16).toString(16)
+    ).join('') : null;
+    
+    // Calculate costs
+    const fileSize = file.size;
+    const BSV_PRICE_USD = 50;
+    const SATOSHIS_PER_BYTE = 0.5;
+    const SATOSHIS_PER_BSV = 100000000;
+    
+    const baseSatoshis = fileSize * SATOSHIS_PER_BYTE;
+    const baseUSD = (baseSatoshis / SATOSHIS_PER_BSV) * BSV_PRICE_USD;
+    
+    const storageCost = options.storageMethod === 'b_protocol' ? 
+      Math.max(0.001, baseUSD) : 
+      Math.max(0.002, baseUSD * 1.2);
+    
+    const nftCost = options.createNFT ? 0.05 : 0;
+    const updatesCost = options.enableUpdates ? 0.02 : 0;
+    const serviceFee = storageCost * 0.02;
+    const totalCost = storageCost + nftCost + updatesCost + serviceFee;
+
+    // Store file record
+    const fileRecord = {
+      id: mockTxId,
+      filename: file.name,
+      mimeType: file.type,
+      size: file.size,
+      storageMethod: options.storageMethod,
+      encrypted: options.encrypt,
+      uploadedAt: new Date().toISOString(),
+      owner: 'user_' + authToken.substring(0, 8),
+      txId: mockTxId,
+      nftTxId: mockNftTxId,
+      downloadUrl: `https://bico.media/${mockTxId}`,
+      cost: totalCost,
+      publishType: options.publishType,
+      paywallPrice: options.paywallOptions?.accessPrice || 0
+    };
+
+    filesDb.set(mockTxId, fileRecord);
+    
+    const userHandle = 'user_' + authToken.substring(0, 8);
+    if (!usersDb.has(userHandle)) {
+      usersDb.set(userHandle, []);
+    }
+    usersDb.get(userHandle).push(fileRecord);
+
+    res.json({
+      success: true,
+      txId: mockTxId,
+      fileUrl: `https://bico.media/${mockTxId}`,
+      nftTxId: mockNftTxId,
+      cost: totalCost,
+      protocol: options.storageMethod === 'b_protocol' ? 'B://' : 'BCAT://',
+      message: `Mock BSV upload successful! File "${file.name}" ready for blockchain.`
+    });
+
+  } catch (error) {
+    console.error('BSV upload error:', error);
+    res.status(500).json({ 
+      error: 'Mock BSV upload failed',
+      message: error.message
+    });
+  }
+});
+
 // For Vercel deployment
 if (process.env.VERCEL) {
   module.exports = app;
