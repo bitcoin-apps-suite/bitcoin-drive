@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAP - Bitcoin Asset Protocol</title>
+    <title>Bitcoin Drive - NFT Container Format & BAP Integration</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,615 +14,451 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            color: #202124;
-            line-height: 1.6;
+        :root {
+            --primary-green: #00D632;
+            --primary-green-dark: #00A028;
+            --primary-green-light: #00FF3C;
+            --bitcoin-orange: #FF9500;
+            --bg-dark: #0A0A0A;
+            --bg-surface: #1A1A1A;
+            --bg-surface-hover: #252525;
+            --border-color: rgba(0, 214, 50, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --text-muted: #707070;
         }
 
-        .header {
-            background: white;
-            border-bottom: 1px solid #dadce0;
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
         }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
         }
 
         .logo {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 12px;
-            text-decoration: none;
-            color: #202124;
+            margin-bottom: 24px;
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: #188038;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             font-size: 24px;
+            color: var(--bg-dark);
             font-weight: bold;
         }
 
-        .logo-text {
-            font-size: 22px;
-            font-weight: 600;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #5f6368;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: #188038;
-        }
-
-        .hero {
-            background: white;
-            padding: 60px 0;
-            border-bottom: 1px solid #dadce0;
-        }
-
-        .hero h1 {
+        h1 {
             font-size: 48px;
-            font-weight: 400;
-            color: #202124;
+            font-weight: 700;
+            color: var(--primary-green);
             margin-bottom: 16px;
         }
 
-        .hero .subtitle {
+        .subtitle {
             font-size: 20px;
-            color: #5f6368;
-            max-width: 800px;
-        }
-
-        .content {
-            padding: 40px 0;
+            color: var(--text-secondary);
         }
 
         .section {
-            background: white;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 32px;
+            color: var(--primary-green);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3 {
+            font-size: 24px;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .highlight {
+            color: var(--primary-green);
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 32px;
-            margin-bottom: 24px;
-            border: 1px solid #dadce0;
+            padding: 24px;
+            margin: 24px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
         }
 
-        .section h2 {
-            font-size: 28px;
-            font-weight: 500;
-            color: #202124;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #dadce0;
-        }
-
-        .section h3 {
-            font-size: 20px;
-            font-weight: 500;
-            color: #202124;
-            margin-top: 24px;
-            margin-bottom: 16px;
-        }
-
-        .section p {
-            color: #5f6368;
-            margin-bottom: 16px;
-            line-height: 1.7;
+        .code-block pre {
+            color: var(--primary-green);
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
-            margin-top: 24px;
+            margin: 32px 0;
         }
 
         .feature-card {
-            background: #f8f9fa;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             padding: 24px;
-            border-radius: 8px;
-            border: 1px solid #dadce0;
         }
 
         .feature-card h4 {
-            color: #188038;
-            font-size: 16px;
-            font-weight: 600;
+            color: var(--primary-green);
             margin-bottom: 12px;
-        }
-
-        .feature-card p {
-            color: #5f6368;
-            font-size: 14px;
-        }
-
-        .asset-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-            margin-top: 24px;
-        }
-
-        .asset-card {
-            background: white;
-            border: 2px solid #e8f5e9;
-            border-radius: 8px;
-            padding: 24px;
-            transition: all 0.2s;
-        }
-
-        .asset-card:hover {
-            border-color: #188038;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
-        }
-
-        .asset-card .icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .asset-card h4 {
-            color: #188038;
             font-size: 18px;
-            margin-bottom: 8px;
         }
 
-        .asset-card .subtitle {
-            color: #5f6368;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        .asset-card p {
-            color: #5f6368;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .code-block {
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            padding: 20px;
-            margin: 20px 0;
-            overflow-x: auto;
-        }
-
-        .code-block pre {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 14px;
-            color: #188038;
-            margin: 0;
-        }
-
-        .architecture-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 24px 0;
-        }
-
-        .architecture-table th,
-        .architecture-table td {
-            padding: 16px;
-            text-align: left;
-            border: 1px solid #dadce0;
-        }
-
-        .architecture-table th {
-            background: #f8f9fa;
-            font-weight: 500;
-            color: #202124;
-        }
-
-        .architecture-table td {
-            color: #5f6368;
-        }
-
-        .vision-box {
-            background: #e8f5e9;
-            border-left: 4px solid #188038;
-            padding: 24px;
-            margin: 24px 0;
-            border-radius: 4px;
-        }
-
-        .vision-box h3 {
-            color: #188038;
-            margin-top: 0;
-        }
-
-        .vision-box p {
-            margin-bottom: 12px;
-        }
-
-        .vision-box p:last-child {
-            margin-bottom: 0;
-        }
-
-        .tagline {
-            background: linear-gradient(135deg, #e8f5e9, #f1f8f4);
-            border: 2px solid #188038;
-            border-radius: 8px;
-            padding: 32px;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .tagline h2 {
-            color: #188038;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            border: none;
+        .protocol-list {
+            list-style: none;
             padding: 0;
         }
 
-        .tagline p {
-            color: #5f6368;
-            font-size: 16px;
-            margin: 0;
+        .protocol-list li {
+            background: var(--bg-dark);
+            border-left: 3px solid var(--primary-green);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .protocol-list strong {
+            color: var(--primary-green);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .warning-box {
+            background: rgba(255, 149, 0, 0.1);
+            border: 1px solid var(--bitcoin-orange);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .warning-box p {
+            color: var(--bitcoin-orange);
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #188038;
+            color: var(--primary-green);
             text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 24px;
-            transition: opacity 0.2s;
+            font-weight: 500;
+            margin-bottom: 40px;
+            transition: opacity 0.3s;
         }
 
         .back-link:hover {
             opacity: 0.8;
         }
 
-        ul {
-            margin: 16px 0;
-            padding-left: 24px;
-        }
-
-        ul li {
-            color: #5f6368;
-            margin-bottom: 8px;
-        }
-
-        ul li strong {
-            color: #202124;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 32px;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .feature-grid,
-            .asset-grid {
-                grid-template-columns: 1fr;
-            }
+        .badge {
+            display: inline-block;
+            background: rgba(0, 214, 50, 0.1);
+            color: var(--primary-green);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/drive.html" class="logo">
-                    <div class="logo-icon">₿</div>
-                    <span class="logo-text">Bitcoin Asset Protocol</span>
-                </a>
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="/drive.html">Bitcoin Drive</a></li>
-                        <li><a href="#overview">Overview</a></li>
-                        <li><a href="#assets">Asset Classes</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#architecture">Architecture</a></li>
-                        <li><a href="https://github.com/b0ase/bitcoin-drive" target="_blank">GitHub</a></li>
-                    </ul>
-                </nav>
+    <div class="container">
+        <a href="/drive.html" class="back-link">
+            ← Back to Bitcoin Drive
+        </a>
+
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">₿</div>
+                <span style="font-size: 32px; font-weight: 600; color: var(--primary-green);">Bitcoin Drive</span>
+            </div>
+            <h1>NFT Container Format Documentation</h1>
+            <p class="subtitle">Revolutionary file storage on BitcoinSV with identity attestation</p>
+        </div>
+
+        <div class="section">
+            <h2>📦 The .nft Container Format</h2>
+            <p>
+                The <span class="highlight">.nft (Network File Type)</span> is Bitcoin Drive's revolutionary container format 
+                designed specifically for BitcoinSV blockchain storage. Like .zip or .tar formats, but optimized for on-chain data.
+            </p>
+
+            <h3>Core Innovation</h3>
+            <p>
+                The .nft format acts as a universal container that can encapsulate any file type while adding blockchain-specific 
+                metadata, encryption layers, and ownership attestation through integration with existing BSV protocols.
+            </p>
+
+            <div class="code-block">
+                <pre>{
+  "container": ".nft",
+  "version": "1.0",
+  "metadata": {
+    "content_type": "image/jpeg",
+    "original_name": "document.jpg",
+    "size": 2048576,
+    "created": "2024-01-14T12:00:00Z",
+    "owner": "$handle",
+    "attestation": "BAP signature"
+  },
+  "encryption": {
+    "algorithm": "AES-256-GCM",
+    "key_derivation": "PBKDF2"
+  },
+  "data": "base64_encoded_content",
+  "protocols": ["B://", "BAP", "MAP"]
+}</pre>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔐 Multi-Layer Encryption</h4>
+                    <p>Granular encryption at file, folder, or individual data level with selective access control</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎯 Universal Compatibility</h4>
+                    <p>Wraps any file format: documents, images, videos, databases, or raw binary data</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⛓️ Blockchain Native</h4>
+                    <p>Designed for efficient on-chain storage with built-in BSV protocol support</p>
+                </div>
             </div>
         </div>
-    </header>
 
-    <section class="hero">
-        <div class="container">
-            <a href="/drive.html" class="back-link">
-                ← Back to Bitcoin Drive
-            </a>
-            <h1>Bitcoin Asset Protocol (BAP)</h1>
-            <p class="subtitle">
-                Transforming Digital Objects into Bitcoin-Native Assets. Build Bitcoin Applications (BApps) 
-                with payments, tokens, and on-chain logic using the original Bitcoin protocol on BSV.
+        <div class="section">
+            <h2>🔏 Bitcoin Attestation Protocol (BAP)</h2>
+            <p>
+                Bitcoin Drive leverages the <span class="highlight">Bitcoin Attestation Protocol</span> to create 
+                verifiable chains of trust for stored files. BAP provides cryptographic proof of ownership, 
+                identity verification, and attribute attestation.
             </p>
+
+            <h3>What is BAP?</h3>
+            <p>
+                BAP is a protocol for creating attestations and identity verification on the Bitcoin blockchain. 
+                It allows for:
+            </p>
+
+            <ul class="protocol-list">
+                <li>
+                    <strong>Identity Creation</strong>
+                    Generate unique identity keys linked to Bitcoin addresses without exposing private keys
+                </li>
+                <li>
+                    <strong>Attribute Attestation</strong>
+                    Third parties can verify and cryptographically sign identity attributes
+                </li>
+                <li>
+                    <strong>Chain of Trust</strong>
+                    Build verifiable trust relationships for data without publishing the actual data
+                </li>
+                <li>
+                    <strong>Key Rotation</strong>
+                    Update signing keys without invalidating existing attestations
+                </li>
+            </ul>
+
+            <h3>BAP Integration in Bitcoin Drive</h3>
+            <p>
+                Every .nft file uploaded to Bitcoin Drive can be attested using BAP, creating an immutable 
+                record of:
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Ownership Proof</h4>
+                    <p>Cryptographic attestation linking files to verified identities</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Access Control</h4>
+                    <p>Define who can decrypt and access files based on attested attributes</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Audit Trail</h4>
+                    <p>Complete history of file creation, modification, and access</p>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <pre>// BAP Attestation Transaction Structure
+OP_RETURN
+  1BAPSuaPnfGnSBM3GLV9yhxUdYe4vGbdMT  // BAP Protocol Prefix
+  ATTEST                               // Transaction Type
+  [identity_key]                       // Identity Being Attested
+  [attribute_hash]                     // Hash of Attribute
+  [attestor_signature]                 // Cryptographic Signature
+  [nft_file_hash]                     // Link to .nft Container</pre>
+            </div>
         </div>
-    </section>
 
-    <div class="content">
-        <div class="container">
-            <section class="section" id="overview">
-                <h2>🔑 Executive Summary</h2>
+        <div class="section">
+            <h2>🔧 Technical Architecture</h2>
+            
+            <h3>Storage Flow</h3>
+            <div class="code-block">
+                <pre>1. File Upload → 2. NFT Container Creation → 3. BAP Attestation → 4. BSV Transaction → 5. On-Chain Storage</pre>
+            </div>
+
+            <h3>Supported BSV Protocols</h3>
+            <ul class="protocol-list">
+                <li>
+                    <strong>B:// Protocol</strong>
+                    Binary data storage for large files
+                </li>
+                <li>
+                    <strong>C:// Protocol</strong>
+                    Content-addressed storage with built-in deduplication
+                </li>
+                <li>
+                    <strong>D:// Protocol</strong>
+                    Dynamic state management for mutable data
+                </li>
+                <li>
+                    <strong>BCAT Protocol</strong>
+                    Concatenated data for files exceeding single transaction limits
+                </li>
+                <li>
+                    <strong>MAP Protocol</strong>
+                    Magic Attribute Protocol for metadata and indexing
+                </li>
+                <li>
+                    <strong>BAP Protocol</strong>
+                    Bitcoin Attestation Protocol for identity and trust
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Use Cases</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Legal Documents</h4>
+                    <p>Store contracts with BAP attestation for legal validity and timestamping</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Medical Records</h4>
+                    <p>Encrypted health data with granular access control via attested identities</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Digital Art NFTs</h4>
+                    <p>True NFTs with actual files stored on-chain, not just links</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Supply Chain</h4>
+                    <p>Product certificates with multi-party attestation</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Academic Credentials</h4>
+                    <p>Verifiable diplomas and certificates with institutional attestation</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Software Distribution</h4>
+                    <p>Signed software packages with developer attestation</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💡 Why BitcoinSV?</h2>
+            <p>
+                Bitcoin Drive is built exclusively on <span class="highlight">BitcoinSV (BSV)</span> because it's the only 
+                blockchain that maintains the original Bitcoin protocol with:
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Unlimited Scaling</h4>
+                    <p>No artificial block size limits - store files of any size directly on-chain</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Micro-Transaction Fees</h4>
+                    <p>Sub-cent transaction costs make file storage economically viable</p>
+                </div>
+                <div class="feature-card">
+                    <h4>True Peer-to-Peer</h4>
+                    <p>Direct transactions without intermediaries or layer-2 solutions</p>
+                </div>
+            </div>
+
+            <div class="warning-box">
                 <p>
-                    The Bitcoin Asset Protocol (BAP) defines a universal framework for representing any digital object 
-                    as an on-chain asset. From spreadsheets to legal contracts, BAP enables native Bitcoin ownership, 
-                    transfer, and monetization. Each asset becomes part of the global shared ledger, with full support 
-                    for version control, encryption, tokenization, and programmable logic.
+                    <strong>Note:</strong> Bitcoin Drive does not use BTC, Lightning Network, or any other blockchain. 
+                    We leverage BSV's unique capabilities for true on-chain data storage.
                 </p>
-                <p>
-                    With BAP, developers can build BApps (Bitcoin Applications) — user-facing apps that wrap assets in 
-                    familiar interfaces (like spreadsheets) while leveraging Bitcoin's UTXO model for immutable history, 
-                    microtransactions, and scalable peer-to-peer exchange.
-                </p>
+            </div>
+        </div>
 
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>BApps - Bitcoin Applications</h4>
-                        <p>Build full-featured Bitcoin Apps using spreadsheets or any interface, with native Bitcoin integration.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>UTXO Version Control</h4>
-                        <p>Git-like versioning for immutable change tracking on-chain. Every save creates a new transaction.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Granular Encryption</h4>
-                        <p>Encrypt at file, row, column, or cell level with selective access control.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Tokenized Ownership</h4>
-                        <p>Issue shares in assets and distribute dividends automatically through smart contracts.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Micro-Transaction Pricing</h4>
-                        <p>1/1,000,000th of a penny per cell with Bitcoin SV's low fees. Pay only for what you use.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Decentralized Infrastructure</h4>
-                        <p>No central servers — pure peer-to-peer exchange on the BSV blockchain.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="assets">
-                <h2>🧩 Asset Classes in BAP</h2>
-                <p>
-                    BAP treats every digital object as an asset. Each asset type shares the same lifecycle 
-                    (creation → versioning → access control → monetization), but can express unique behaviors.
-                </p>
-
-                <div class="asset-grid">
-                    <div class="asset-card">
-                        <div class="icon">📊</div>
-                        <h4>Spreadsheets</h4>
-                        <div class="subtitle">Data Assets</div>
-                        <p>
-                            Familiar UI with on-chain version control. Each cell can be mapped to UTXOs. 
-                            Supports selective encryption (row, column, or cell). Monetization: pay-per-cell, 
-                            subscription access, or tokenized shares.
-                        </p>
-                        <p><strong>Example:</strong> DAO voting sheet, NFT marketplace, DeFi calculator.</p>
-                    </div>
-
-                    <div class="asset-card">
-                        <div class="icon">📄</div>
-                        <h4>Documents</h4>
-                        <div class="subtitle">Knowledge Assets</div>
-                        <p>
-                            .doc, .pdf, .md etc. wrapped in .nft container. Version history = immutable UTXO chain. 
-                            Granular access (per page, section, or paragraph).
-                        </p>
-                        <p><strong>Example:</strong> Research papers sold by chapter; encrypted reports with royalty payouts.</p>
-                    </div>
-
-                    <div class="asset-card">
-                        <div class="icon">🎵</div>
-                        <h4>Media</h4>
-                        <div class="subtitle">Creative Assets</div>
-                        <p>
-                            Audio, video, and image assets stored or referenced on-chain. Licensing rules enforced 
-                            automatically via smart contracts.
-                        </p>
-                        <p><strong>Example:</strong> Musicians releasing albums with pay-per-stream microtransactions.</p>
-                    </div>
-
-                    <div class="asset-card">
-                        <div class="icon">🪙</div>
-                        <h4>Tokens & Shares</h4>
-                        <div class="subtitle">Financial Assets</div>
-                        <p>
-                            Equity, fungible tokens, stablecoins, and utility tokens. BAP spreadsheets automate 
-                            dividends, payouts, or governance votes.
-                        </p>
-                        <p><strong>Example:</strong> Tokenized company shares, DAO governance spreadsheets.</p>
-                    </div>
-
-                    <div class="asset-card">
-                        <div class="icon">📡</div>
-                        <h4>IoT & Sensor Feeds</h4>
-                        <div class="subtitle">Data Stream Assets</div>
-                        <p>
-                            Sensor readings inscribed as UTXOs. Buyers subscribe to live feeds, paying per datapoint.
-                        </p>
-                        <p><strong>Example:</strong> Weather data streams, energy grid reporting.</p>
-                    </div>
-
-                    <div class="asset-card">
-                        <div class="icon">📜</div>
-                        <h4>Contracts</h4>
-                        <div class="subtitle">Legal/Business Assets</div>
-                        <p>
-                            Agreements encoded in .nft container. Human-readable + machine-executable clauses.
-                        </p>
-                        <p><strong>Example:</strong> Shipping contract that releases payment automatically upon delivery confirmation.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="features">
-                <h2>⚙️ Core Features of BAP</h2>
-                
-                <h3>UTXO Version Control</h3>
-                <ul>
-                    <li>Every save = new transaction</li>
-                    <li>Git-like immutable history baked into Bitcoin</li>
-                    <li>Branch and merge capabilities through transaction chains</li>
-                </ul>
-
-                <h3>Granular Encryption</h3>
-                <ul>
-                    <li>Encrypt at file, row, column, or cell level</li>
-                    <li>Selective key distribution to buyers or collaborators</li>
-                    <li>Time-locked access controls</li>
-                </ul>
-
-                <h3>Tokenized Ownership</h3>
-                <ul>
-                    <li>Issue tokens representing fractional ownership in assets</li>
-                    <li>Revenue auto-distributed via dividends</li>
-                    <li>Governance rights encoded in tokens</li>
-                </ul>
-
-                <h3>Microtransaction Pricing</h3>
-                <ul>
-                    <li>Native pay-per-cell, per-paragraph, or per-datapoint billing</li>
-                    <li>Powered by Bitcoin SV's low-fee microtransactions</li>
-                    <li>Automatic royalty distribution</li>
-                </ul>
-
-                <h3>Interoperability Across Asset Types</h3>
-                <ul>
-                    <li>Documents link into spreadsheets</li>
-                    <li>Spreadsheets call contracts</li>
-                    <li>Contracts trigger media royalties</li>
-                    <li>All assets live on the same global protocol</li>
-                </ul>
-            </section>
-
-            <section class="section" id="architecture">
-                <h2>🏗️ System Architecture</h2>
-                
-                <table class="architecture-table">
-                    <thead>
-                        <tr>
-                            <th>Layer</th>
-                            <th>Components</th>
-                            <th>Purpose</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Application Layer</strong></td>
-                            <td>User interfaces (spreadsheets, dashboards, editors), Authentication (HandCash), Encryption + permissions</td>
-                            <td>User-facing BApps and interfaces</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Protocol Layer (BAP)</strong></td>
-                            <td>.nft container format, JSON manifest for metadata, Access schema, Token protocols</td>
-                            <td>Asset standardization and interoperability</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Blockchain Layer</strong></td>
-                            <td>Bitcoin SV UTXO model, Immutable storage, Smart contracts (sCrypt/Run)</td>
-                            <td>Permanent, trustless infrastructure</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>Example: Spreadsheet as BAP Asset</h3>
-                <div class="code-block">
-                    <pre>root.nft
-├── manifest.json   # metadata, permissions
-├── sheet.csv       # spreadsheet data
-├── schema.json     # cell/column data types
-├── keys.json       # encrypted keys
-└── signatures.json # version signatures</pre>
-                </div>
-
-                <h3>Use Case: DeFi Yield Calculator BApp</h3>
-                <ul>
-                    <li>Cell A1 = user deposit amount</li>
-                    <li>Cell B1 = calculated yield</li>
-                    <li>Smart contract triggers swap if yield threshold is met</li>
-                    <li>Transactions + revenue logged automatically on-chain</li>
-                </ul>
-            </section>
-
-            <section class="section">
-                <h2>🚀 The Vision</h2>
-                
-                <div class="vision-box">
-                    <h3>One Ledger, Many Assets</h3>
-                    <p>
-                        Spreadsheets, contracts, media, tokens — all managed with the same rules on Bitcoin SV. 
-                        Every digital object becomes a first-class citizen on the blockchain.
-                    </p>
-                    
-                    <h3>One Protocol, Infinite Apps</h3>
-                    <p>
-                        Any developer can turn assets into BApps with familiar UIs and Bitcoin-native logic. 
-                        Build once, interoperate everywhere.
-                    </p>
-                    
-                    <h3>One Economy, Built on Bitcoin</h3>
-                    <p>
-                        Everything becomes tradeable, auditable, and monetizable — at micro and macro scale. 
-                        From individual spreadsheet cells to entire business ecosystems.
-                    </p>
-                </div>
-
-                <div class="tagline">
-                    <h2>BAP: One Protocol for Every Asset. One Ledger for the World.</h2>
-                    <p>Building the future of digital ownership on Bitcoin SV</p>
-                </div>
-            </section>
-
-            <section class="section">
-                <h2>📚 Learn More</h2>
-                <p>
-                    BAP is an open protocol built on Bitcoin SV. Join the community and start building:
-                </p>
-                <ul>
-                    <li><strong>GitHub:</strong> <a href="https://github.com/b0ase/bitcoin-drive" target="_blank">github.com/b0ase/bitcoin-drive</a></li>
-                    <li><strong>BSV Wiki:</strong> <a href="https://wiki.bitcoinsv.io" target="_blank">wiki.bitcoinsv.io</a></li>
-                    <li><strong>HandCash Developer Docs:</strong> <a href="https://docs.handcash.dev" target="_blank">docs.handcash.dev</a></li>
-                    <li><strong>WhatsOnChain Explorer:</strong> <a href="https://whatsonchain.com" target="_blank">whatsonchain.com</a></li>
-                </ul>
-            </section>
+        <div class="section">
+            <h2>🔗 Learn More</h2>
+            <p>Explore the protocols and technologies that power Bitcoin Drive:</p>
+            
+            <ul class="protocol-list">
+                <li>
+                    <strong>Bitcoin Attestation Protocol</strong>
+                    <a href="https://github.com/icellan/bap" target="_blank" style="color: var(--text-secondary);">
+                        github.com/icellan/bap
+                    </a>
+                </li>
+                <li>
+                    <strong>BSV Protocol Documentation</strong>
+                    <a href="https://docs.bsvblockchain.org" target="_blank" style="color: var(--text-secondary);">
+                        docs.bsvblockchain.org
+                    </a>
+                </li>
+                <li>
+                    <strong>HandCash Connect SDK</strong>
+                    <a href="https://docs.handcash.io" target="_blank" style="color: var(--text-secondary);">
+                        docs.handcash.io
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </body>

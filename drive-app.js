@@ -308,20 +308,17 @@ class BitcoinDrive {
     }
 
     async connectHandCash() {
-        const isDemoMode = confirm('Use demo mode? (Click Cancel to connect with real HandCash)');
+        // Direct connection to HandCash - no demo mode
+        const appId = '68c697fb5287127557e47739';
+        const redirectUrl = window.location.origin + '/auth/handcash/callback';
+        const authUrl = `https://app.handcash.io/#/authorizeApp?appId=${appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
         
-        if (isDemoMode) {
-            this.authToken = 'demo-token';
-            localStorage.setItem('authToken', this.authToken);
-            await this.fetchUserProfile();
-            this.showToast('Connected in demo mode', 'success');
-        } else {
-            // Use the configured HandCash App ID from .env
-            const appId = '68c697fb5287127557e47739';
-            const redirectUrl = window.location.origin + '/auth/handcash/callback';
-            const authUrl = `https://app.handcash.io/#/authorizeApp?appId=${appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+        this.showToast('Redirecting to HandCash...', 'success');
+        
+        // Small delay to show the toast
+        setTimeout(() => {
             window.location.href = authUrl;
-        }
+        }, 500);
     }
 
     logout() {

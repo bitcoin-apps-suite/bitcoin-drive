@@ -24,8 +24,8 @@ const upload = multer({
 });
 
 const handCashConnect = new HandCashConnect({
-  appId: process.env.HANDCASH_APP_ID || 'demo-app-id',
-  appSecret: process.env.HANDCASH_APP_SECRET || 'demo-app-secret'
+  appId: process.env.HANDCASH_APP_ID,
+  appSecret: process.env.HANDCASH_APP_SECRET
 });
 
 const uploadDir = path.join(__dirname, 'uploads');
@@ -83,17 +83,6 @@ app.get('/api/handcash-profile', async (req, res) => {
       return res.status(401).json({ error: 'No auth token provided' });
     }
 
-    if (authToken === 'demo-token') {
-      return res.json({
-        publicProfile: {
-          handle: 'demo_user',
-          displayName: 'Demo User',
-          avatarUrl: null,
-          localCurrencyCode: 'USD'
-        }
-      });
-    }
-
     const account = handCashConnect.getAccountFromAuthToken(authToken);
     const profile = await account.profile.getCurrentProfile();
     
@@ -118,7 +107,7 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
     }
 
     const fileId = crypto.randomBytes(16).toString('hex');
-    const userHandle = authToken === 'demo-token' ? 'demo_user' : 'user_' + authToken.substring(0, 8);
+    const userHandle = 'user_' + authToken.substring(0, 8);
     
     const fileData = {
       id: fileId,
@@ -129,7 +118,7 @@ app.post('/api/files/upload', upload.single('file'), async (req, res) => {
       encrypted: encrypt === 'true',
       uploadedAt: new Date().toISOString(),
       owner: userHandle,
-      txId: `demo_tx_${fileId}`,
+      txId: `pending_tx_${fileId}`,
       downloadUrl: `/api/files/${fileId}/download`
     };
 
@@ -165,7 +154,7 @@ app.get('/api/files', async (req, res) => {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const userHandle = authToken === 'demo-token' ? 'demo_user' : 'user_' + authToken.substring(0, 8);
+    const userHandle = 'user_' + authToken.substring(0, 8);
     const userFiles = usersDb.get(userHandle) || [];
     
     res.json({
@@ -219,7 +208,7 @@ app.delete('/api/files/:fileId', async (req, res) => {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    const userHandle = authToken === 'demo-token' ? 'demo_user' : 'user_' + authToken.substring(0, 8);
+    const userHandle = 'user_' + authToken.substring(0, 8);
     
     if (fileData.owner !== userHandle) {
       return res.status(403).json({ error: 'Not authorized to delete this file' });
