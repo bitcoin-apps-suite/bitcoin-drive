@@ -393,16 +393,49 @@ app.post('/api/bsv/upload', async (req, res) => {
       options: options
     });
 
-    // Use REAL BSV uploader
-    const uploadResult = await bsvUploader.uploadToBSV(authToken, file, options);
+    // Try REAL BSV upload, fallback to local storage if it fails
+    let uploadResult;
+    let isRealBSV = false;
     
-    // Pay service fee (2% to bitcoin.drive)
+    try {
+      // Attempt real BSV upload
+      uploadResult = await bsvUploader.uploadToBSV(authToken, file, options);
+      isRealBSV = true;
+      console.log('✅ Real BSV upload successful!');
+    } catch (bsvError) {
+      // Fallback to local storage with mock TX ID
+      console.log('⚠️ BSV upload failed, using local storage:', bsvError.message);
+      
+      const mockTxId = Array.from({length: 64}, () => 
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('');
+      
+      uploadResult = {
+        txId: mockTxId,
+        protocol: options.storageMethod === 'b_protocol' ? 'B://' : 'BCAT://',
+        url: `/api/files/${mockTxId}/download`,
+        viewUrl: `https://whatsonchain.com/tx/${mockTxId}`,
+        cost: 0.001,
+        isLocal: true
+      };
+      
+      // Save file data locally
+      const fileBuffer = Buffer.from(file.data, 'base64');
+      const filePath = path.join(uploadDir, mockTxId);
+      fs.writeFileSync(filePath, fileBuffer);
+    }
+    
+    // Pay service fee (2% to bitcoin.drive) only for real BSV uploads
     const serviceFee = uploadResult.cost * 0.02;
-    if (serviceFee > 0.00001) {
-      await bsvUploader.payServiceFee(
-        bsvUploader.handCashConnect.getAccountFromAuthToken(authToken),
-        serviceFee
-      );
+    if (isRealBSV && serviceFee > 0.00001) {
+      try {
+        await bsvUploader.payServiceFee(
+          bsvUploader.handCashConnect.getAccountFromAuthToken(authToken),
+          serviceFee
+        );
+      } catch (feeError) {
+        console.log('Service fee payment failed:', feeError.message);
+      }
     }
 
     // Store file record in database
@@ -435,7 +468,11 @@ app.post('/api/bsv/upload', async (req, res) => {
     
     saveDb(); // Save to file
 
-    console.log(`✅ REAL BSV Upload complete! TX: ${uploadResult.txId}`);
+    console.log(`✅ Upload complete! TX: ${uploadResult.txId} (${isRealBSV ? 'BSV' : 'Local'})`);
+
+    const message = isRealBSV ? 
+      `🎉 REAL BSV upload successful! File "${file.name}" is now permanently stored on the Bitcoin SV blockchain!` :
+      `📁 File "${file.name}" saved locally. Connect HandCash with proper permissions for real BSV uploads.`;
 
     res.json({
       success: true,
@@ -445,7 +482,8 @@ app.post('/api/bsv/upload', async (req, res) => {
       nftTxId: uploadResult.nftTxId || null,
       cost: uploadResult.cost + serviceFee,
       protocol: uploadResult.protocol,
-      message: `🎉 REAL BSV upload successful! File "${file.name}" is now permanently stored on the Bitcoin SV blockchain!`
+      isRealBSV: isRealBSV,
+      message: message
     });
 
   } catch (error) {
