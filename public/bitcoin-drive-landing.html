@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Drive - Secure Digital Storage</title>
+    <title>Bitcoin Drive - Decentralized Storage on BSV</title>
     <style>
         * {
             margin: 0;
@@ -11,420 +11,402 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-green: #00ff41;
+            --dark-green: #00cc33;
+            --light-green: #66ff99;
+            --bg-dark: #0a0f0a;
+            --bg-darker: #060906;
+            --text-light: #e0ffe0;
+            --text-dim: #80ff99;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 100%);
-            color: #ffffff;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a1a;
+            color: var(--text-light);
+            font-weight: 100;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            padding: 30px 0;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(247, 147, 26, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        nav {
+        .hero {
+            padding: 3rem 2rem 2rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #f7931a;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #f7931a, #ffb84d);
-            border-radius: 50%;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            animation: pulse 2s infinite;
+            position: relative;
+            background: #1e1e1e;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            list-style: none;
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
-        .nav-links a {
-            color: #ffffff;
-            text-decoration: none;
-            transition: color 0.3s;
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
 
-        .nav-links a:hover {
-            color: #f7931a;
+        h1 {
+            font-size: 7rem;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 0.5rem;
         }
-
-        .hero {
-            padding: 100px 0;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #f7931a, #ffb84d);
+        
+        h1 .bitcoin {
+            background: linear-gradient(90deg, var(--primary-green), var(--light-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+        }
+        
+        h1 .drive {
+            color: var(--text-light);
         }
 
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: #a8a8a8;
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .btn {
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
+            padding: 0.8rem 2.5rem;
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 1px;
             text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            border: 1px solid var(--primary-green);
+            background: transparent;
+            color: var(--primary-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #f7931a, #ffb84d);
-            color: #000000;
-            border: none;
+            background: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(247, 147, 26, 0.3);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #f7931a;
-            border: 2px solid #f7931a;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(247, 147, 26, 0.1);
+            background: var(--light-green);
         }
 
         .features {
-            padding: 80px 0;
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            margin-top: 60px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(247, 147, 26, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            transition: all 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: #f7931a;
-            background: rgba(247, 147, 26, 0.05);
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #f7931a, #ffb84d);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        .feature-title {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-            color: #ffffff;
-        }
-
-        .feature-description {
-            color: #a8a8a8;
-            line-height: 1.6;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .section-title {
+            font-size: 2rem;
+            font-weight: 200;
+            letter-spacing: 2px;
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #f7931a, #ffb84d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 2rem;
+            color: var(--primary-green);
         }
 
-        .stats {
-            padding: 60px 0;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 40px;
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .stat {
-            text-align: center;
+        .feature-card {
+            background: rgba(0, 255, 65, 0.03);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #f7931a;
-            margin-bottom: 8px;
+        .feature-card:hover {
+            background: rgba(0, 255, 65, 0.06);
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
         }
 
-        .stat-label {
-            color: #a8a8a8;
-            font-size: 1rem;
+        .feature-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary-green);
         }
 
-        .bitcoin-animation {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.03;
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 200;
+            margin-bottom: 0.6rem;
+            color: var(--light-green);
+            letter-spacing: 1px;
         }
 
-        .bitcoin-float {
-            position: absolute;
-            font-size: 40px;
-            animation: float 20s infinite linear;
+        .feature-desc {
+            font-weight: 100;
+            line-height: 1.8;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
         }
 
-        @keyframes float {
-            from {
-                transform: translateY(100vh) rotate(0deg);
-            }
-            to {
-                transform: translateY(-100px) rotate(360deg);
-            }
+        .explanation {
+            padding: 3rem 2rem;
+            background: linear-gradient(180deg, transparent, rgba(0, 255, 65, 0.02));
         }
 
-        footer {
-            padding: 40px 0;
-            text-align: center;
-            border-top: 1px solid rgba(247, 147, 26, 0.2);
-            color: #a8a8a8;
+        .explanation-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: left;
         }
 
-        .footer-links {
+        .explanation-text {
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            letter-spacing: 0.3px;
+        }
+
+        .tech-stack {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
         }
 
-        .footer-links a {
-            color: #a8a8a8;
-            text-decoration: none;
-            transition: color 0.3s;
+        .tech-badge {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--primary-green);
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            color: var(--primary-green);
+            background: rgba(0, 255, 65, 0.05);
         }
 
-        .footer-links a:hover {
-            color: #f7931a;
+        .protocol-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .protocol-card {
+            text-align: center;
+            padding: 1.2rem;
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .protocol-card:hover {
+            border-color: var(--primary-green);
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        .protocol-name {
+            font-size: 1.4rem;
+            font-weight: 100;
+            color: var(--primary-green);
+            margin-bottom: 0.4rem;
+            letter-spacing: 2px;
+        }
+
+        .protocol-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            font-weight: 200;
+            letter-spacing: 0.5px;
+        }
+
+        .footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        .footer-text {
+            font-weight: 100;
+            color: var(--text-dim);
+            letter-spacing: 1px;
         }
 
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+            h1 {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
             }
             
-            .features-grid {
-                grid-template-columns: 1fr;
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .btn {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="bitcoin-animation">
-        <div class="bitcoin-float" style="left: 10%; animation-delay: 0s;">₿</div>
-        <div class="bitcoin-float" style="left: 30%; animation-delay: 5s;">₿</div>
-        <div class="bitcoin-float" style="left: 50%; animation-delay: 10s;">₿</div>
-        <div class="bitcoin-float" style="left: 70%; animation-delay: 15s;">₿</div>
-        <div class="bitcoin-float" style="left: 90%; animation-delay: 20s;">₿</div>
-    </div>
-
-    <header>
-        <nav class="container">
-            <a href="#" class="logo">
-                <div class="logo-icon">₿</div>
-                Bitcoin Drive
-            </a>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#security">Security</a></li>
-                <li><a href="#pricing">Pricing</a></li>
-                <li><a href="#about">About</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <section class="hero">
-        <div class="container">
-            <h1>Your Digital Vault on the Blockchain</h1>
-            <p class="hero-subtitle">
-                Secure, decentralized storage powered by Bitcoin technology. 
-                Store your digital assets with military-grade encryption and blockchain immutability.
+        <div class="logo-container">
+            <img src="../bitcoin-drive-icon-2.jpg" alt="Bitcoin Drive Logo">
+        </div>
+        <h1><span class="bitcoin">Bitcoin</span> <span class="drive">Drive</span></h1>
+        <p class="tagline">Monetize Your Content with Blockchain Storage</p>
+        <div class="cta-buttons">
+            <a href="/drive.html" class="btn btn-primary">Launch App</a>
+            <a href="/docs" class="btn">Documentation</a>
+        </div>
+    </section>
+
+    <section class="explanation">
+        <div class="explanation-content">
+            <h2 class="section-title">What is Bitcoin Drive?</h2>
+            <p class="explanation-text">
+                Bitcoin Drive is a decentralized content monetization platform built on the BitcoinSV blockchain. 
+                Store your music, videos, images, and documents permanently on-chain while selling access 
+                to your content and issuing revenue shares to investors.
             </p>
-            <div class="cta-buttons">
-                <a href="#" class="btn btn-primary">
-                    🚀 Get Started
-                </a>
-                <a href="#" class="btn btn-secondary">
-                    📖 Learn More
-                </a>
-            </div>
-            
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-number">256-bit</div>
-                    <div class="stat-label">Encryption</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">99.99%</div>
-                    <div class="stat-label">Uptime</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Active Users</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">1PB+</div>
-                    <div class="stat-label">Data Secured</div>
-                </div>
+            <p class="explanation-text">
+                Content creators can sell access to their work through paywalls and issue tokenized shares 
+                in individual assets. Revenue-generating content automatically distributes dividends to 
+                shareholders, creating a new model for content investment and creator funding.
+            </p>
+            <p class="explanation-text">
+                Files are stored immutably on the BSV blockchain with cryptographic security. 
+                Creators retain full ownership while benefiting from transparent, automated revenue 
+                distribution and permanent content preservation.
+            </p>
+            <div class="tech-stack">
+                <span class="tech-badge">REVENUE SHARING</span>
+                <span class="tech-badge">DIVIDEND PAYMENTS</span>
+                <span class="tech-badge">CONTENT MONETIZATION</span>
+                <span class="tech-badge">BSV BLOCKCHAIN</span>
             </div>
         </div>
     </section>
 
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title">Powered by Bitcoin Technology</h2>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3 class="feature-title">End-to-End Encryption</h3>
-                    <p class="feature-description">
-                        Your data is encrypted with AES-256 before it ever leaves your device. 
-                        Only you hold the keys to your digital vault.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⛓️</div>
-                    <h3 class="feature-title">Blockchain Verified</h3>
-                    <p class="feature-description">
-                        Every file is timestamped and verified on the Bitcoin blockchain, 
-                        ensuring authenticity and preventing tampering.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3 class="feature-title">Decentralized Network</h3>
-                    <p class="feature-description">
-                        Your data is distributed across a global network of nodes, 
-                        eliminating single points of failure.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3 class="feature-title">Lightning Fast</h3>
-                    <p class="feature-description">
-                        Leveraging the Lightning Network for instant file transfers 
-                        and micropayments for storage.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">💎</div>
-                    <h3 class="feature-title">Immutable Storage</h3>
-                    <p class="feature-description">
-                        Once stored, your data becomes part of an immutable ledger, 
-                        protecting against unauthorized modifications.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🔑</div>
-                    <h3 class="feature-title">Self-Sovereign</h3>
-                    <p class="feature-description">
-                        You maintain complete control over your data. No third party 
-                        can access or delete your files without your permission.
-                    </p>
-                </div>
+    <section class="features">
+        <h2 class="section-title">Core Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">Revenue Shares</h3>
+                <p class="feature-desc">
+                    Issue tokenized shares in your content assets. Investors receive 
+                    automatic dividend payments from your content's revenue streams.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h3 class="feature-title">Content Monetization</h3>
+                <p class="feature-desc">
+                    Sell access to your music, videos, images and documents through 
+                    blockchain-powered paywalls with instant micropayments.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Transparent Analytics</h3>
+                <p class="feature-desc">
+                    Track revenue, views, and shareholder distributions in real-time. 
+                    All transactions are recorded permanently on the blockchain.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Permanent Storage</h3>
+                <p class="feature-desc">
+                    Content is stored immutably on BSV blockchain with SHA-256 security. 
+                    No subscription fees, no data loss, files exist forever.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Instant Payments</h3>
+                <p class="feature-desc">
+                    Revenue and dividends are distributed automatically through 
+                    HandCash wallet integration with near-zero transaction fees.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">Global Access</h3>
+                <p class="feature-desc">
+                    Content is accessible worldwide through the BSV network. 
+                    No geographic restrictions or platform dependencies.
+                </p>
             </div>
         </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Bitcoin Drive. Built with ₿ and cryptographic excellence.</p>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Documentation</a>
-                <a href="#">Contact</a>
+    <section class="protocol-section">
+        <h2 class="section-title">BSV Data Protocols</h2>
+        <div class="protocol-grid">
+            <div class="protocol-card">
+                <div class="protocol-name">B://</div>
+                <p class="protocol-desc">Base protocol for on-chain data storage</p>
+            </div>
+            <div class="protocol-card">
+                <div class="protocol-name">BCAT://</div>
+                <p class="protocol-desc">Concatenated data for large files</p>
+            </div>
+            <div class="protocol-card">
+                <div class="protocol-name">MAP</div>
+                <p class="protocol-desc">Magic Attribute Protocol for metadata</p>
+            </div>
+            <div class="protocol-card">
+                <div class="protocol-name">AIP</div>
+                <p class="protocol-desc">Author Identity Protocol for ownership</p>
+            </div>
+            <div class="protocol-card">
+                <div class="protocol-name">BAP</div>
+                <p class="protocol-desc">Bitcoin Attestation Protocol for identity</p>
+            </div>
+            <div class="protocol-card">
+                <div class="protocol-name">PAYMAIL</div>
+                <p class="protocol-desc">Human-readable payment addresses</p>
             </div>
         </div>
+    </section>
+
+    <footer class="footer">
+        <p class="footer-text">Built on BitcoinSV - The Original Bitcoin Protocol</p>
     </footer>
 </body>
 </html>
