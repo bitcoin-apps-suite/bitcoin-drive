@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Drive - Decentralized File Storage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="drive-styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Bitcoin Taskbar -->
+        <div class="bitcoin-taskbar">
+            <div class="taskbar-left">
+                <!-- Bitcoin Logo Menu -->
+                <div class="bitcoin-menu-container">
+                    <button class="bitcoin-logo-button" id="bitcoinMenuBtn" aria-label="Bitcoin Menu">
+                        <div class="bitcoin-logo">₿</div>
+                    </button>
+                    <div class="bitcoin-menu" id="bitcoinMenu" style="display: none;">
+                        <div class="menu-header">
+                            <div class="bitcoin-logo-small">₿</div>
+                            <span>Bitcoin</span>
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="twitter">
+                            <span>🐦</span> Follow on X
+                        </div>
+                        <div class="menu-item" data-action="about">
+                            <span>ℹ️</span> About Bitcoin Drive
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="restart">
+                            <span>🔄</span> Restart
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bitcoin Drive Menu -->
+                <div class="drive-menu-container">
+                    <button class="drive-menu-button" id="driveMenuBtn" aria-label="Bitcoin Drive Menu">
+                        <span>Bitcoin Drive</span>
+                    </button>
+                    <div class="drive-menu" id="driveMenu" style="display: none;">
+                        <div class="menu-header">
+                            <span>Bitcoin Drive</span>
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="upload">
+                            <span>📤</span> Upload Files
+                        </div>
+                        <div class="menu-item" data-action="new-folder">
+                            <span>📁</span> New Folder
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="tokenize">
+                            <span>🪙</span> Tokenize Selection
+                        </div>
+                        <div class="menu-item" data-action="share">
+                            <span>🔗</span> Share Drive
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="baps-summary">
+                            <span>📄</span> BAPS Executive Summary
+                        </div>
+                        <div class="menu-item" data-action="stats">
+                            <span>📊</span> Storage Statistics
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Developer Menu -->
+                <div class="developer-menu-container">
+                    <button class="developer-menu-button" id="developerMenuBtn" aria-label="Developer Menu">
+                        <span>Developer</span>
+                    </button>
+                    <div class="developer-menu" id="developerMenu" style="display: none;">
+                        <div class="menu-header">
+                            <span>Developer Resources</span>
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="baps-docs">
+                            <span>📋</span> BAPS Documentation
+                        </div>
+                        <div class="menu-item" data-action="nft-spec">
+                            <span>📄</span> NFT File Format Spec
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="github">
+                            <span>🔗</span> GitHub Repository
+                        </div>
+                        <div class="menu-item" data-action="handcash-docs">
+                            <span>💳</span> HandCash API Docs
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="debug">
+                            <span>🐛</span> Debug Console
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="taskbar-right">
+                <a href="https://x.com/BitcoinDrive" target="_blank" rel="noopener noreferrer" class="taskbar-twitter-link" aria-label="Follow on X">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">₿</div>
+                    <span>Bitcoin Drive</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-bar">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" placeholder="Search files..." id="searchInput">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="user-section" id="userSection">
+                    <button class="btn-connect" id="connectBtn">Connect HandCash</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <button class="btn-upload" id="uploadBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Upload Files
+                    </button>
+                </div>
+
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-view="all">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        All Files
+                    </a>
+                    <a href="#" class="nav-item" data-view="recent">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Recent
+                    </a>
+                    <a href="#" class="nav-item" data-view="nfts">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        NFTs
+                    </a>
+                    <a href="#" class="nav-item" data-view="shared">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                        </svg>
+                        Shared
+                    </a>
+                </nav>
+
+                <div class="storage-info">
+                    <div class="storage-header">Storage Used</div>
+                    <div class="storage-bar">
+                        <div class="storage-bar-fill" id="storageBar"></div>
+                    </div>
+                    <div class="storage-text" id="storageText">0 MB of ∞</div>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="content-header">
+                    <h1 id="viewTitle">All Files</h1>
+                    <div class="view-toggles">
+                        <button class="view-toggle active" data-view-type="grid">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                        <button class="view-toggle" data-view-type="list">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Drop files here to upload</p>
+                        <p class="drop-zone-hint">or click to browse</p>
+                    </div>
+                </div>
+
+                <div class="files-grid" id="filesGrid"></div>
+                <div class="files-list" id="filesList" style="display: none;"></div>
+
+                <div class="empty-state" id="emptyState">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <h3>No files yet</h3>
+                    <p>Upload your first file to get started</p>
+                </div>
+            </main>
+        </div>
+
+        <input type="file" id="fileInput" multiple style="display: none;">
+
+        <div class="modal" id="uploadModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Upload Files</h2>
+                    <button class="modal-close" id="closeUploadModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-preview" id="uploadPreview"></div>
+                    
+                    <div class="storage-method-section">
+                        <h3>Storage Method</h3>
+                        <div class="storage-methods" id="storageMethods">
+                            <label class="storage-method">
+                                <input type="radio" name="storageMethod" value="op_return">
+                                <div class="method-card">
+                                    <div class="method-name">Quick Save</div>
+                                    <div class="method-desc">Metadata only (80 bytes)</div>
+                                    <div class="method-cost">~$0.01</div>
+                                </div>
+                            </label>
+                            <label class="storage-method">
+                                <input type="radio" name="storageMethod" value="op_pushdata4" checked>
+                                <div class="method-card recommended">
+                                    <div class="method-name">Full Storage</div>
+                                    <div class="method-desc">Complete file on-chain</div>
+                                    <div class="method-cost" id="fullStorageCost">Calculating...</div>
+                                </div>
+                            </label>
+                            <label class="storage-method">
+                                <input type="radio" name="storageMethod" value="multisig_p2sh">
+                                <div class="method-card">
+                                    <div class="method-name">Smart Storage</div>
+                                    <div class="method-desc">Script-based storage</div>
+                                    <div class="method-cost" id="smartStorageCost">Calculating...</div>
+                                </div>
+                            </label>
+                            <label class="storage-method">
+                                <input type="radio" name="storageMethod" value="nft">
+                                <div class="method-card">
+                                    <div class="method-name">NFT Mode</div>
+                                    <div class="method-desc">Tokenized storage</div>
+                                    <div class="method-cost" id="nftStorageCost">~$1.00</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="upload-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="encryptFiles" checked>
+                            <span>Encrypt files</span>
+                        </label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
+                        <button class="btn btn-primary" id="confirmUpload">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="fileDetailsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="fileDetailsName">File Details</h2>
+                    <button class="modal-close" id="closeFileDetails">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="file-preview" id="filePreview"></div>
+                    <div class="file-info" id="fileInfo"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="downloadFile">Download</button>
+                        <button class="btn btn-primary" id="tokenizeFile">Create NFT</button>
+                        <button class="btn btn-danger" id="deleteFile">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script src="drive-app.js"></script>
+</body>
+</html>

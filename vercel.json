@@ -1,19 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
-      "source": "/",
-      "destination": "/public/bitcoin-drive-landing.html"
-    },
-    {
-      "source": "/drive",
-      "destination": "/public/drive.html"
-    }
-  ],
   "functions": {
     "api/index.js": {
       "maxDuration": 30
