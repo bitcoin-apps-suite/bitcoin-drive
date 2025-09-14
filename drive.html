@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Drive - Decentralized File Storage</title>
+    <title>Bitcoin Drive - BSV Blockchain Storage with NFT Container Format</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -30,6 +30,9 @@
                         </div>
                         <div class="menu-item" data-action="about">
                             <span>ℹ️</span> About Bitcoin Drive
+                        </div>
+                        <div class="menu-item" data-action="docs">
+                            <span>📚</span> NFT & BAPS Documentation
                         </div>
                         <div class="menu-separator"></div>
                         <div class="menu-item" data-action="restart">
@@ -322,8 +325,214 @@
         </div>
 
         <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Documentation Modal -->
+        <div class="modal" id="docsModal" style="display: none;">
+            <div class="modal-content docs-modal">
+                <div class="modal-header">
+                    <h2 style="color: #00ff41;">₿SV Bitcoin Drive - Technical Documentation</h2>
+                    <button class="close-btn" onclick="closeDocsModal()">&times;</button>
+                </div>
+                <div class="modal-body" style="background: #0a0f0a; color: #e0ffe0; padding: 30px; overflow-y: auto; max-height: 70vh;">
+                    <section class="docs-section">
+                        <h3 style="color: #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 10px;">NFT Container File Format (.nft)</h3>
+                        <p style="margin: 20px 0; line-height: 1.8;">
+                            The <strong style="color: #00ff41;">.nft</strong> (Network File Type) is a versatile container format designed specifically for BitcoinSV blockchain storage. 
+                            Similar to how <strong>.mov</strong> and <strong>.avi</strong> can contain different video codecs, the <strong>.nft</strong> format acts as a universal container 
+                            that can encapsulate various data types and formats.
+                        </p>
+                        
+                        <h4 style="color: #33ff66; margin-top: 25px;">Supported Internal Formats:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 20px 0;">
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.xml</strong> - For structured data and configurations</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.csv</strong> - For spreadsheet and tabular data</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.json</strong> - For structured objects and APIs</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.pdf</strong> - For documents and reports</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.jpg/.png</strong> - For images and graphics</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.mp4/.webm</strong> - For video content</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">.mp3/.wav</strong> - For audio files</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">Any binary data</strong> - Raw data streams</li>
+                        </ul>
+
+                        <div style="background: rgba(0, 255, 65, 0.1); border: 2px solid #00ff41; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h4 style="color: #00ff41;">NFT Container Structure:</h4>
+                            <pre style="color: #33ff66; font-family: 'Courier New', monospace; margin: 15px 0;">
+{
+  "version": "1.0.0",
+  "container": "NFT",
+  "metadata": {
+    "created": "timestamp",
+    "bsvTxId": "transaction_hash",
+    "blockHeight": 123456,
+    "size": 1048576,
+    "mimeType": "application/vnd.spreadsheet",
+    "encoding": "base64"
+  },
+  "payload": {
+    "format": "csv",
+    "data": "encoded_content_here",
+    "checksum": "sha256_hash"
+  },
+  "attestation": {
+    "protocol": "BAPS/1.0",
+    "signature": "ecdsa_signature"
+  }
+}</pre>
+                        </div>
+                    </section>
+
+                    <section class="docs-section" style="margin-top: 40px;">
+                        <h3 style="color: #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 10px;">BitcoinSV (BSV) Technology Stack</h3>
+                        <p style="margin: 20px 0; line-height: 1.8;">
+                            Bitcoin Drive is built on <strong style="color: #00ff41;">BitcoinSV (BSV)</strong>, the blockchain that maintains the original Bitcoin protocol 
+                            with unbounded scaling capabilities. BSV provides:
+                        </p>
+                        
+                        <ul style="list-style: none; padding: 0; margin: 20px 0;">
+                            <li style="padding: 10px 0;">• <strong style="color: #00ff41;">Unlimited Block Size</strong> - Store files directly on-chain</li>
+                            <li style="padding: 10px 0;">• <strong style="color: #00ff41;">Sub-cent Transaction Fees</strong> - Economical for data storage</li>
+                            <li style="padding: 10px 0;">• <strong style="color: #00ff41;">Instant Transactions</strong> - 0-conf for immediate access</li>
+                            <li style="padding: 10px 0;">• <strong style="color: #00ff41;">IPv6 Integration</strong> - Direct peer-to-peer connectivity</li>
+                            <li style="padding: 10px 0;">• <strong style="color: #00ff41;">Native Data Protocols</strong> - Built-in support for large data</li>
+                        </ul>
+
+                        <div style="background: rgba(247, 147, 26, 0.1); border: 2px solid #f7931a; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <p style="color: #f7931a;">
+                                <strong>⚠️ Important:</strong> Bitcoin Drive uses BSV, not BTC. We do NOT use Lightning Network, IPFS, or Taproot. 
+                                All data is stored directly on the BSV blockchain using native Bitcoin script and OP_RETURN transactions.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section class="docs-section" style="margin-top: 40px;">
+                        <h3 style="color: #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 10px;">BAPS - Bitcoin Attestation Protocol System</h3>
+                        <p style="margin: 20px 0; line-height: 1.8;">
+                            BAPS provides cryptographic proof of existence, integrity, and ownership on the BSV blockchain:
+                        </p>
+                        
+                        <h4 style="color: #33ff66; margin-top: 25px;">Key Features:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 20px 0;">
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">On-chain Storage</strong> - Files stored directly in BSV transactions</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">Immutable Timestamps</strong> - Permanent proof of existence</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">Digital Signatures</strong> - ECDSA authentication</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">Chain of Custody</strong> - Track ownership history</li>
+                            <li style="padding: 8px 0;">• <strong style="color: #00ff41;">MetaNet Protocol</strong> - Hierarchical data structures</li>
+                        </ul>
+
+                        <div style="background: rgba(0, 255, 65, 0.1); border: 2px solid #00ff41; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h4 style="color: #00ff41;">BSV Transaction Structure:</h4>
+                            <pre style="color: #33ff66; font-family: 'Courier New', monospace; margin: 15px 0;">
+// BSV Data Transaction
+{
+  "version": 2,
+  "inputs": [{
+    "txid": "previous_tx",
+    "vout": 0,
+    "scriptSig": "signature_pubkey"
+  }],
+  "outputs": [
+    {
+      "value": 0,
+      "script": "OP_FALSE OP_RETURN 'NFT' [data_pushdata]"
+    },
+    {
+      "value": 546,  // Dust limit satoshis
+      "script": "OP_DUP OP_HASH160 [pubkeyhash] OP_EQUALVERIFY OP_CHECKSIG"
+    }
+  ],
+  "locktime": 0
+}</pre>
+                        </div>
+                    </section>
+
+                    <section class="docs-section" style="margin-top: 40px;">
+                        <h3 style="color: #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 10px;">BSV Data Protocols</h3>
+                        
+                        <h4 style="color: #33ff66; margin-top: 25px;">Supported Protocols:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 20px 0;">
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">B://</strong> - Binary data protocol for large files
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">C://</strong> - Content-addressed storage
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">D://</strong> - Dynamic state protocol
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">BCAT://</strong> - Concatenated data for files > 100KB
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">AIP://</strong> - Author Identity Protocol
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <strong style="color: #00ff41;">MAP://</strong> - Magic Attribute Protocol
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="docs-section" style="margin-top: 40px;">
+                        <h3 style="color: #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 10px;">API Endpoints</h3>
+                        
+                        <div style="background: #000; border: 1px solid #00ff41; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <pre style="color: #00ff41; font-family: 'Courier New', monospace;">
+// Upload NFT Container
+POST /api/v1/nft/upload
+{
+  "container": {
+    "format": "csv",
+    "data": "base64_encoded_csv",
+    "metadata": {
+      "title": "Spreadsheet.nft",
+      "description": "Financial data"
+    }
+  }
+}
+
+// Retrieve NFT
+GET /api/v1/nft/{txid}
+
+// Query BSV Transaction
+GET /api/v1/bsv/tx/{txid}
+
+// Create BAPS Attestation
+POST /api/v1/baps/attest
+{
+  "txid": "bsv_transaction_id",
+  "signature": "ecdsa_signature"
+}</pre>
+                        </div>
+                    </section>
+
+                    <div style="margin-top: 50px; padding: 20px; background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 255, 65, 0.05)); border: 2px solid #00ff41; border-radius: 10px;">
+                        <p style="text-align: center; color: #00ff41; font-size: 18px; margin: 0;">
+                            <strong>₿SV Bitcoin Drive</strong> - Building on the Original Bitcoin Protocol
+                        </p>
+                        <p style="text-align: center; color: #33ff66; margin-top: 10px;">
+                            Unbounded Scaling • Direct On-Chain Storage • True Peer-to-Peer
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="drive-app.js"></script>
+    <script>
+        function closeDocsModal() {
+            document.getElementById('docsModal').style.display = 'none';
+        }
+        
+        // Add event listener for docs menu item
+        document.addEventListener('DOMContentLoaded', function() {
+            const docsMenuItem = document.querySelector('[data-action="docs"]');
+            if (docsMenuItem) {
+                docsMenuItem.addEventListener('click', function() {
+                    document.getElementById('docsModal').style.display = 'flex';
+                    document.getElementById('bitcoinMenu').style.display = 'none';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
