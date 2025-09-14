@@ -118,8 +118,8 @@ class BitcoinDrive {
                     case 'share':
                         alert('Share your drive with others - coming soon!');
                         break;
-                    case 'baps-summary':
-                        window.open('/baps_executive_summary.pdf', '_blank');
+                    case 'bap-summary':
+                        window.open('/bap_executive_summary.pdf', '_blank');
                         break;
                     case 'stats':
                         const totalFiles = this.files.length;
