@@ -85,6 +85,10 @@ class BitcoinDrive {
                     case 'about':
                         alert('Bitcoin Drive v1.0\nDecentralized file storage on BSV blockchain\n\nPowered by Bitcoin SV\n\n© 2025');
                         break;
+                    case 'docs':
+                        document.getElementById('docsModal').style.display = 'flex';
+                        toggleMenu('bitcoinMenu');
+                        break;
                     case 'restart':
                         window.location.reload();
                         break;
@@ -134,10 +138,22 @@ class BitcoinDrive {
                 const action = item.dataset.action;
                 switch(action) {
                     case 'baps-docs':
-                        window.open('/bitcoin-drive', '_blank');
+                        document.getElementById('docsModal').style.display = 'flex';
+                        toggleMenu('developerMenu');
+                        // Scroll to BAPS section
+                        setTimeout(() => {
+                            const bapsSection = document.querySelector('#docsModal h3:nth-of-type(3)');
+                            if (bapsSection) bapsSection.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
                         break;
                     case 'nft-spec':
-                        window.open('/nft_file_format_spec.md', '_blank');
+                        document.getElementById('docsModal').style.display = 'flex';
+                        toggleMenu('developerMenu');
+                        // Scroll to NFT section
+                        setTimeout(() => {
+                            const nftSection = document.querySelector('#docsModal h3:first-of-type');
+                            if (nftSection) nftSection.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
                         break;
                     case 'github':
                         window.open('https://github.com/b0ase/bitcoin-drive', '_blank');
