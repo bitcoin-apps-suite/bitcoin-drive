@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../../../Volumes/Extreme SSD/Projects/bitcoin-writer"
 		}
 	],
 	"settings": {}

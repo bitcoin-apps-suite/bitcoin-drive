@@ -83,3 +83,4 @@ config.local.js
 config.local.json
 
 .vercel
+.next/

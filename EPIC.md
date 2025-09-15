@@ -20,17 +20,18 @@
 ### Sprint 1: Foundation & Setup (Week 1-2)
 #### Story 1.1: Project Setup
 **As a** developer  
-**I want** a properly configured project structure  
+**I want** a properly configured Next.js project structure  
 **So that** I can build features efficiently  
 
 **Tasks**:
-- [ ] Initialize React TypeScript project
-- [ ] Set up Express backend server on port 4003
-- [ ] Configure build tools (Webpack/Vite)
-- [ ] Set up ESLint and Prettier
-- [ ] Create folder structure matching reference projects
-- [ ] Initialize Git repository
-- [ ] Set up environment variables structure
+- [x] Initialize Next.js 15.5 TypeScript project
+- [x] Configure App Router with /src/app directory
+- [x] Set up API routes in /app/api
+- [x] Configure ESLint with Next.js config
+- [x] Set up Tailwind CSS v4 and PostCSS
+- [x] Initialize Git repository
+- [x] Set up environment variables (.env.local)
+- [x] Configure Prisma ORM with SQLite
 
 #### Story 1.2: Design System Implementation
 **As a** user  
@@ -38,39 +39,40 @@
 **So that** I can navigate the app easily  
 
 **Tasks**:
-- [ ] Create color palette with green theme (#00D632 primary)
-- [ ] Set up typography system
-- [ ] Build reusable UI components (Button, Input, Card, Modal)
-- [ ] Implement dark theme with proper contrast
-- [ ] Create responsive grid system
-- [ ] Design file/folder icons set
+- [x] Create CSS variable-based theming system
+- [x] Implement dynamic theme switcher (multiple themes)
+- [x] Build React components with TypeScript
+- [x] Create Upload Modal component
+- [x] Implement responsive layout with Tailwind
+- [x] Integrate Lucide React icons
 
 ### Sprint 2: Authentication (Week 3-4)
-#### Story 2.1: HandCash Integration
+#### Story 2.1: Google & HandCash Integration
 **As a** user  
-**I want** to login with HandCash  
+**I want** to login with Google or HandCash  
 **So that** I can access my files securely  
 
 **Tasks**:
-- [ ] Implement HandCashAuthService.ts
-- [ ] Create OAuth2 redirect flow
-- [ ] Build login page with HandCash branding
-- [ ] Implement token storage and validation
-- [ ] Create user profile display component
-- [ ] Add logout functionality
-- [ ] Set up demo mode for testing
+- [x] Implement NextAuth.js with Google OAuth
+- [x] Create API routes for authentication
+- [x] Build sign-in UI components
+- [x] Implement session management
+- [x] Create user profile display component
+- [x] Add sign out functionality
+- [x] Make authentication optional for browsing
+- [ ] Complete HandCash OAuth integration
 
-#### Story 2.2: Backend Authentication
+#### Story 2.2: API Authentication
 **As a** system  
-**I need** secure server-side authentication  
+**I need** secure API route protection  
 **So that** user data is protected  
 
 **Tasks**:
-- [ ] Create /api/handcash-profile endpoint
-- [ ] Implement JWT token generation
-- [ ] Add authentication middleware
-- [ ] Set up session management
-- [ ] Create user database schema
+- [x] Create /api/auth/[...nextauth] route
+- [x] Set up NextAuth session provider
+- [x] Configure NEXTAUTH_SECRET
+- [x] Create /api/handcash routes
+- [x] Add Prisma user schema
 - [ ] Implement rate limiting
 
 ### Sprint 3: File Management Core (Week 5-6)

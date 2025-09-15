@@ -132,19 +132,21 @@ To create the world's most secure and permanent file storage solution, where use
 - **Mobile**: Essential features, vertical layout
 
 ### 6. Technical Infrastructure
-#### Frontend
-- **Framework**: React 18+ with TypeScript
+#### Frontend & Backend (Unified Next.js Architecture)
+- **Framework**: Next.js 15.5+ with TypeScript
+- **React Version**: React 19.1 with Server Components
 - **State Management**: React Context + hooks
-- **Styling**: CSS Modules + Styled Components
-- **Build Tool**: Vite or Create React App
+- **Styling**: Tailwind CSS v4 + CSS Variables for theming
+- **Build Tool**: Next.js built-in with Turbopack
 - **File Handling**: react-dropzone, file-type detection
 
-#### Backend (Port 4003)
-- **Framework**: Express.js with TypeScript
-- **Authentication**: HandCash Connect SDK
-- **File Processing**: Multer for uploads, Sharp for images
+#### API Routes (Next.js App Router)
+- **Location**: `/src/app/api/` directory
+- **Authentication**: NextAuth.js v4 with Google OAuth
+- **HandCash Integration**: Connect SDK via API routes
+- **File Processing**: Multer for uploads in API routes
 - **Blockchain**: BSV library for transactions
-- **Database**: PostgreSQL for metadata, Redis for caching
+- **Database**: Prisma ORM with SQLite (upgradeable to PostgreSQL)
 
 #### Blockchain Integration
 - **BSV Libraries**: bsv.js, scrypt-ts

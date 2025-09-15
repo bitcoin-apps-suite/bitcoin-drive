@@ -1,128 +1,165 @@
-# Bitcoin Drive
+# Bitcoin Drive 🚀
 
-Decentralized file storage platform built on the Bitcoin SV blockchain with NFT tokenization capabilities.
+A decentralized file storage platform built on the BSV blockchain with Next.js, enabling users to securely upload, store, and tokenize files as NFTs.
 
-## Features
+## 🌟 Features
 
-- 🔐 **Secure Storage**: Files stored on BSV blockchain with AES-256 encryption
-- 💎 **NFT Tokenization**: Convert any file into a tradeable NFT
-- 💰 **Multiple Storage Methods**: Choose between Quick Save, Full Storage, Smart Storage, or NFT Mode
-- 🤝 **HandCash Integration**: Simple authentication and payments via HandCash
-- 📊 **BAPS Compatible**: Part of the Bitcoin Application Protocol Schema ecosystem
-- 🎨 **Modern UI**: Clean, responsive interface with green Bitcoin theme
+- **Blockchain Storage**: Permanent file storage on BSV blockchain
+- **NFT Tokenization**: Convert any file into tradeable NFTs
+- **Multiple Storage Methods**: Choose between quick metadata storage or full on-chain storage
+- **Google Authentication**: Secure login with Google OAuth (HandCash coming soon)
+- **Theme System**: Multiple UI themes with dynamic switching
+- **Responsive Design**: Works seamlessly on desktop and mobile
 
-## Quick Start
+## 🛠 Tech Stack
 
-### Prerequisites
-- Node.js v14 or higher
+- **Framework**: Next.js 15.5 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Authentication**: NextAuth.js with Google OAuth
+- **Database**: Prisma ORM with SQLite
+- **Icons**: Lucide React
+- **Blockchain**: BSV libraries for transaction handling
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
 - npm or yarn
-- HandCash account (optional, demo mode available)
+- Google OAuth credentials
+- HandCash Developer Account (optional)
 
-### Installation
+## 🚀 Quick Start
 
+### 1. Clone the repository
 ```bash
-# Clone the repository
 git clone https://github.com/b0ase/bitcoin-drive.git
 cd bitcoin-drive
-
-# Install dependencies
-npm install
-
-# Create .env file (optional for HandCash integration)
-cp .env.example .env
-# Edit .env with your HandCash credentials
 ```
 
-### Running the Application
-
+### 2. Install dependencies
 ```bash
-# Start the backend server (port 4003)
-npm start
-
-# In another terminal, start the frontend (port 3003)
-npm run client
-
-# Open in browser
-open http://localhost:3003/drive.html
+npm install
 ```
 
-## Usage
+### 3. Set up environment variables
+Create a `.env.local` file in the root directory:
+```env
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3003
+NEXTAUTH_SECRET=your-secret-key-here
 
-1. **Connect HandCash**: Click "Connect HandCash" and choose demo mode or real authentication
-2. **Upload Files**: Drag and drop files or click the upload button
-3. **Choose Storage Method**:
-   - Quick Save: Metadata only (cheapest)
-   - Full Storage: Complete file on-chain (most secure)
-   - Smart Storage: Balanced cost/security
-   - NFT Mode: Create tradeable NFT
-4. **Manage Files**: View, download, share, or tokenize your files
-5. **Create NFTs**: Convert any file into an NFT with customizable royalties
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-## Architecture
+# HandCash (Optional)
+HANDCASH_APP_ID=your-handcash-app-id
+HANDCASH_APP_SECRET=your-handcash-secret
+```
+
+### 4. Set up the database
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### 5. Run the development server
+```bash
+npm run dev -- --port 3003
+```
+
+Open [http://localhost:3003](http://localhost:3003) in your browser.
+
+## 📂 Project Structure
 
 ```
 bitcoin-drive/
-├── backend-server.js     # Express API server
-├── public/
-│   ├── drive.html       # Main application
-│   ├── drive-app.js     # Frontend JavaScript
-│   └── drive-styles.css # Styling
-├── PRD.md              # Product Requirements Document
-├── EPIC.md             # Development roadmap
-└── nft_drive_spec.md   # NFT file format specification
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── api/             # API routes
+│   │   │   ├── auth/        # NextAuth endpoints
+│   │   │   ├── handcash/    # HandCash integration
+│   │   │   └── upload/      # File upload handling
+│   │   ├── layout.tsx       # Root layout
+│   │   └── page.tsx         # Home page
+│   ├── components/          # React components
+│   │   ├── Providers.tsx    # Context providers
+│   │   ├── ThemeSelector.tsx # Theme system
+│   │   └── UploadModal.tsx  # File upload UI
+│   └── lib/                 # Utilities
+├── prisma/
+│   └── schema.prisma        # Database schema
+├── public/                  # Static assets
+└── package.json            # Dependencies
 ```
 
-## Storage Methods
+## 🔧 Available Scripts
 
-| Method | Description | Use Case | Cost |
-|--------|-------------|----------|------|
-| OP_RETURN | Metadata only (80 bytes) | Large files with external storage | ~$0.01 |
-| OP_PUSHDATA4 | Full file on-chain | Critical documents | ~$0.001/KB |
-| Multisig P2SH | Script-based storage | Balanced approach | ~$0.0005/KB |
-| NFT Mode | Tokenized storage | Monetizable content | ~$1.00 |
+- `npm run dev` - Start development server on port 3000
+- `npm run dev -- --port 3003` - Start on custom port
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run backend` - Run legacy Express server (deprecated)
 
-## API Endpoints
+## 🎨 Theme System
 
-- `GET /api/health` - Health check
-- `GET /api/handcash-profile` - Get user profile
-- `POST /api/files/upload` - Upload file
-- `GET /api/files` - List user files
-- `GET /api/files/:id/download` - Download file
-- `DELETE /api/files/:id` - Delete file
-- `POST /api/files/:id/tokenize` - Create NFT from file
-- `GET /api/storage-methods` - Get available storage methods
+The app includes a dynamic theme system with multiple presets:
+- Cyberpunk (Purple/Pink)
+- Forest (Green)
+- Ocean (Blue)
+- Sunset (Orange/Pink)
+- Monochrome (Black/White)
+- Neon (Bright colors)
+- Custom themes can be added
 
-## BAPS Integration
+## 🔐 Authentication
 
-Bitcoin Drive is part of the Bitcoin Application Protocol Schema (BAPS) ecosystem:
+The app supports two authentication methods:
+1. **Google OAuth** (Currently active)
+2. **HandCash** (Integration in progress)
 
-- Shared authentication via HandCash
-- Compatible `.nft` file format
-- Cross-app token compatibility
-- Unified marketplace for digital assets
+Authentication is optional - users can browse the interface without signing in.
 
-## Development
+## 📤 File Upload
 
+Files can be uploaded with different storage options:
+- **Full BSV**: Complete file stored on blockchain
+- **Hybrid**: Metadata on BSV, file on traditional storage
+- **NFT Mode**: Tokenize files as tradeable NFTs
+
+## 🚢 Deployment
+
+### Vercel (Recommended)
 ```bash
-# Run in development mode with auto-reload
-npm run dev
-
-# Run tests (when available)
-npm test
-
-# Build for production (when configured)
-npm run build
+vercel
 ```
 
-## Security
+The app auto-deploys to [bitcoin-drive.vercel.app](https://bitcoin-drive.vercel.app) on push to main.
 
-- Client-side encryption before upload
-- User-specific encryption keys derived from HandCash profile
-- Secure token storage in localStorage
-- HTTPS enforcement in production
-- Input sanitization and validation
+### Docker
+```bash
+docker build -t bitcoin-drive .
+docker run -p 3003:3003 bitcoin-drive
+```
 
-## Contributing
+## 🛠 Development Tools
+
+### Kill Port 3003 App
+A macOS utility app is included to quickly free port 3003:
+```bash
+open "Kill Port 3003.app"
+```
+Add it to your dock for quick access.
+
+## 📄 Documentation
+
+- [Product Requirements Document (PRD)](./PRD.md)
+- [Development Epic](./EPIC.md)
+- [NFT Drive Specification](./nft_drive_spec.md)
+- [HandCash Configuration](./handcash-config.md)
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -130,26 +167,21 @@ npm run build
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
-MIT License - see LICENSE file for details
+This project is licensed under the MIT License.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- Built on Bitcoin SV
-- Powered by HandCash Connect
-- Part of the BAPS ecosystem
-- Inspired by Bitcoin Spreadsheet and Bitcoin Writer
+- BSV Blockchain for scalable storage
+- HandCash for wallet integration
+- Next.js team for the amazing framework
+- The open-source community
 
-## Contact
+## 📧 Contact
 
-- Twitter: [@BitcoinDrive](https://x.com/BitcoinDrive)
-- GitHub: [b0ase/bitcoin-drive](https://github.com/b0ase/bitcoin-drive)
-
-## Roadmap
-
-See [EPIC.md](EPIC.md) for detailed development roadmap and upcoming features.
+For questions or support, please open an issue on GitHub.
 
 ---
 
-**Bitcoin Drive** - Your files, your ownership, forever on the blockchain.
+Built with ❤️ using Next.js and BSV
