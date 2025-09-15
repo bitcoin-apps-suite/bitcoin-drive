@@ -1,5 +1,6 @@
 const { HandCashConnect } = require('@handcash/handcash-connect');
 const bsv = require('bsv');
+const crypto = require('crypto');
 
 class RealBSVUploader {
     constructor() {
@@ -7,6 +8,66 @@ class RealBSVUploader {
             appId: process.env.HANDCASH_APP_ID,
             appSecret: process.env.HANDCASH_APP_SECRET
         });
+    }
+
+    /**
+     * Encrypt data using HandCash signature as key material
+     */
+    async encryptWithHandCash(account, data) {
+        // Get a signature from HandCash for key derivation
+        const message = 'Bitcoin Drive Encryption Key ' + Date.now();
+        const signature = await account.profile.signData({ value: message, format: 'utf-8' });
+        
+        // Derive encryption key from signature
+        const key = crypto.createHash('sha256').update(signature.signature).digest();
+        
+        // Generate random IV
+        const iv = crypto.randomBytes(16);
+        
+        // Encrypt the data
+        const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+        const encrypted = Buffer.concat([
+            cipher.update(data),
+            cipher.final()
+        ]);
+        const authTag = cipher.getAuthTag();
+        
+        // Return encrypted data with metadata
+        return {
+            encrypted,
+            iv: iv.toString('base64'),
+            authTag: authTag.toString('base64'),
+            keyMessage: message // Store this to recreate the key later
+        };
+    }
+    
+    /**
+     * Decrypt data using HandCash signature
+     */
+    async decryptWithHandCash(account, encryptedData, metadata) {
+        // Recreate the same signature for the key
+        const signature = await account.profile.signData({ 
+            value: metadata.keyMessage, 
+            format: 'utf-8' 
+        });
+        
+        // Derive the same encryption key
+        const key = crypto.createHash('sha256').update(signature.signature).digest();
+        
+        // Decrypt the data
+        const decipher = crypto.createDecipheriv(
+            'aes-256-gcm', 
+            key, 
+            Buffer.from(metadata.iv, 'base64')
+        );
+        decipher.setAuthTag(Buffer.from(metadata.authTag, 'base64'));
+        
+        const decrypted = Buffer.concat([
+            decipher.update(encryptedData),
+            decipher.final()
+        ]);
+        
+        return decrypted;
     }
 
     /**
@@ -30,10 +91,25 @@ class RealBSVUploader {
             }
 
             // Convert file data
-            const fileBuffer = Buffer.from(fileData.data, 'base64');
-            const fileSize = fileBuffer.length;
+            let fileBuffer = Buffer.from(fileData.data, 'base64');
+            let uploadMetadata = {};
             
-            console.log(`File: ${fileData.name}, Size: ${fileSize} bytes`);
+            // Encrypt if requested
+            if (options.encrypt) {
+                console.log('Encrypting file with HandCash signature...');
+                const encryptionResult = await this.encryptWithHandCash(account, fileBuffer);
+                fileBuffer = encryptionResult.encrypted;
+                uploadMetadata = {
+                    encrypted: true,
+                    iv: encryptionResult.iv,
+                    authTag: encryptionResult.authTag,
+                    keyMessage: encryptionResult.keyMessage
+                };
+                console.log('File encrypted successfully');
+            }
+            
+            const fileSize = fileBuffer.length;
+            console.log(`File: ${fileData.name}, Size: ${fileSize} bytes${options.encrypt ? ' (encrypted)' : ''}`);
 
             let uploadResult;
             
@@ -42,14 +118,22 @@ class RealBSVUploader {
                 uploadResult = await this.uploadViaBProtocol(account, {
                     buffer: fileBuffer,
                     name: fileData.name,
-                    type: fileData.type
+                    type: options.encrypt ? 'application/octet-stream' : fileData.type,
+                    metadata: uploadMetadata
                 });
             } else { // Large files - use BCAT protocol
                 uploadResult = await this.uploadViaBCAT(account, {
                     buffer: fileBuffer,
                     name: fileData.name,
-                    type: fileData.type
+                    type: options.encrypt ? 'application/octet-stream' : fileData.type,
+                    metadata: uploadMetadata
                 });
+            }
+            
+            // Add encryption metadata to result
+            if (options.encrypt) {
+                uploadResult.encrypted = true;
+                uploadResult.encryptionMetadata = uploadMetadata;
             }
 
             // Create NFT if requested

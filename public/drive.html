@@ -130,7 +130,16 @@
             
             <div class="header-right">
                 <div class="user-section" id="userSection">
-                    <button class="btn-connect" id="connectBtn">Connect HandCash</button>
+                    <button class="btn-connect" id="connectBtn">Sign In</button>
+                    <div id="userMenu" class="user-menu" style="display: none;">
+                        <img id="userAvatar" class="user-avatar" src="" alt="">
+                        <div class="user-info">
+                            <span id="userName" class="user-name"></span>
+                            <span id="userEmail" class="user-email"></span>
+                        </div>
+                        <button id="profileBtn" class="profile-btn">Profile</button>
+                        <button id="signOutBtn" class="signout-btn">Sign Out</button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -154,6 +163,16 @@
                             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                         </svg>
                         All Files
+                    </a>
+                    <a href="#" class="nav-item" data-view="documents">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Documents
                     </a>
                     <a href="#" class="nav-item" data-view="recent">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -228,6 +247,46 @@
 
                 <div class="files-grid" id="filesGrid"></div>
                 <div class="files-list" id="filesList" style="display: none;"></div>
+                
+                <!-- Document Editor -->
+                <div id="documentEditor" class="document-editor" style="display: none;">
+                    <div class="editor-toolbar">
+                        <button id="newDocBtn" class="editor-btn" title="New Document">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                        </button>
+                        <button id="saveDocBtn" class="editor-btn" title="Save to BSV">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </button>
+                        <div class="editor-separator"></div>
+                        <button id="boldBtn" class="editor-btn" title="Bold">
+                            <strong>B</strong>
+                        </button>
+                        <button id="italicBtn" class="editor-btn" title="Italic">
+                            <em>I</em>
+                        </button>
+                        <button id="underlineBtn" class="editor-btn" title="Underline">
+                            <u>U</u>
+                        </button>
+                        <div class="editor-separator"></div>
+                        <input id="docTitle" type="text" class="doc-title" placeholder="Untitled Document" />
+                    </div>
+                    <div id="editorContent" class="editor-content" contenteditable="true" placeholder="Start typing your document...">
+                    </div>
+                    <div class="editor-status">
+                        <span id="wordCount">0 words</span>
+                        <span id="charCount">0 characters</span>
+                        <span id="saveStatus">Ready</span>
+                    </div>
+                </div>
 
                 <div class="empty-state" id="emptyState">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
@@ -317,6 +376,132 @@
                         <button class="btn btn-primary" id="tokenizeFile">Create NFT</button>
                         <button class="btn btn-danger" id="deleteFile">Delete</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div class="modal" id="profileModal" style="display: none;">
+            <div class="modal-content profile-modal">
+                <div class="modal-header">
+                    <h2>User Profile</h2>
+                    <button class="modal-close" id="closeProfileModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-section">
+                        <h3>Google Account</h3>
+                        <div id="googleAccount" class="account-card">
+                            <div id="googleNotConnected" class="account-not-connected">
+                                <p>Connect your Google account to sync files</p>
+                                <button id="connectGoogleBtn" class="btn btn-google">
+                                    <svg width="18" height="18" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                    Sign in with Google
+                                </button>
+                            </div>
+                            <div id="googleConnected" class="account-connected" style="display: none;">
+                                <img id="googleAvatar" class="account-avatar" src="" alt="">
+                                <div class="account-info">
+                                    <span id="googleName" class="account-name"></span>
+                                    <span id="googleEmail" class="account-email"></span>
+                                </div>
+                                <button id="googleServicesBtn" class="btn btn-outline">Manage Services</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>HandCash Wallet</h3>
+                        <div id="handcashAccount" class="account-card">
+                            <div id="handcashNotConnected" class="account-not-connected">
+                                <p>Connect your HandCash wallet for BSV transactions</p>
+                                <button id="connectHandCashBtn" class="btn btn-handcash">
+                                    Connect HandCash
+                                </button>
+                            </div>
+                            <div id="handcashConnected" class="account-connected" style="display: none;">
+                                <div class="account-info">
+                                    <span id="handcashHandle" class="account-name"></span>
+                                    <span id="handcashBalance" class="account-balance"></span>
+                                </div>
+                                <button id="disconnectHandCashBtn" class="btn btn-outline">Disconnect</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>Google Services</h3>
+                        <div class="services-grid">
+                            <div class="service-card" data-service="drive">
+                                <svg class="service-icon" viewBox="0 0 24 24">
+                                    <path fill="#4688F1" d="M7.71 3.52L1.15 15l4.58 7.98 6.56-11.46L7.71 3.52z"/>
+                                    <path fill="#FFC107" d="M15.88 22.98l4.59-7.98H7.29l4.58 7.98h4.01z"/>
+                                    <path fill="#0F9D58" d="M12.29 11.52L7.71 3.52h9.16L22.85 15l-10.56-3.48z"/>
+                                </svg>
+                                <span>Google Drive</span>
+                                <button class="service-btn" id="syncDriveBtn">Sync</button>
+                            </div>
+                            <div class="service-card" data-service="gmail">
+                                <svg class="service-icon" viewBox="0 0 24 24">
+                                    <path fill="#EA4335" d="M3 3h18c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2z"/>
+                                    <path fill="#FFF" d="M21 7l-9 6-9-6v10h18V7z"/>
+                                </svg>
+                                <span>Gmail</span>
+                                <button class="service-btn" id="backupGmailBtn">Backup</button>
+                            </div>
+                            <div class="service-card" data-service="docs">
+                                <svg class="service-icon" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                                    <path fill="#FFF" d="M7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
+                                </svg>
+                                <span>Google Docs</span>
+                                <button class="service-btn" id="syncDocsBtn">Sync</button>
+                            </div>
+                            <div class="service-card" data-service="youtube">
+                                <svg class="service-icon" viewBox="0 0 24 24">
+                                    <path fill="#FF0000" d="M23.5 6.2c-.3-1-1-1.8-2-2.1C19.7 3.6 12 3.6 12 3.6s-7.7 0-9.5.5c-1 .3-1.7 1.1-2 2.1C0 8 0 12 0 12s0 4 .5 5.8c.3 1 1 1.8 2 2.1 1.8.5 9.5.5 9.5.5s7.7 0 9.5-.5c1-.3 1.7-1.1 2-2.1.5-1.8.5-5.8.5-5.8s0-4-.5-5.8z"/>
+                                    <path fill="#FFF" d="M9.5 15.5V8.5l6.5 3.5-6.5 3.5z"/>
+                                </svg>
+                                <span>YouTube</span>
+                                <button class="service-btn" id="publishYouTubeBtn">Publish</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign In Modal -->
+        <div class="modal" id="signInModal" style="display: none;">
+            <div class="modal-content signin-modal">
+                <div class="modal-header">
+                    <h2>Sign In to Bitcoin Drive</h2>
+                    <button class="modal-close" id="closeSignInModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="signin-options">
+                        <button id="signInGoogleBtn" class="btn btn-google btn-large">
+                            <svg width="20" height="20" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+                        <div class="signin-divider">OR</div>
+                        <button id="signInHandCashBtn" class="btn btn-handcash btn-large">
+                            Connect with HandCash Only
+                        </button>
+                    </div>
+                    <p class="signin-note">
+                        Sign in with Google to sync your files and integrate with Google services. 
+                        You can connect your HandCash wallet later for blockchain features.
+                    </p>
                 </div>
             </div>
         </div>

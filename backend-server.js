@@ -8,13 +8,31 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const { HandCashConnect } = require('@handcash/handcash-connect');
+const session = require('express-session');
+const { initDatabase } = require('./database');
+const { initGoogleAuth } = require('./google-auth');
 
 const app = express();
 const PORT = 4003;
 
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3003', 'https://bitcoin-drive.vercel.app'],
+    credentials: true
+}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'bitcoin-drive-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    }
+}));
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -550,8 +568,17 @@ app.post('/api/bsv/upload', async (req, res) => {
 if (process.env.VERCEL) {
   module.exports = app;
 } else {
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
+    // Initialize database
+    await initDatabase();
+    console.log('Database initialized');
+    
+    // Initialize Google OAuth
+    const { authMiddleware } = initGoogleAuth(app);
+    app.authMiddleware = authMiddleware;
+    
     console.log(`Bitcoin Drive backend server running on port ${PORT}`);
     console.log(`Health check: http://localhost:${PORT}/api/health`);
+    console.log(`Google OAuth: http://localhost:${PORT}/api/auth/google`);
   });
 }

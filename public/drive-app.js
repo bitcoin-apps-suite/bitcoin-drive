@@ -6,9 +6,11 @@ class BitcoinDrive {
             : '/api';
         this.authToken = null;
         this.currentUser = null;
+        this.googleToken = null;
+        this.isGoogleUser = false;
         this.files = [];
         this.selectedFiles = [];
-        this.currentView = 'all';
+        this.currentView = 'documents';  // Default to documents view
         this.viewType = 'grid';
         
         this.init();
@@ -17,8 +19,11 @@ class BitcoinDrive {
     init() {
         this.setupEventListeners();
         this.setupTaskbarMenus();
+        this.setupDocumentEditor();
         this.checkAuth();
         this.loadStorageMethods();
+        // Switch to documents view by default
+        setTimeout(() => this.switchView('documents'), 100);
     }
 
     setupTaskbarMenus() {
@@ -161,7 +166,14 @@ class BitcoinDrive {
     }
 
     setupEventListeners() {
-        document.getElementById('connectBtn').addEventListener('click', () => this.connectHandCash());
+        document.getElementById('connectBtn').addEventListener('click', () => this.showSignInModal());
+        document.getElementById('profileBtn').addEventListener('click', () => this.showProfileModal());
+        document.getElementById('signOutBtn').addEventListener('click', () => this.signOut());
+        document.getElementById('signInGoogleBtn').addEventListener('click', () => this.signInWithGoogle());
+        document.getElementById('signInHandCashBtn').addEventListener('click', () => this.connectHandCash());
+        document.getElementById('connectHandCashBtn').addEventListener('click', () => this.connectHandCashFromProfile());
+        document.getElementById('closeSignInModal').addEventListener('click', () => this.hideSignInModal());
+        document.getElementById('closeProfileModal').addEventListener('click', () => this.hideProfileModal());
         document.getElementById('uploadBtn').addEventListener('click', () => this.showUploadModal());
         document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileSelect(e));
         document.getElementById('confirmUpload').addEventListener('click', () => this.uploadFiles());
@@ -225,6 +237,79 @@ class BitcoinDrive {
         });
     }
 
+    showSignInModal() {
+        document.getElementById('signInModal').style.display = 'block';
+    }
+    
+    hideSignInModal() {
+        document.getElementById('signInModal').style.display = 'none';
+    }
+    
+    showProfileModal() {
+        document.getElementById('profileModal').style.display = 'block';
+    }
+    
+    hideProfileModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+    
+    signInWithGoogle() {
+        window.location.href = `${this.apiUrl}/auth/google`;
+    }
+    
+    async signOut() {
+        try {
+            // Call logout endpoint if using Google auth
+            if (this.googleToken) {
+                await fetch(`${this.apiUrl}/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.googleToken}`
+                    }
+                });
+            }
+            
+            // Clear all stored tokens and data
+            localStorage.removeItem('googleToken');
+            localStorage.removeItem('authToken');
+            this.googleToken = null;
+            this.authToken = null;
+            this.currentUser = null;
+            this.isGoogleUser = false;
+            
+            // Reset UI
+            document.getElementById('connectBtn').style.display = 'block';
+            document.getElementById('userMenu').style.display = 'none';
+            
+            // Hide modals
+            this.hideProfileModal();
+            this.hideSignInModal();
+            
+            // Clear files
+            this.files = [];
+            this.displayFiles();
+            
+            // Show toast
+            this.showToast('Signed out successfully', 'success');
+            
+            // Redirect to landing or refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } catch (error) {
+            console.error('Sign out error:', error);
+            this.showToast('Error signing out', 'error');
+        }
+    }
+    
+    async connectHandCashFromProfile() {
+        if (!this.googleToken) {
+            this.showToast('Please sign in with Google first', 'error');
+            return;
+        }
+        await this.connectHandCash();
+    }
+    
     async connectHandCash() {
         const isDemoMode = confirm('Use demo mode? (Click Cancel to connect with real HandCash)');
         
@@ -243,19 +328,92 @@ class BitcoinDrive {
 
     async checkAuth() {
         const urlParams = new URLSearchParams(window.location.search);
-        const authToken = urlParams.get('authToken');
+        const googleToken = urlParams.get('token');
+        const authType = urlParams.get('auth');
+        const handcashToken = urlParams.get('authToken');
         
-        if (authToken) {
-            this.authToken = authToken;
-            localStorage.setItem('authToken', authToken);
+        // Handle Google OAuth callback
+        if (googleToken && authType === 'google') {
+            this.googleToken = googleToken;
+            localStorage.setItem('googleToken', googleToken);
+            this.isGoogleUser = true;
             window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-            this.authToken = localStorage.getItem('authToken');
+            await this.loadGoogleProfile();
+        } 
+        // Handle HandCash callback
+        else if (handcashToken) {
+            this.authToken = handcashToken;
+            localStorage.setItem('authToken', handcashToken);
+            window.history.replaceState({}, document.title, window.location.pathname);
+            await this.fetchUserProfile();
+        }
+        // Check for stored tokens
+        else {
+            const storedGoogleToken = localStorage.getItem('googleToken');
+            const storedHandCashToken = localStorage.getItem('authToken');
+            
+            if (storedGoogleToken) {
+                this.googleToken = storedGoogleToken;
+                this.isGoogleUser = true;
+                await this.loadGoogleProfile();
+            } else if (storedHandCashToken) {
+                this.authToken = storedHandCashToken;
+                await this.fetchUserProfile();
+            }
         }
         
-        if (this.authToken) {
-            await this.fetchUserProfile();
+        if (this.authToken || this.googleToken) {
             await this.loadFiles();
+        }
+    }
+    
+    async loadGoogleProfile() {
+        try {
+            const response = await fetch(`${this.apiUrl}/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${this.googleToken}`
+                }
+            });
+            
+            if (response.ok) {
+                const user = await response.json();
+                this.currentUser = user;
+                this.updateUserUI(user);
+                
+                // Update profile modal
+                document.getElementById('googleConnected').style.display = 'block';
+                document.getElementById('googleNotConnected').style.display = 'none';
+                document.getElementById('googleAvatar').src = user.picture || '';
+                document.getElementById('googleName').textContent = user.name;
+                document.getElementById('googleEmail').textContent = user.email;
+                
+                if (user.hasHandCash) {
+                    document.getElementById('handcashConnected').style.display = 'block';
+                    document.getElementById('handcashNotConnected').style.display = 'none';
+                    document.getElementById('handcashHandle').textContent = user.handcashHandle;
+                }
+            } else {
+                localStorage.removeItem('googleToken');
+                this.googleToken = null;
+            }
+        } catch (error) {
+            console.error('Failed to load Google profile:', error);
+        }
+    }
+    
+    updateUserUI(user) {
+        const connectBtn = document.getElementById('connectBtn');
+        const userMenu = document.getElementById('userMenu');
+        
+        if (user) {
+            connectBtn.style.display = 'none';
+            userMenu.style.display = 'block';
+            document.getElementById('userAvatar').src = user.picture || '';
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userEmail').textContent = user.email;
+        } else {
+            connectBtn.style.display = 'block';
+            userMenu.style.display = 'none';
         }
     }
 
@@ -269,29 +427,26 @@ class BitcoinDrive {
             
             if (response.ok) {
                 const data = await response.json();
-                this.currentUser = data.publicProfile || data;
-                this.updateUserUI();
+                const profile = data.publicProfile || data.user || data;
+                
+                // Convert HandCash profile to standard user format
+                this.currentUser = {
+                    name: profile.handle || profile.displayName || 'HandCash User',
+                    email: `${profile.handle || 'user'}@handcash`,
+                    picture: profile.avatarUrl || profile.photoURL || '',
+                    hasHandCash: true,
+                    hasGoogle: false,
+                    handcashHandle: profile.handle
+                };
+                
+                // Use the same updateUserUI function with user parameter
+                this.updateUserUI(this.currentUser);
             }
         } catch (error) {
             console.error('Failed to fetch profile:', error);
         }
     }
 
-    updateUserUI() {
-        const userSection = document.getElementById('userSection');
-        
-        if (this.currentUser) {
-            userSection.innerHTML = `
-                <div class="user-profile">
-                    <div class="user-avatar">${this.currentUser.handle ? this.currentUser.handle[0].toUpperCase() : 'U'}</div>
-                    <div>
-                        <div class="user-handle">$${this.currentUser.handle || 'user'}</div>
-                        <div class="user-balance">Balance: 0.00000000 BSV</div>
-                    </div>
-                </div>
-            `;
-        }
-    }
 
     async loadStorageMethods() {
         try {
@@ -306,8 +461,8 @@ class BitcoinDrive {
     }
 
     showUploadModal() {
-        if (!this.authToken) {
-            this.showToast('Please connect your HandCash wallet first', 'error');
+        if (!this.authToken && !this.googleToken) {
+            this.showToast('Please sign in first', 'error');
             return;
         }
         
@@ -378,29 +533,55 @@ class BitcoinDrive {
         const encrypt = document.getElementById('encryptFiles').checked;
         
         for (const file of this.selectedFiles) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('storageMethod', storageMethod);
-            formData.append('encrypt', encrypt);
-            
             try {
-                const response = await fetch(`${this.apiUrl}/files/upload`, {
+                // Read file as base64 for BSV upload
+                const reader = new FileReader();
+                const fileData = await new Promise((resolve, reject) => {
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1];
+                        resolve({
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            data: base64
+                        });
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                // Use BSV upload endpoint
+                const response = await fetch(`${this.apiUrl}/bsv/upload`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${this.authToken}`
+                        'Authorization': `Bearer ${this.authToken}`,
+                        'Content-Type': 'application/json'
                     },
-                    body: formData
+                    body: JSON.stringify({
+                        file: fileData,
+                        options: {
+                            storageMethod: storageMethod,
+                            encrypt: encrypt,
+                            createNFT: false,
+                            publishType: 'public'
+                        }
+                    })
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    this.showToast(`Uploaded ${file.name} successfully`, 'success');
+                    const txUrl = data.isLocal ? 
+                        'Local storage (BSV upload pending)' : 
+                        `https://whatsonchain.com/tx/${data.txId}`;
+                    this.showToast(`✅ Uploaded ${file.name} to BSV! TX: ${data.txId.substring(0, 8)}...`, 'success');
+                    console.log('BSV Upload successful:', data);
                 } else {
-                    this.showToast(`Failed to upload ${file.name}`, 'error');
+                    const error = await response.json();
+                    this.showToast(`Failed to upload ${file.name}: ${error.error}`, 'error');
                 }
             } catch (error) {
                 console.error('Upload error:', error);
-                this.showToast(`Error uploading ${file.name}`, 'error');
+                this.showToast(`Error uploading ${file.name}: ${error.message}`, 'error');
             }
         }
         
@@ -647,13 +828,34 @@ class BitcoinDrive {
         
         const titles = {
             'all': 'All Files',
+            'documents': 'Documents',
             'recent': 'Recent Files',
             'nfts': 'NFT Collection',
             'shared': 'Shared Files'
         };
         
         document.getElementById('viewTitle').textContent = titles[view];
-        this.displayFiles();
+        
+        // Show/hide appropriate views
+        const filesGrid = document.getElementById('filesGrid');
+        const filesList = document.getElementById('filesList');
+        const documentEditor = document.getElementById('documentEditor');
+        const emptyState = document.getElementById('emptyState');
+        const dropZone = document.querySelector('.drop-zone-wrapper');
+        
+        if (view === 'documents') {
+            // Show document editor
+            filesGrid.style.display = 'none';
+            filesList.style.display = 'none';
+            documentEditor.style.display = 'flex';
+            emptyState.style.display = 'none';
+            if (dropZone) dropZone.style.display = 'none';
+        } else {
+            // Show files view
+            documentEditor.style.display = 'none';
+            if (dropZone) dropZone.style.display = 'block';
+            this.displayFiles();
+        }
     }
 
     switchViewType(type) {
@@ -744,6 +946,139 @@ class BitcoinDrive {
         if (diff < 604800000) return Math.floor(diff / 86400000) + ' days ago';
         
         return date.toLocaleDateString();
+    }
+    
+    setupDocumentEditor() {
+        const boldBtn = document.getElementById('boldBtn');
+        const italicBtn = document.getElementById('italicBtn');
+        const underlineBtn = document.getElementById('underlineBtn');
+        const newDocBtn = document.getElementById('newDocBtn');
+        const saveDocBtn = document.getElementById('saveDocBtn');
+        const editorContent = document.getElementById('editorContent');
+        
+        if (boldBtn) {
+            boldBtn.addEventListener('click', () => {
+                document.execCommand('bold', false, null);
+            });
+        }
+        
+        if (italicBtn) {
+            italicBtn.addEventListener('click', () => {
+                document.execCommand('italic', false, null);
+            });
+        }
+        
+        if (underlineBtn) {
+            underlineBtn.addEventListener('click', () => {
+                document.execCommand('underline', false, null);
+            });
+        }
+        
+        if (newDocBtn) {
+            newDocBtn.addEventListener('click', () => {
+                if (confirm('Create a new document? Any unsaved changes will be lost.')) {
+                    document.getElementById('docTitle').value = '';
+                    document.getElementById('editorContent').innerHTML = '';
+                    this.updateWordCount();
+                }
+            });
+        }
+        
+        if (saveDocBtn) {
+            saveDocBtn.addEventListener('click', () => this.saveDocument());
+        }
+        
+        if (editorContent) {
+            editorContent.addEventListener('input', () => this.updateWordCount());
+        }
+    }
+    
+    updateWordCount() {
+        const content = document.getElementById('editorContent').innerText || '';
+        const words = content.trim().split(/\s+/).filter(word => word.length > 0).length;
+        const chars = content.length;
+        
+        document.getElementById('wordCount').textContent = `${words} words`;
+        document.getElementById('charCount').textContent = `${chars} characters`;
+    }
+    
+    async saveDocument() {
+        const title = document.getElementById('docTitle').value || 'Untitled Document';
+        const content = document.getElementById('editorContent').innerHTML;
+        
+        if (!content.trim()) {
+            this.showToast('Document is empty', 'error');
+            return;
+        }
+        
+        if (!this.authToken) {
+            this.showToast('Please connect your HandCash wallet first', 'error');
+            return;
+        }
+        
+        document.getElementById('saveStatus').textContent = 'Saving...';
+        
+        try {
+            // Create HTML document
+            const htmlDoc = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <h1>${title}</h1>
+    ${content}
+</body>
+</html>`;
+            
+            // Convert to base64
+            const base64 = btoa(unescape(encodeURIComponent(htmlDoc)));
+            
+            // Upload to BSV
+            const response = await fetch(`${this.apiUrl}/bsv/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    file: {
+                        name: `${title}.html`,
+                        type: 'text/html',
+                        size: htmlDoc.length,
+                        data: base64
+                    },
+                    options: {
+                        storageMethod: 'b_protocol',
+                        encrypt: true,
+                        createNFT: false,
+                        publishType: 'public'
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('saveStatus').textContent = 'Saved to BSV!';
+                this.showToast(`Document saved to BSV! TX: ${data.txId.substring(0, 8)}...`, 'success');
+                setTimeout(() => {
+                    document.getElementById('saveStatus').textContent = 'Ready';
+                }, 3000);
+            } else {
+                throw new Error('Failed to save');
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            document.getElementById('saveStatus').textContent = 'Save failed';
+            this.showToast('Failed to save document', 'error');
+            setTimeout(() => {
+                document.getElementById('saveStatus').textContent = 'Ready';
+            }, 3000);
+        }
     }
 
     showToast(message, type = 'info') {

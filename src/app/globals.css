@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+:root {
+  /* Base colors */
+  --background: #000000;
+  --foreground: #ffffff;
+  
+  /* Theme colors - default green */
+  --color-primary: rgb(34 197 94);
+  --color-secondary: rgb(134 239 172);
+  --color-accent: rgb(74 222 128);
+  --color-border: rgba(34, 197, 94, 0.3);
+  --color-hover: rgba(34, 197, 94, 0.1);
+  --color-text: rgb(74 222 128);
+  --color-text-muted: rgba(134, 239, 172, 0.6);
+  
+  /* Component backgrounds */
+  --bg-primary: #000000;
+  --bg-secondary: rgb(17 24 39);
+  --bg-card: rgba(0, 0, 0, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Light mode overrides */
+.light-mode {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --bg-card: #ffffff;
+  --foreground: #111827;
+  --background: #ffffff;
+  
+  /* Adjust theme colors for better contrast in light mode */
+  --color-border: rgba(0, 0, 0, 0.15);
+  --color-hover: rgba(0, 0, 0, 0.05);
+  --color-text-muted: rgba(17, 24, 39, 0.6);
+}
+
+/* Theme-aware components */
+.theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.theme-bg-card {
+  background-color: var(--bg-card);
+}
+
+.theme-border {
+  border-color: var(--color-border);
+}
+
+.theme-text {
+  color: var(--color-text);
+}
+
+.theme-text-accent {
+  color: var(--color-accent);
+}
+
+.theme-text-muted {
+  color: var(--color-text-muted);
+}
+
+.theme-hover:hover {
+  background-color: var(--color-hover);
+}

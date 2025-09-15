@@ -1,0 +1,8 @@
+#!/bin/bash
+# Bitcoin Drive Launcher
+# Opens the Bitcoin Drive web application in the default browser
+
+URL="https://bitcoin-drive.vercel.app/drive.html"
+
+# Open the URL in the default browser
+open "$URL"
