@@ -4,6 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import UploadModal, { UploadOptions } from "@/components/UploadModal"
+import AuthModal from "@/components/AuthModal"
 import { useTheme } from "@/components/ThemeSelector"
 import ThemeControls from "@/components/ThemeControls"
 import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List } from 'lucide-react'
@@ -14,6 +15,7 @@ export default function Home() {
   const [handcashConnected, setHandcashConnected] = useState(false)
   const [handcashProfile, setHandcashProfile] = useState<{handle?: string; displayName?: string} | null>(null)
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -123,11 +125,11 @@ export default function Home() {
                 </div>
               ) : (
                 <button
-                  onClick={() => signIn("google")}
+                  onClick={() => setShowAuthModal(true)}
                   className="w-full text-left text-sm transition-opacity hover:opacity-80"
                   style={{ color: 'var(--color-accent)' }}
                 >
-                  Sign in with Google
+                  Connect Accounts
                 </button>
               )}
             </div>
@@ -309,7 +311,7 @@ export default function Home() {
               {/* User Menu or Sign In */}
               {!session ? (
                 <button
-                  onClick={() => signIn("google")}
+                  onClick={() => setShowAuthModal(true)}
                   className="px-4 py-2 font-medium rounded-lg transition-opacity hover:opacity-90"
                   style={{ backgroundColor: 'var(--color-primary)', color: 'var(--bg-primary)' }}>
                   Sign In
@@ -374,6 +376,16 @@ export default function Home() {
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
         onUpload={handleFileUpload}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          // Refresh the page to update session
+          window.location.reload()
+        }}
       />
     </div>
   )
