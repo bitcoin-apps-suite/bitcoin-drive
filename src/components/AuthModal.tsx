@@ -28,21 +28,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       id: 'google',
       name: 'Google',
       icon: <Mail size={20} />,
-      color: '#4285f4',
+      color: '#00ff88',
       connected: connectedProviders.has('google')
     },
     {
       id: 'twitter',
       name: 'Twitter',
       icon: <Twitter size={20} />,
-      color: '#1da1f2',
+      color: '#00ff88',
       connected: connectedProviders.has('twitter')
     },
     {
       id: 'handcash',
       name: 'HandCash',
       icon: <Wallet size={20} />,
-      color: '#38cb7c',
+      color: '#00ff88',
       connected: connectedProviders.has('handcash')
     }
   ]

@@ -5,12 +5,9 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import UploadModal, { UploadOptions } from "@/components/UploadModal"
 import AuthModal from "@/components/AuthModal"
-import { useTheme } from "@/components/ThemeSelector"
-import ThemeControls from "@/components/ThemeControls"
 import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List } from 'lucide-react'
 
 export default function Home() {
-  useTheme() // Initialize theme system
   const { data: session, status } = useSession()
   const [handcashConnected, setHandcashConnected] = useState(false)
   const [handcashProfile, setHandcashProfile] = useState<{handle?: string; displayName?: string} | null>(null)
@@ -186,8 +183,6 @@ export default function Home() {
               <List size={16} />
             </button>
           </div>
-
-          <ThemeControls />
 
           {session ? (
             <div className="flex items-center gap-2">

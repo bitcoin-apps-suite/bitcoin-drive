@@ -45,19 +45,19 @@ body {
 /* Light mode overrides */
 .light-mode {
   --bg-primary: #ffffff;
-  --bg-secondary: #f0fff0;
-  --bg-card: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-card: rgba(0, 102, 0, 0.03);
   --foreground: #006600;
   --background: #ffffff;
   
-  /* Green theme for light mode */
-  --color-primary: #00cc00;
-  --color-secondary: #009900;
-  --color-accent: #006600;
-  --color-border: rgba(0, 204, 0, 0.3);
-  --color-hover: rgba(0, 204, 0, 0.1);
-  --color-text: #006600;
-  --color-text-muted: rgba(0, 102, 0, 0.6);
+  /* Dark green theme for light mode */
+  --color-primary: #006600;
+  --color-secondary: rgba(0, 102, 0, 0.1);
+  --color-accent: #004400;
+  --color-border: rgba(0, 102, 0, 0.2);
+  --color-hover: rgba(0, 102, 0, 0.08);
+  --color-text: #004400;
+  --color-text-muted: rgba(0, 102, 0, 0.7);
 }
 
 /* Suite-style button design */
