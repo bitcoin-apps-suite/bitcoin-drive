@@ -88,18 +88,135 @@ export default function Home() {
 
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      {/* Sidebar */}
-      <div className="w-64 border-r" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)' }}>
-        <div className="p-4 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.12)' }}>
-          <h1 className="text-2xl font-light flex items-center gap-2" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
-            <span className="status-indicator" style={{ position: 'relative', marginRight: '4px' }}></span>
-            <span style={{ color: '#00ff88', fontWeight: '300' }}>₿</span>
-            <span style={{ fontWeight: '200' }}>Bitcoin Drive</span>
-          </h1>
+    <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      {/* Toolbar */}
+      <div className="toolbar" style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '12px 20px',
+        background: 'rgba(0, 0, 0, 0.9)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        minHeight: '52px'
+      }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {/* Logo and Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="status-indicator"></span>
+            <span style={{ color: '#00ff88', fontSize: '20px', fontWeight: '300' }}>₿</span>
+            <h1 style={{ 
+              fontSize: '18px', 
+              fontWeight: '200', 
+              letterSpacing: '-0.02em',
+              color: '#ffffff',
+              margin: 0
+            }}>
+              Bitcoin Drive
+            </h1>
+          </div>
         </div>
-        
-        <div className="p-4">
+
+        {/* Center section - Search bar */}
+        <div style={{ flex: 1, maxWidth: '600px', margin: '0 20px' }}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
+            <input
+              type="text"
+              placeholder="Search files..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ 
+                width: '100%',
+                paddingLeft: '40px',
+                paddingRight: '16px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '13px',
+                outline: 'none',
+                transition: 'all 0.3s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+              }}
+              onBlur={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Right section - Actions */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button 
+            onClick={() => setShowUploadModal(true)}
+            className="btn-primary"
+            style={{ fontSize: '13px', padding: '8px 12px' }}>
+            <Upload size={16} style={{ marginRight: '4px' }} />
+            Upload
+          </button>
+          
+          {/* View Mode Toggle */}
+          <div style={{ display: 'flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+            <button
+              onClick={() => setViewMode('grid')}
+              style={{ 
+                padding: '8px',
+                backgroundColor: viewMode === 'grid' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                color: viewMode === 'grid' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
+                border: 'none',
+                borderRight: '1px solid rgba(255, 255, 255, 0.12)'
+              }}>
+              <Grid size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              style={{ 
+                padding: '8px',
+                backgroundColor: viewMode === 'list' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                color: viewMode === 'list' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
+                border: 'none'
+              }}>
+              <List size={16} />
+            </button>
+          </div>
+
+          <ThemeControls />
+
+          {session ? (
+            <div className="flex items-center gap-2">
+              {session.user?.image && (
+                <Image
+                  src={session.user.image}
+                  alt="Profile"
+                  width={28}
+                  height={28}
+                  className="rounded-full"
+                  style={{ border: '1px solid rgba(255, 255, 255, 0.12)' }}
+                />
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              style={{ fontSize: '13px', padding: '8px 12px' }}>
+              Sign In
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-64 border-r" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)', overflow: 'auto' }}>
+          <div className="p-4">
           <div className="space-y-4">
             {/* User Profile */}
             <div className="card p-3">
@@ -264,79 +381,6 @@ export default function Home() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="border-b" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)' }}>
-          <div className="px-6 py-3 flex items-center justify-between gap-4">
-            {/* Search Bar */}
-            <div className="flex-1 max-w-2xl">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-text-muted)' }} />
-                <input
-                  type="text"
-                  placeholder="Search files..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-                  style={{ 
-                    backgroundColor: 'var(--bg-primary)', 
-                    borderColor: 'var(--color-border)',
-                    color: 'var(--color-accent)'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Right side controls */}
-            <div className="flex items-center gap-3">
-              {/* View Mode Toggle */}
-              <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: 'var(--color-border)' }}>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className="p-2 transition-colors"
-                  style={{ 
-                    backgroundColor: viewMode === 'grid' ? 'var(--color-primary)' : 'transparent',
-                    color: viewMode === 'grid' ? 'var(--bg-primary)' : 'var(--color-accent)'
-                  }}>
-                  <Grid size={18} />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className="p-2 transition-colors"
-                  style={{ 
-                    backgroundColor: viewMode === 'list' ? 'var(--color-primary)' : 'transparent',
-                    color: viewMode === 'list' ? 'var(--bg-primary)' : 'var(--color-accent)'
-                  }}>
-                  <List size={18} />
-                </button>
-              </div>
-
-              {/* Theme Controls */}
-              <ThemeControls />
-
-              {/* User Menu or Sign In */}
-              {!session ? (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="btn-primary px-4 py-2 font-medium rounded-lg transition-all">
-                  Sign In
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  {session.user?.image && (
-                    <Image
-                      src={session.user.image}
-                      alt="Profile"
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="flex-1 flex flex-col" style={{ backgroundColor: 'var(--bg-primary)' }}>
           {/* Category Header */}
@@ -374,8 +418,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+    </div>
 
-      {/* Upload Modal */}
+    {/* Upload Modal */}
       <UploadModal 
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
