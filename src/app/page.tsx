@@ -3,7 +3,8 @@
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import UploadModal, { UploadOptions } from "@/components/UploadModal"
+import Taskbar from "@/components/Taskbar"
+import BlockchainUploadModal, { UploadOptions } from "@/components/BlockchainUploadModal"
 import AuthModal from "@/components/AuthModal"
 import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List } from 'lucide-react'
 
@@ -86,7 +87,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      {/* Toolbar */}
+      {/* macOS-style Taskbar */}
+      <Taskbar />
+      
+      {/* App Toolbar */}
       <div className="toolbar" style={{ 
         display: 'flex',
         justifyContent: 'space-between',
@@ -152,11 +156,12 @@ export default function Home() {
         {/* Right section - Actions */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button 
+            id="upload-btn"
             onClick={() => setShowUploadModal(true)}
             className="btn-primary"
             style={{ fontSize: '13px', padding: '8px 12px' }}>
             <Upload size={16} style={{ marginRight: '4px' }} />
-            Upload
+            Upload to Chain
           </button>
           
           {/* View Mode Toggle */}
@@ -279,7 +284,7 @@ export default function Home() {
               onClick={() => setShowUploadModal(true)}
               className="btn-primary w-full mb-4 px-4 py-3 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
               <Upload size={18} />
-              Upload Files
+              Upload to Blockchain
             </button>
 
             {/* Navigation Categories */}
@@ -415,8 +420,8 @@ export default function Home() {
       </div>
     </div>
 
-    {/* Upload Modal */}
-      <UploadModal 
+    {/* Blockchain Upload Modal */}
+      <BlockchainUploadModal 
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
         onUpload={handleFileUpload}
