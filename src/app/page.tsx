@@ -91,17 +91,18 @@ export default function Home() {
     <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* Sidebar */}
       <div className="w-64 border-r" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)' }}>
-        <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
-          <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--color-accent)' }}>
-            <span style={{ color: 'var(--color-primary)' }}>₿</span>
-            Bitcoin Drive
+        <div className="p-4 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.12)' }}>
+          <h1 className="text-2xl font-light flex items-center gap-2" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
+            <span className="status-indicator" style={{ position: 'relative', marginRight: '4px' }}></span>
+            <span style={{ color: '#00ff88', fontWeight: '300' }}>₿</span>
+            <span style={{ fontWeight: '200' }}>Bitcoin Drive</span>
           </h1>
         </div>
         
         <div className="p-4">
           <div className="space-y-4">
             {/* User Profile */}
-            <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--color-border)' }}>
+            <div className="card p-3">
               {session ? (
                 <div className="flex items-center space-x-3">
                   {session.user?.image && (
@@ -126,8 +127,8 @@ export default function Home() {
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="w-full text-left text-sm transition-opacity hover:opacity-80"
-                  style={{ color: 'var(--color-accent)' }}
+                  className="w-full text-left text-sm font-light transition-all"
+                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
                 >
                   Connect Accounts
                 </button>
@@ -136,7 +137,7 @@ export default function Home() {
 
             {/* HandCash Status - Only show when logged in */}
             {session && (
-              <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--color-border)' }}>
+              <div className="card p-3">
                 {handcashConnected ? (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -152,8 +153,8 @@ export default function Home() {
                 ) : (
                   <button
                     onClick={connectHandCash}
-                    className="w-full text-left text-sm transition-opacity hover:opacity-80"
-                    style={{ color: 'var(--color-accent)' }}
+                    className="w-full text-left text-sm font-light transition-all"
+                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
                   >
                     Connect HandCash Wallet
                   </button>
@@ -164,9 +165,8 @@ export default function Home() {
             {/* Upload Button */}
             <button 
               onClick={() => setShowUploadModal(true)}
-              className="w-full mb-4 px-4 py-3 font-semibold rounded-lg transition-all hover:opacity-90 flex items-center justify-center gap-2"
-              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--bg-primary)' }}>
-              <Upload size={20} />
+              className="btn-primary w-full mb-4 px-4 py-3 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+              <Upload size={18} />
               Upload Files
             </button>
 
@@ -174,50 +174,55 @@ export default function Home() {
             <nav className="space-y-1 mb-4">
               <button 
                 onClick={() => setActiveCategory('all')}
-                className={`w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeCategory === 'all' ? '' : 'hover:bg-[var(--color-hover)]'}`}
+                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
                 style={{ 
-                  backgroundColor: activeCategory === 'all' ? 'var(--color-primary)' : 'transparent', 
-                  color: activeCategory === 'all' ? 'var(--bg-primary)' : 'var(--color-accent)' 
+                  backgroundColor: activeCategory === 'all' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                  borderLeft: activeCategory === 'all' ? '2px solid #00ff88' : '2px solid transparent',
+                  color: activeCategory === 'all' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
                 }}>
                 <Grid size={16} />
                 All Files
               </button>
               <button 
                 onClick={() => setActiveCategory('documents')}
-                className={`w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeCategory === 'documents' ? '' : 'hover:bg-[var(--color-hover)]'}`}
+                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
                 style={{ 
-                  backgroundColor: activeCategory === 'documents' ? 'var(--color-primary)' : 'transparent', 
-                  color: activeCategory === 'documents' ? 'var(--bg-primary)' : 'var(--color-accent)' 
+                  backgroundColor: activeCategory === 'documents' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                  borderLeft: activeCategory === 'documents' ? '2px solid #00ff88' : '2px solid transparent',
+                  color: activeCategory === 'documents' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
                 }}>
                 <FileText size={16} />
                 Documents
               </button>
               <button 
                 onClick={() => setActiveCategory('recent')}
-                className={`w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeCategory === 'recent' ? '' : 'hover:bg-[var(--color-hover)]'}`}
+                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
                 style={{ 
-                  backgroundColor: activeCategory === 'recent' ? 'var(--color-primary)' : 'transparent', 
-                  color: activeCategory === 'recent' ? 'var(--bg-primary)' : 'var(--color-accent)' 
+                  backgroundColor: activeCategory === 'recent' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                  borderLeft: activeCategory === 'recent' ? '2px solid #00ff88' : '2px solid transparent',
+                  color: activeCategory === 'recent' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
                 }}>
                 <Clock size={16} />
                 Recent
               </button>
               <button 
                 onClick={() => setActiveCategory('nfts')}
-                className={`w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeCategory === 'nfts' ? '' : 'hover:bg-[var(--color-hover)]'}`}
+                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
                 style={{ 
-                  backgroundColor: activeCategory === 'nfts' ? 'var(--color-primary)' : 'transparent', 
-                  color: activeCategory === 'nfts' ? 'var(--bg-primary)' : 'var(--color-accent)' 
+                  backgroundColor: activeCategory === 'nfts' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                  borderLeft: activeCategory === 'nfts' ? '2px solid #00ff88' : '2px solid transparent',
+                  color: activeCategory === 'nfts' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
                 }}>
                 <Hexagon size={16} />
                 NFTs
               </button>
               <button 
                 onClick={() => setActiveCategory('shared')}
-                className={`w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeCategory === 'shared' ? '' : 'hover:bg-[var(--color-hover)]'}`}
+                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
                 style={{ 
-                  backgroundColor: activeCategory === 'shared' ? 'var(--color-primary)' : 'transparent', 
-                  color: activeCategory === 'shared' ? 'var(--bg-primary)' : 'var(--color-accent)' 
+                  backgroundColor: activeCategory === 'shared' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                  borderLeft: activeCategory === 'shared' ? '2px solid #00ff88' : '2px solid transparent',
+                  color: activeCategory === 'shared' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
                 }}>
                 <Share2 size={16} />
                 Shared
@@ -225,7 +230,7 @@ export default function Home() {
             </nav>
 
             {/* Storage Indicator */}
-            <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--color-border)' }}>
+            <div className="card p-3 mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <HardDrive size={16} style={{ color: 'var(--color-accent)' }} />
                 <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>Storage Used</span>
@@ -312,8 +317,7 @@ export default function Home() {
               {!session ? (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="px-4 py-2 font-medium rounded-lg transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--bg-primary)' }}>
+                  className="btn-primary px-4 py-2 font-medium rounded-lg transition-all">
                   Sign In
                 </button>
               ) : (

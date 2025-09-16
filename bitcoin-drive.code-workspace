@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../../../Volumes/Extreme SSD/Projects/bitcoin-writer"
+		},
+		{
+			"path": "../../blockchain-spreadsheet"
 		}
 	],
 	"settings": {}
