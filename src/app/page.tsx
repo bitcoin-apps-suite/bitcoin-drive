@@ -99,72 +99,11 @@ export default function Home() {
         background: 'rgba(0, 0, 0, 0.9)',
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        height: '36px'
+        height: '36px',
+        position: 'relative'
       }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {/* Logo and Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="status-indicator"></span>
-            <span style={{ color: '#00ff88', fontSize: '16px', fontWeight: '300' }}>₿</span>
-            <h1 style={{ 
-              fontSize: '14px', 
-              fontWeight: '300', 
-              letterSpacing: '-0.02em',
-              color: '#ffffff',
-              margin: 0
-            }}>
-              Bitcoin Drive
-            </h1>
-          </div>
-        </div>
-
-        {/* Center section - Search bar */}
-        <div style={{ flex: 1, maxWidth: '500px', margin: '0 16px' }}>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
-            <input
-              type="text"
-              placeholder="Search files..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ 
-                width: '100%',
-                paddingLeft: '32px',
-                paddingRight: '12px',
-                paddingTop: '4px',
-                paddingBottom: '4px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '13px',
-                outline: 'none',
-                transition: 'all 0.3s ease'
-              }}
-              onFocus={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-              }}
-              onBlur={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Right section - Actions */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button 
-            id="upload-btn"
-            onClick={() => setShowUploadModal(true)}
-            className="btn-primary"
-            style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
-            <Upload size={14} style={{ marginRight: '3px' }} />
-            Upload to Chain
-          </button>
-          
-          {/* View Mode Toggle */}
+        {/* Left section - View Mode Toggle */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
           <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
             <button
               onClick={() => setViewMode('grid')}
@@ -188,6 +127,44 @@ export default function Home() {
               <List size={14} />
             </button>
           </div>
+        </div>
+        
+        {/* Center section - Bitcoin Drive Title */}
+        <div style={{ 
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}>
+          <Image
+            src="/bitcoin-drive-icon.ico"
+            alt="Bitcoin Drive"
+            width={20}
+            height={20}
+          />
+          <h1 style={{ 
+            fontSize: '14px', 
+            fontWeight: '300', 
+            letterSpacing: '-0.02em',
+            color: '#ffffff',
+            margin: 0
+          }}>
+            Bitcoin Drive
+          </h1>
+        </div>
+
+        {/* Right section - Actions */}
+        <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <button 
+            id="upload-btn"
+            onClick={() => setShowUploadModal(true)}
+            className="btn-primary"
+            style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
+            <Upload size={14} style={{ marginRight: '3px' }} />
+            Upload to Chain
+          </button>
 
           {session ? (
             <div className="flex items-center gap-2">
@@ -383,8 +360,8 @@ export default function Home() {
       <div className="flex-1 flex flex-col">
         {/* Content */}
         <div className="flex-1 flex flex-col" style={{ backgroundColor: 'var(--bg-primary)' }}>
-          {/* Category Header */}
-          <div className="px-6 py-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
+          {/* Category Header with Search */}
+          <div className="px-6 py-3 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
             <h2 className="text-lg font-semibold capitalize" style={{ color: 'var(--color-accent)' }}>
               {activeCategory === 'all' && 'All Files'}
               {activeCategory === 'documents' && 'Documents'}
@@ -392,6 +369,41 @@ export default function Home() {
               {activeCategory === 'nfts' && 'NFT Collection'}
               {activeCategory === 'shared' && 'Shared with Me'}
             </h2>
+            
+            {/* Search Bar */}
+            <div style={{ width: '300px' }}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
+                <input
+                  type="text"
+                  placeholder="Search files..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ 
+                    width: '100%',
+                    paddingLeft: '32px',
+                    paddingRight: '12px',
+                    paddingTop: '6px',
+                    paddingBottom: '6px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Files Grid/List */}
