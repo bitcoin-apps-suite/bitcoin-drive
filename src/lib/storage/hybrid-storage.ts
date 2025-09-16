@@ -20,12 +20,12 @@ export interface TimelockConfig {
   unlockDate: Date
   unlockConditions?: {
     type: 'time' | 'payment' | 'multisig'
-    value: any
+    value: unknown
   }[]
 }
 
 export class HybridStorage {
-  private drive: any
+  private drive: ReturnType<typeof google.drive>
   
   constructor(accessToken: string) {
     const auth = new google.auth.OAuth2()
@@ -91,7 +91,7 @@ export class HybridStorage {
       fileSize: processedFile.length,
       mimeType,
       sha256Hash,
-      googleDriveId,
+      googleDriveId: googleDriveId || undefined,
       blockchainTxId,
       timelockUntil: options?.timelock?.unlockDate,
       encryptionKey,
@@ -117,11 +117,11 @@ export class HybridStorage {
       { responseType: 'arraybuffer' }
     )
     
-    let file = Buffer.from(response.data)
+    let file = Buffer.from(response.data as ArrayBuffer)
     
     // Decrypt if needed
     if (encryptionKey) {
-      file = this.decryptFile(file, encryptionKey)
+      file = Buffer.from(this.decryptFile(file, encryptionKey))
     }
     
     // Verify hash
@@ -184,7 +184,7 @@ export class HybridStorage {
    */
   private async storeHashOnBlockchain(
     hash: string,
-    metadata: any
+    metadata: unknown
   ): Promise<string> {
     // TODO: Implement actual BSV blockchain storage
     // For now, return a mock transaction ID
@@ -196,8 +196,8 @@ export class HybridStorage {
    * Create a shareable link with optional payment requirements
    */
   async createShareableLink(
-    fileId: string,
-    options?: {
+    _fileId: string,
+    _options?: {
       requirePayment?: boolean
       amount?: number
       recipientAddress?: string

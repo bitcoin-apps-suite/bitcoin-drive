@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Link from 'next/link'
 
 interface DropdownItem {
-  label: string
+  label?: string
   action?: () => void
   href?: string
   divider?: boolean
@@ -134,23 +133,22 @@ export default function Taskbar() {
       style={{
         display: 'flex',
         alignItems: 'center',
-        height: '24px',
-        background: 'rgba(0, 0, 0, 0.95)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        height: '28px',
+        background: 'linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%)',
+        borderBottom: '1px solid #1a1a1a',
         fontSize: '13px',
-        fontWeight: '400',
+        fontWeight: '500',
         color: '#ffffff',
         userSelect: 'none',
         position: 'relative',
-        zIndex: 9999
+        zIndex: 10000
       }}
     >
       {/* Bitcoin Logo */}
       <div style={{
-        padding: '0 16px',
-        fontSize: '14px',
-        fontWeight: '600',
+        padding: '0 12px',
+        fontSize: '18px',
+        fontWeight: 'bold',
         color: '#00ff88',
         display: 'flex',
         alignItems: 'center',
@@ -185,16 +183,17 @@ export default function Taskbar() {
             {activeMenu === menu.label && (
               <div style={{
                 position: 'absolute',
-                top: '24px',
+                top: '28px',
                 left: 0,
-                minWidth: '240px',
-                background: 'rgba(30, 30, 30, 0.98)',
-                backdropFilter: 'blur(20px)',
+                minWidth: '200px',
+                background: '#1a1a1a',
+                backdropFilter: 'blur(16px)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '6px',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                borderRadius: '8px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
                 padding: '4px 0',
-                zIndex: 10000
+                zIndex: 9999,
+                overflow: 'hidden'
               }}>
                 {menu.items.map((item, index) => (
                   item.divider ? (

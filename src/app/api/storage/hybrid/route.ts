@@ -4,7 +4,7 @@ import { HybridStorage, TimelockConfig } from '@/lib/storage/hybrid-storage'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession() as any
+    const session = await getServerSession() as { accessToken?: string } | null
     
     if (!session?.accessToken) {
       return NextResponse.json(
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession() as any
+    const session = await getServerSession() as { accessToken?: string } | null
     
     if (!session?.accessToken) {
       return NextResponse.json(
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Return file as response
-    return new NextResponse(file, {
+    return new NextResponse(file as unknown as BodyInit, {
       headers: {
         'Content-Type': 'application/octet-stream',
         'X-Hash-Verified': 'true'

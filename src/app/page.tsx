@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession, signIn, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Taskbar from "@/components/Taskbar"
@@ -95,36 +95,35 @@ export default function Home() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '6px 16px',
-        background: 'rgba(0, 0, 0, 0.9)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        height: '36px',
+        padding: '20px 24px',
+        background: 'var(--bg-secondary)',  // Pure black for header
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        height: '96px',
         position: 'relative'
       }}>
         {/* Left section - View Mode Toggle */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-          <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+          <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
             <button
               onClick={() => setViewMode('grid')}
               style={{ 
-                padding: '4px 6px',
-                backgroundColor: viewMode === 'grid' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                color: viewMode === 'grid' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
+                padding: '8px 12px',
+                backgroundColor: viewMode === 'grid' ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
+                color: viewMode === 'grid' ? '#00ff88' : 'rgba(255, 255, 255, 0.5)',
                 border: 'none',
-                borderRight: '1px solid rgba(255, 255, 255, 0.12)'
+                borderRight: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
-              <Grid size={14} />
+              <Grid size={18} />
             </button>
             <button
               onClick={() => setViewMode('list')}
               style={{ 
-                padding: '4px 6px',
-                backgroundColor: viewMode === 'list' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                color: viewMode === 'list' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
+                padding: '8px 12px',
+                backgroundColor: viewMode === 'list' ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
+                color: viewMode === 'list' ? '#00ff88' : 'rgba(255, 255, 255, 0.5)',
                 border: 'none'
               }}>
-              <List size={14} />
+              <List size={18} />
             </button>
           </div>
         </div>
@@ -136,22 +135,23 @@ export default function Home() {
           transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px'
+          gap: '12px'
         }}>
           <Image
-            src="/bitcoin-drive-icon.ico"
+            src="/bitcoindrive-icon.jpg"
             alt="Bitcoin Drive"
-            width={20}
-            height={20}
+            width={40}
+            height={40}
+            style={{ borderRadius: '8px' }}
           />
           <h1 style={{ 
-            fontSize: '14px', 
+            fontSize: '28px', 
             fontWeight: '300', 
-            letterSpacing: '-0.02em',
-            color: '#ffffff',
+            letterSpacing: '-0.03em',
             margin: 0
           }}>
-            Bitcoin Drive
+            <span style={{ color: '#00ff88' }}>Bitcoin</span>
+            <span style={{ color: '#ffffff' }}> Drive</span>
           </h1>
         </div>
 
@@ -408,25 +408,81 @@ export default function Home() {
 
           {/* Files Grid/List */}
           <div className="flex-1 p-6">
-            <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--color-border)' }}>
-              <svg className="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--color-primary)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-accent)' }}>
-                {searchQuery ? `No files matching "${searchQuery}"` : 'No files yet'}
+            {/* Perforation Edge Drop Box */}
+            <div 
+              className="rounded-lg text-center relative"
+              style={{ 
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                backgroundImage: `radial-gradient(circle at 15px 15px, transparent 2px, rgba(0, 255, 136, 0.08) 2px, rgba(0, 255, 136, 0.08) 3px, transparent 3px)`,
+                backgroundSize: '30px 30px',
+                border: '2px dashed rgba(0, 255, 136, 0.25)',
+                padding: '60px 40px',
+                minHeight: '400px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 255, 136, 0.05)';
+              }}
+              onDragLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.15)';
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.15)';
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                  // Handle file drop
+                  console.log('Files dropped:', files);
+                  setShowUploadModal(true);
+                }
+              }}
+              onClick={() => setShowUploadModal(true)}
+            >
+              <Upload size={48} style={{ color: '#00ff88', marginBottom: '20px', opacity: 0.8 }} />
+              <h3 className="text-xl font-light mb-3" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
+                Drop files here to upload
               </h3>
-              <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
-                {searchQuery ? 'Try a different search term' : 'Upload your first file to get started'}
+              <p className="mb-6" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px' }}>
+                or click to browse files
               </p>
-              {!searchQuery && (
-                <button 
-                  onClick={() => setShowUploadModal(true)}
-                  className="px-4 py-2 font-semibold rounded-md transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--bg-primary)' }}>
-                  Upload File
-                </button>
-              )}
+              <div style={{ 
+                display: 'flex', 
+                gap: '8px', 
+                fontSize: '12px', 
+                color: 'rgba(255, 255, 255, 0.5)',
+                alignItems: 'center'
+              }}>
+                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(0, 255, 136, 0.1)', borderRadius: '4px' }}>
+                  OP_RETURN
+                </span>
+                <span>•</span>
+                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(0, 255, 136, 0.1)', borderRadius: '4px' }}>
+                  OP_PUSHDATA4
+                </span>
+                <span>•</span>
+                <span style={{ padding: '4px 8px', backgroundColor: 'rgba(0, 255, 136, 0.1)', borderRadius: '4px' }}>
+                  Hash + Drive
+                </span>
+              </div>
             </div>
+            
+            {/* Show this when there are files */}
+            {searchQuery && (
+              <div className="mt-6 text-center">
+                <p style={{ color: 'var(--color-text-muted)' }}>
+                  No files matching &quot;{searchQuery}&quot;
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

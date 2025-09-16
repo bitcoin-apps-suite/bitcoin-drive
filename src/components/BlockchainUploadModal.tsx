@@ -27,7 +27,7 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload }: Blo
   const [enablePrice, setEnablePrice] = useState(false)
   const [price, setPrice] = useState('')
   const [currency, setCurrency] = useState<'BSV' | 'USD'>('BSV')
-  const [description, setDescription] = useState('')
+  const [description] = useState('')
   const [estimatedCost, setEstimatedCost] = useState<number>(0)
 
   const calculateCost = (file: File | null, method: UploadOptions['method']) => {
