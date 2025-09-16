@@ -3,21 +3,21 @@
 :root {
   /* Base colors */
   --background: #000000;
-  --foreground: #ffffff;
+  --foreground: #00ff00;
   
-  /* Theme colors - default green */
-  --color-primary: rgb(34 197 94);
-  --color-secondary: rgb(134 239 172);
-  --color-accent: rgb(74 222 128);
-  --color-border: rgba(34, 197, 94, 0.3);
-  --color-hover: rgba(34, 197, 94, 0.1);
-  --color-text: rgb(74 222 128);
-  --color-text-muted: rgba(134, 239, 172, 0.6);
+  /* Theme colors - vibrant green */
+  --color-primary: #00ff00;
+  --color-secondary: #00cc00;
+  --color-accent: #00ff00;
+  --color-border: rgba(0, 255, 0, 0.3);
+  --color-hover: rgba(0, 255, 0, 0.15);
+  --color-text: #00ff00;
+  --color-text-muted: rgba(0, 255, 0, 0.6);
   
   /* Component backgrounds */
   --bg-primary: #000000;
-  --bg-secondary: rgb(17 24 39);
-  --bg-card: rgba(0, 0, 0, 0.5);
+  --bg-secondary: #0a0a0a;
+  --bg-card: rgba(0, 255, 0, 0.05);
 }
 
 @theme inline {
@@ -43,15 +43,19 @@ body {
 /* Light mode overrides */
 .light-mode {
   --bg-primary: #ffffff;
-  --bg-secondary: #f3f4f6;
+  --bg-secondary: #f0fff0;
   --bg-card: #ffffff;
-  --foreground: #111827;
+  --foreground: #006600;
   --background: #ffffff;
   
-  /* Adjust theme colors for better contrast in light mode */
-  --color-border: rgba(0, 0, 0, 0.15);
-  --color-hover: rgba(0, 0, 0, 0.05);
-  --color-text-muted: rgba(17, 24, 39, 0.6);
+  /* Green theme for light mode */
+  --color-primary: #00cc00;
+  --color-secondary: #009900;
+  --color-accent: #006600;
+  --color-border: rgba(0, 204, 0, 0.3);
+  --color-hover: rgba(0, 204, 0, 0.1);
+  --color-text: #006600;
+  --color-text-muted: rgba(0, 102, 0, 0.6);
 }
 
 /* Theme-aware components */

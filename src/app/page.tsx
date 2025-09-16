@@ -93,7 +93,7 @@ export default function Home() {
       <div className="w-64 border-r" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)' }}>
         <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
           <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--color-accent)' }}>
-            <span className="text-yellow-500">₿</span>
+            <span style={{ color: 'var(--color-primary)' }}>₿</span>
             Bitcoin Drive
           </h1>
         </div>
