@@ -95,20 +95,20 @@ export default function Home() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '12px 20px',
+        padding: '6px 16px',
         background: 'rgba(0, 0, 0, 0.9)',
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        minHeight: '52px'
+        height: '36px'
       }}>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {/* Logo and Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="status-indicator"></span>
-            <span style={{ color: '#00ff88', fontSize: '20px', fontWeight: '300' }}>₿</span>
+            <span style={{ color: '#00ff88', fontSize: '16px', fontWeight: '300' }}>₿</span>
             <h1 style={{ 
-              fontSize: '18px', 
-              fontWeight: '200', 
+              fontSize: '14px', 
+              fontWeight: '300', 
               letterSpacing: '-0.02em',
               color: '#ffffff',
               margin: 0
@@ -119,9 +119,9 @@ export default function Home() {
         </div>
 
         {/* Center section - Search bar */}
-        <div style={{ flex: 1, maxWidth: '600px', margin: '0 20px' }}>
+        <div style={{ flex: 1, maxWidth: '500px', margin: '0 16px' }}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
             <input
               type="text"
               placeholder="Search files..."
@@ -129,10 +129,10 @@ export default function Home() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ 
                 width: '100%',
-                paddingLeft: '40px',
-                paddingRight: '16px',
-                paddingTop: '8px',
-                paddingBottom: '8px',
+                paddingLeft: '32px',
+                paddingRight: '12px',
+                paddingTop: '4px',
+                paddingBottom: '4px',
                 backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '8px',
@@ -159,33 +159,33 @@ export default function Home() {
             id="upload-btn"
             onClick={() => setShowUploadModal(true)}
             className="btn-primary"
-            style={{ fontSize: '13px', padding: '8px 12px' }}>
-            <Upload size={16} style={{ marginRight: '4px' }} />
+            style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
+            <Upload size={14} style={{ marginRight: '3px' }} />
             Upload to Chain
           </button>
           
           {/* View Mode Toggle */}
-          <div style={{ display: 'flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+          <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
             <button
               onClick={() => setViewMode('grid')}
               style={{ 
-                padding: '8px',
+                padding: '4px 6px',
                 backgroundColor: viewMode === 'grid' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
                 color: viewMode === 'grid' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
                 border: 'none',
                 borderRight: '1px solid rgba(255, 255, 255, 0.12)'
               }}>
-              <Grid size={16} />
+              <Grid size={14} />
             </button>
             <button
               onClick={() => setViewMode('list')}
               style={{ 
-                padding: '8px',
+                padding: '4px 6px',
                 backgroundColor: viewMode === 'list' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
                 color: viewMode === 'list' ? '#00ff88' : 'rgba(255, 255, 255, 0.6)',
                 border: 'none'
               }}>
-              <List size={16} />
+              <List size={14} />
             </button>
           </div>
 
@@ -195,8 +195,8 @@ export default function Home() {
                 <Image
                   src={session.user.image}
                   alt="Profile"
-                  width={28}
-                  height={28}
+                  width={24}
+                  height={24}
                   className="rounded-full"
                   style={{ border: '1px solid rgba(255, 255, 255, 0.12)' }}
                 />
@@ -205,7 +205,7 @@ export default function Home() {
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              style={{ fontSize: '13px', padding: '8px 12px' }}>
+              style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
               Sign In
             </button>
           )}
