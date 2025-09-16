@@ -6,7 +6,10 @@ import Image from "next/image"
 import Taskbar from "@/components/Taskbar"
 import BlockchainUploadModal, { UploadOptions } from "@/components/BlockchainUploadModal"
 import AuthModal from "@/components/AuthModal"
-import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List } from 'lucide-react'
+import StorageConnector from '@/components/StorageConnector'
+import type { StorageProvider } from '@/components/StorageConnector'
+import TokenizationModal, { TokenizationSettings } from '@/components/TokenizationModal'
+import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List, Cloud } from 'lucide-react'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -14,6 +17,10 @@ export default function Home() {
   const [handcashProfile, setHandcashProfile] = useState<{handle?: string; displayName?: string} | null>(null)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showStorageConnector, setShowStorageConnector] = useState(false)
+  const [showTokenizationModal, setShowTokenizationModal] = useState(false)
+  const [selectedFileForTokenization, setSelectedFileForTokenization] = useState<File | null>(null)
+  const [connectedStorageProviders, setConnectedStorageProviders] = useState<StorageProvider[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -54,9 +61,25 @@ export default function Home() {
   const handleFileUpload = async (file: File, options: UploadOptions) => {
     console.log('Uploading file:', file.name, options)
     
+    // Check if tokenization is requested
+    if (options.tokenize) {
+      setSelectedFileForTokenization(file)
+      setShowTokenizationModal(true)
+      setShowUploadModal(false)
+      return
+    }
+    
     const formData = new FormData()
     formData.append('file', file)
     formData.append('options', JSON.stringify(options))
+    
+    // Add cloud storage provider if selected
+    if (options.cloudProvider && connectedStorageProviders.length > 0) {
+      const provider = connectedStorageProviders.find(p => p.type === options.cloudProvider)
+      if (provider) {
+        formData.append('cloudProvider', JSON.stringify(provider))
+      }
+    }
     
     try {
       const response = await fetch('/api/upload', {
@@ -74,6 +97,26 @@ export default function Home() {
     } catch (error) {
       console.error('Error uploading file:', error)
     }
+  }
+
+  const handleStorageConnect = (provider: StorageProvider) => {
+    setConnectedStorageProviders([...connectedStorageProviders, provider])
+    console.log('Connected storage provider:', provider)
+  }
+
+  const handleTokenizationComplete = (tokenSettings: TokenizationSettings) => {
+    console.log('Tokenization complete:', tokenSettings)
+    // Here we would upload the file with tokenization settings
+    if (selectedFileForTokenization) {
+      handleFileUpload(selectedFileForTokenization, {
+        method: 'hash_drive',
+        encrypt: tokenSettings.encrypted,
+        tokenize: true,
+        currency: 'BSV'
+      } as UploadOptions)
+    }
+    setShowTokenizationModal(false)
+    setSelectedFileForTokenization(null)
   }
 
   if (status === "loading") {
@@ -157,14 +200,7 @@ export default function Home() {
 
         {/* Right section - Actions */}
         <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <button 
-            id="upload-btn"
-            onClick={() => setShowUploadModal(true)}
-            className="btn-primary"
-            style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
-            <Upload size={14} style={{ marginRight: '3px' }} />
-            Upload to Chain
-          </button>
+          {/* Removed Upload to Chain button from here - moved near upload pad */}
 
           {session ? (
             <div className="flex items-center gap-2">
@@ -256,13 +292,31 @@ export default function Home() {
               </div>
             )}
 
-            {/* Upload Button */}
+            {/* Action Buttons */}
             <button 
               onClick={() => setShowUploadModal(true)}
-              className="btn-primary w-full mb-4 px-4 py-3 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+              className="btn-primary w-full mb-2 px-4 py-3 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
               <Upload size={18} />
               Upload to Blockchain
             </button>
+            
+            <button 
+              onClick={() => setShowStorageConnector(true)}
+              className="w-full mb-2 px-4 py-2 font-medium rounded-lg transition-all flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
+              <Cloud size={16} />
+              Connect Cloud Storage
+            </button>
+            
+            {connectedStorageProviders.length > 0 && (
+              <div className="text-xs mb-4" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                {connectedStorageProviders.length} provider{connectedStorageProviders.length > 1 ? 's' : ''} connected
+              </div>
+            )}
 
             {/* Navigation Categories */}
             <nav className="space-y-1 mb-4">
@@ -454,6 +508,22 @@ export default function Home() {
               <p className="mb-6" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px' }}>
                 or click to browse files
               </p>
+              
+              <button 
+                id="upload-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowUploadModal(true);
+                }}
+                className="btn-primary flex items-center gap-2 px-6 py-2 rounded-lg font-medium"
+                style={{ 
+                  backgroundColor: '#00ff88',
+                  color: '#000000',
+                  marginBottom: '20px'
+                }}>
+                <Upload size={16} />
+                Upload to Chain
+              </button>
               <div style={{ 
                 display: 'flex', 
                 gap: '8px', 
@@ -493,6 +563,7 @@ export default function Home() {
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
         onUpload={handleFileUpload}
+        connectedProviders={connectedStorageProviders}
       />
 
       {/* Auth Modal */}
@@ -504,6 +575,28 @@ export default function Home() {
           window.location.reload()
         }}
       />
+      
+      {/* Storage Connector Modal */}
+      <StorageConnector
+        isOpen={showStorageConnector}
+        onClose={() => setShowStorageConnector(false)}
+        onConnect={handleStorageConnect}
+      />
+      
+      {/* Tokenization Modal */}
+      {selectedFileForTokenization && (
+        <TokenizationModal
+          isOpen={showTokenizationModal}
+          onClose={() => {
+            setShowTokenizationModal(false)
+            setSelectedFileForTokenization(null)
+          }}
+          fileName={selectedFileForTokenization.name}
+          fileSize={selectedFileForTokenization.size}
+          mimeType={selectedFileForTokenization.type}
+          onTokenize={handleTokenizationComplete}
+        />
+      )}
     </div>
   )
 }

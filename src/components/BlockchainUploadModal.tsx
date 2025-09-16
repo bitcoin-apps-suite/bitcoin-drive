@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Upload, Hash, HardDrive, Lock, DollarSign, FileText, AlertCircle } from 'lucide-react'
+import { X, Upload, Hash, HardDrive, Lock, DollarSign, FileText, AlertCircle, Cloud, Coins } from 'lucide-react'
+import type { StorageProvider } from './StorageConnector'
 
 interface BlockchainUploadModalProps {
   isOpen: boolean
   onClose: () => void
   onUpload: (file: File, options: UploadOptions) => void
+  connectedProviders?: StorageProvider[]
 }
 
 export interface UploadOptions {
@@ -16,9 +18,11 @@ export interface UploadOptions {
   price?: number
   currency: 'BSV' | 'USD'
   description?: string
+  cloudProvider?: string
+  tokenize?: boolean
 }
 
-export default function BlockchainUploadModal({ isOpen, onClose, onUpload }: BlockchainUploadModalProps) {
+export default function BlockchainUploadModal({ isOpen, onClose, onUpload, connectedProviders = [] }: BlockchainUploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadMethod, setUploadMethod] = useState<UploadOptions['method']>('hash_drive')
   const [encrypt, setEncrypt] = useState(false)
@@ -29,6 +33,8 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload }: Blo
   const [currency, setCurrency] = useState<'BSV' | 'USD'>('BSV')
   const [description] = useState('')
   const [estimatedCost, setEstimatedCost] = useState<number>(0)
+  const [selectedCloudProvider, setSelectedCloudProvider] = useState<string>('')
+  const [enableTokenization, setEnableTokenization] = useState(false)
 
   const calculateCost = (file: File | null, method: UploadOptions['method']) => {
     if (!file) return 0
@@ -65,7 +71,9 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload }: Blo
       timelock: enableTimelock && timelockDate ? new Date(timelockDate) : undefined,
       price: enablePrice && price ? parseFloat(price) : undefined,
       currency,
-      description
+      description,
+      cloudProvider: selectedCloudProvider,
+      tokenize: enableTokenization
     }
 
     onUpload(selectedFile, options)
@@ -308,6 +316,50 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload }: Blo
                 </div>
               )}
             </div>
+            
+            {/* Cloud Storage */}
+            {connectedProviders.length > 0 && (
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer mb-2">
+                  <Cloud size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
+                    Also save to cloud storage
+                  </span>
+                </label>
+                <select
+                  value={selectedCloudProvider}
+                  onChange={(e) => setSelectedCloudProvider(e.target.value)}
+                  className="ml-7 px-3 py-1 rounded border"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#ffffff',
+                    fontSize: '13px'
+                  }}
+                >
+                  <option value="">None</option>
+                  {connectedProviders.map(provider => (
+                    <option key={provider.type} value={provider.type}>
+                      {provider.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            {/* Tokenization */}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={enableTokenization}
+                onChange={(e) => setEnableTokenization(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <Coins size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
+                Tokenize this file (create revenue shares)
+              </span>
+            </label>
           </div>
 
           {/* Cost Estimate */}
