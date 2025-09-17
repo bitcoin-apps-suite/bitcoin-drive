@@ -10,6 +10,7 @@ import AuthModal from "@/components/AuthModal"
 import StorageConnector from '@/components/StorageConnector'
 import type { StorageProvider } from '@/components/StorageConnector'
 import TokenizationModal, { TokenizationSettings } from '@/components/TokenizationModal'
+import InstallAppButton from '@/components/InstallAppButton'
 import { Search, Upload, Grid, List, RefreshCw } from 'lucide-react'
 import { useDriveFiles } from '@/hooks/useDriveFiles'
 import GoogleDriveFileCard from '@/components/GoogleDriveFileCard'
@@ -180,14 +181,10 @@ export default function Home() {
     }
   }, [isResizing])
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-        <div className="text-2xl" style={{ color: 'var(--color-accent)' }}>Loading...</div>
-      </div>
-    )
-  }
-
+  // Set mounted state for other uses in the component
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
@@ -195,18 +192,16 @@ export default function Home() {
       <Taskbar />
       
       {/* App Toolbar */}
-      <div className="toolbar" style={{ 
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '20px 24px',
+      <div className="toolbar px-4 sm:px-6" style={{ 
+        padding: '16px',
         background: 'var(--bg-secondary)',  // Pure black for header
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        height: '96px',
-        position: 'relative'
+        minHeight: '96px'
       }}>
-        {/* Left section - View Mode Toggle */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+        {/* Mobile responsive wrapper */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-0 w-full sm:justify-between">
+          {/* Left section - View Mode Toggle (hidden on mobile) */}
+          <div className="hidden sm:flex sm:flex-1 items-center">
           <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
             <button
               onClick={() => setViewMode('grid')}
@@ -230,17 +225,10 @@ export default function Home() {
               <List size={18} />
             </button>
           </div>
-        </div>
-        
-        {/* Center section - Bitcoin Drive Title */}
-        <div style={{ 
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
+          </div>
+          
+          {/* Center section - Bitcoin Drive Title */}
+          <div className="order-first sm:order-none flex items-center gap-3">
           <Image
             src="/bitcoindrive-icon.jpg"
             alt="Bitcoin Drive"
@@ -248,9 +236,8 @@ export default function Home() {
             height={40}
             style={{ borderRadius: '8px' }}
           />
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '28px', 
+          <div className="text-center sm:text-center">
+            <h1 className="text-2xl sm:text-3xl" style={{ 
               fontWeight: '300', 
               letterSpacing: '-0.03em',
               margin: 0,
@@ -259,7 +246,7 @@ export default function Home() {
               <span style={{ color: '#00ff88' }}>Bitcoin</span>
               <span style={{ color: '#ffffff' }}> Drive</span>
             </h1>
-            <p style={{
+            <p className="hidden sm:block" style={{
               fontSize: '13px',
               color: 'rgba(255, 255, 255, 0.6)',
               margin: 0,
@@ -269,11 +256,11 @@ export default function Home() {
               Decentralized Storage & Tokenization Platform
             </p>
           </div>
-        </div>
+          </div>
 
-        {/* Right section - Actions */}
-        <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          {/* Removed Upload to Chain button from here - moved near upload pad */}
+          {/* Right section - Actions */}
+          <div className="flex gap-2 sm:flex-1 sm:justify-end items-center">
+          <InstallAppButton />
 
           {session ? (
             <div className="flex items-center gap-2">
@@ -320,10 +307,11 @@ export default function Home() {
                   <circle cx="18" cy="16" r="3"/>
                   <path d="M22 22l-1.5-1.5"/>
                 </svg>
-                Connect Wallet
+                Connect Services
               </span>
             </button>
           )}
+          </div>
         </div>
       </div>
 

@@ -60,6 +60,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Unregister all service workers and clear caches
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('SW unregistered: ', registration);
+                  }
+                });
+                caches.keys().then(function(names) {
+                  for (let name of names) {
+                    caches.delete(name);
+                    console.log('Cache deleted: ', name);
+                  }
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

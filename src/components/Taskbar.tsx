@@ -226,6 +226,7 @@ export default function Taskbar() {
       style={{
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         height: '28px',
         background: 'linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%)',
         borderBottom: '1px solid #1a1a1a',
@@ -237,46 +238,48 @@ export default function Taskbar() {
         zIndex: 10000
       }}
     >
-      {/* Bitcoin Logo */}
-      <div style={{ position: 'relative' }}>
-        <button
-          onClick={() => {
-            setShowBitcoinSuite(!showBitcoinSuite)
-            setActiveMenu(null)
-          }}
-          style={{
-            padding: '0 12px',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            color: '#00ff88',
-            display: 'flex',
-            alignItems: 'center',
-            height: '28px',
-            background: showBitcoinSuite ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'background 0.15s ease'
-          }}
-          title="Bitcoin Suite Apps"
-        >
-          ₿
-        </button>
+      {/* Left side - Bitcoin Logo and menus */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* Bitcoin Logo container */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => {
+              setShowBitcoinSuite(!showBitcoinSuite)
+              setActiveMenu(null)
+            }}
+            style={{
+              padding: '0 12px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#00ff88',
+              display: 'flex',
+              alignItems: 'center',
+              height: '28px',
+              background: showBitcoinSuite ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.15s ease'
+            }}
+            title="Bitcoin Suite Apps"
+          >
+            ₿
+          </button>
 
-        {/* Bitcoin Suite Dropdown */}
-        {showBitcoinSuite && (
-          <div style={{
-            position: 'absolute',
-            top: '28px',
-            left: 0,
-            minWidth: '220px',
-            background: '#1a1a1a',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '8px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
-            padding: '8px 0',
-            zIndex: 1000
-          }}>
+          {/* Bitcoin Suite Dropdown */}
+          {showBitcoinSuite && (
+            <div style={{
+              position: 'absolute',
+              top: '28px',
+              left: 0,
+              minWidth: '220px',
+              background: '#1a1a1a',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '8px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
+              padding: '8px 0',
+              zIndex: 1000
+            }}>
             <div style={{
               padding: '8px 16px',
               fontSize: '12px',
@@ -328,14 +331,17 @@ export default function Taskbar() {
             ))}
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Menu Items */}
-      <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        {/* Menu Items - Hidden on mobile */}
+        <div className="hidden sm:flex" style={{ alignItems: 'center', height: '100%' }}>
         {menus.map((menu) => (
           <div key={menu.label} style={{ position: 'relative' }}>
             <button
-              onClick={() => setActiveMenu(activeMenu === menu.label ? null : menu.label)}
+              onClick={() => {
+                setActiveMenu(activeMenu === menu.label ? null : menu.label)
+                setShowBitcoinSuite(false)
+              }}
               onMouseEnter={() => activeMenu && setActiveMenu(menu.label)}
               style={{
                 padding: '0 12px',
@@ -447,12 +453,21 @@ export default function Taskbar() {
             )}
           </div>
         ))}
+        </div>
+      </div>
+
+      {/* Mobile: Center title */}
+      <div className="sm:hidden flex-1 text-center" style={{ 
+        fontSize: '14px',
+        fontWeight: '600',
+        color: '#00ff88'
+      }}>
+        Bitcoin Drive
       </div>
 
       {/* Right side - Status items */}
-      <div style={{
+      <div className="hidden sm:flex" style={{
         marginLeft: 'auto',
-        display: 'flex',
         alignItems: 'center',
         gap: '16px',
         paddingRight: '16px',
