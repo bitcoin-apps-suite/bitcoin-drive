@@ -248,15 +248,27 @@ export default function Home() {
             height={40}
             style={{ borderRadius: '8px' }}
           />
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: '300', 
-            letterSpacing: '-0.03em',
-            margin: 0
-          }}>
-            <span style={{ color: '#00ff88' }}>Bitcoin</span>
-            <span style={{ color: '#ffffff' }}> Drive</span>
-          </h1>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ 
+              fontSize: '28px', 
+              fontWeight: '300', 
+              letterSpacing: '-0.03em',
+              margin: 0,
+              marginBottom: '4px'
+            }}>
+              <span style={{ color: '#00ff88' }}>Bitcoin</span>
+              <span style={{ color: '#ffffff' }}> Drive</span>
+            </h1>
+            <p style={{
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.6)',
+              margin: 0,
+              fontWeight: '400',
+              letterSpacing: '0.02em'
+            }}>
+              Decentralized Storage & Tokenization Platform
+            </p>
+          </div>
         </div>
 
         {/* Right section - Actions */}
