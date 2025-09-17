@@ -1,20 +1,22 @@
 'use client'
 
-import { useSession, signOut } from "next-auth/react"
-import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { useState } from "react"
 import Image from "next/image"
 import Taskbar from "@/components/Taskbar"
+import DriveSidebar from "@/components/DriveSidebar"
 import BlockchainUploadModal, { UploadOptions } from "@/components/BlockchainUploadModal"
 import AuthModal from "@/components/AuthModal"
 import StorageConnector from '@/components/StorageConnector'
 import type { StorageProvider } from '@/components/StorageConnector'
 import TokenizationModal, { TokenizationSettings } from '@/components/TokenizationModal'
-import { Search, Upload, FileText, Clock, Hexagon, Share2, HardDrive, Grid, List, Cloud } from 'lucide-react'
+import { Search, Upload, Grid, List, RefreshCw } from 'lucide-react'
+import { useDriveFiles } from '@/hooks/useDriveFiles'
+import GoogleDriveFileCard from '@/components/GoogleDriveFileCard'
+import { GoogleDriveFile } from '@/types/drive'
 
 export default function Home() {
   const { data: session, status } = useSession()
-  const [handcashConnected, setHandcashConnected] = useState(false)
-  const [handcashProfile, setHandcashProfile] = useState<{handle?: string; displayName?: string} | null>(null)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showStorageConnector, setShowStorageConnector] = useState(false)
@@ -25,38 +27,20 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [storageUsed] = useState(0) // MB
+  const [selectedGoogleDriveFile, setSelectedGoogleDriveFile] = useState<GoogleDriveFile | null>(null)
+  
+  // Google Drive integration
+  const {
+    files: driveFiles,
+    loading: driveLoading,
+    error: driveError,
+    hasMore: driveHasMore,
+    refresh: refreshDriveFiles,
+    loadMore: loadMoreDriveFiles
+  } = useDriveFiles({
+    autoFetch: session ? true : false
+  })
 
-  useEffect(() => {
-    // Check HandCash connection status
-    if (session?.user) {
-      checkHandCashConnection()
-    }
-  }, [session])
-
-  const checkHandCashConnection = async () => {
-    try {
-      const response = await fetch('/api/handcash/profile')
-      if (response.ok) {
-        const data = await response.json()
-        setHandcashConnected(true)
-        setHandcashProfile(data)
-      }
-    } catch (error) {
-      console.error('Error checking HandCash connection:', error)
-    }
-  }
-
-  const connectHandCash = async () => {
-    try {
-      const response = await fetch('/api/handcash/connect')
-      const data = await response.json()
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl
-      }
-    } catch (error) {
-      console.error('Error connecting HandCash:', error)
-    }
-  }
 
   const handleFileUpload = async (file: File, options: UploadOptions) => {
     console.log('Uploading file:', file.name, options)
@@ -118,6 +102,31 @@ export default function Home() {
     setShowTokenizationModal(false)
     setSelectedFileForTokenization(null)
   }
+
+  const handleGoogleDriveTokenization = (file: GoogleDriveFile) => {
+    setSelectedGoogleDriveFile(file)
+    setShowTokenizationModal(true)
+  }
+
+  const handleGoogleDriveTokenizationComplete = (tokenSettings: TokenizationSettings) => {
+    if (selectedGoogleDriveFile) {
+      console.log('Tokenizing Google Drive file:', selectedGoogleDriveFile.name, tokenSettings)
+      // Here we would create the blockchain container for the Google Drive file
+      // The file stays in Google Drive, but we create NFT + FT tokens on BSV
+      alert(`Google Drive file "${selectedGoogleDriveFile.name}" would be tokenized with ${tokenSettings.totalSupply} shares at ${tokenSettings.sharePrice} BSV each`)
+    }
+    setShowTokenizationModal(false)
+    setSelectedGoogleDriveFile(null)
+  }
+
+  // Filter and search Google Drive files
+  const filteredDriveFiles = driveFiles.filter(file => {
+    const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = activeCategory === 'all' || 
+                           (activeCategory === 'documents' && file.mimeType.includes('document')) ||
+                           (activeCategory === 'nfts' && file.isTokenized)
+    return matchesSearch && matchesCategory
+  })
 
   if (status === "loading") {
     return (
@@ -228,187 +237,16 @@ export default function Home() {
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 border-r" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-border)', overflow: 'auto' }}>
-          <div className="p-4">
-          <div className="space-y-4">
-            {/* User Profile */}
-            <div className="card p-3">
-              {session ? (
-                <div className="flex items-center space-x-3">
-                  {session.user?.image && (
-                    <Image
-                      src={session.user.image}
-                      alt="Profile"
-                      width={40}
-                      height={40}
-                      className="rounded-full border-2"
-                      style={{ borderColor: 'var(--color-primary)' }}
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-accent)' }}>
-                      {session.user?.name}
-                    </p>
-                    <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>
-                      {session.user?.email}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="w-full text-left text-sm font-light transition-all"
-                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                >
-                  Connect Accounts
-                </button>
-              )}
-            </div>
-
-            {/* HandCash Status - Only show when logged in */}
-            {session && (
-              <div className="card p-3">
-                {handcashConnected ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>HandCash</span>
-                      <span className="text-xs" style={{ color: 'var(--color-primary)' }}>Connected</span>
-                    </div>
-                    {handcashProfile && (
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                        @{handcashProfile.handle}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={connectHandCash}
-                    className="w-full text-left text-sm font-light transition-all"
-                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                  >
-                    Connect HandCash Wallet
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <button 
-              onClick={() => setShowUploadModal(true)}
-              className="btn-primary w-full mb-2 px-4 py-3 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
-              <Upload size={18} />
-              Upload to Blockchain
-            </button>
-            
-            <button 
-              onClick={() => setShowStorageConnector(true)}
-              className="w-full mb-2 px-4 py-2 font-medium rounded-lg transition-all flex items-center justify-center gap-2"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>
-              <Cloud size={16} />
-              Connect Cloud Storage
-            </button>
-            
-            {connectedStorageProviders.length > 0 && (
-              <div className="text-xs mb-4" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-                {connectedStorageProviders.length} provider{connectedStorageProviders.length > 1 ? 's' : ''} connected
-              </div>
-            )}
-
-            {/* Navigation Categories */}
-            <nav className="space-y-1 mb-4">
-              <button 
-                onClick={() => setActiveCategory('all')}
-                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
-                style={{ 
-                  backgroundColor: activeCategory === 'all' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                  borderLeft: activeCategory === 'all' ? '2px solid #00ff88' : '2px solid transparent',
-                  color: activeCategory === 'all' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
-                }}>
-                <Grid size={16} />
-                All Files
-              </button>
-              <button 
-                onClick={() => setActiveCategory('documents')}
-                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
-                style={{ 
-                  backgroundColor: activeCategory === 'documents' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                  borderLeft: activeCategory === 'documents' ? '2px solid #00ff88' : '2px solid transparent',
-                  color: activeCategory === 'documents' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
-                }}>
-                <FileText size={16} />
-                Documents
-              </button>
-              <button 
-                onClick={() => setActiveCategory('recent')}
-                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
-                style={{ 
-                  backgroundColor: activeCategory === 'recent' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                  borderLeft: activeCategory === 'recent' ? '2px solid #00ff88' : '2px solid transparent',
-                  color: activeCategory === 'recent' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
-                }}>
-                <Clock size={16} />
-                Recent
-              </button>
-              <button 
-                onClick={() => setActiveCategory('nfts')}
-                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
-                style={{ 
-                  backgroundColor: activeCategory === 'nfts' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                  borderLeft: activeCategory === 'nfts' ? '2px solid #00ff88' : '2px solid transparent',
-                  color: activeCategory === 'nfts' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
-                }}>
-                <Hexagon size={16} />
-                NFTs
-              </button>
-              <button 
-                onClick={() => setActiveCategory('shared')}
-                className={`w-full text-left px-3 py-2 text-sm font-light rounded-md transition-all flex items-center gap-2`}
-                style={{ 
-                  backgroundColor: activeCategory === 'shared' ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
-                  borderLeft: activeCategory === 'shared' ? '2px solid #00ff88' : '2px solid transparent',
-                  color: activeCategory === 'shared' ? '#00ff88' : 'rgba(255, 255, 255, 0.7)' 
-                }}>
-                <Share2 size={16} />
-                Shared
-              </button>
-            </nav>
-
-            {/* Storage Indicator */}
-            <div className="card p-3 mb-4">
-              <div className="flex items-center gap-2 mb-2">
-                <HardDrive size={16} style={{ color: 'var(--color-accent)' }} />
-                <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>Storage Used</span>
-              </div>
-              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                {storageUsed} MB of ∞
-              </div>
-              <div className="mt-2 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-                <div 
-                  className="h-full transition-all"
-                  style={{ 
-                    width: '0%',
-                    backgroundColor: 'var(--color-primary)'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Sign Out - Only show when logged in */}
-            {session && (
-              <button
-                onClick={() => signOut()}
-                className="w-full text-left px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-md"
-              >
-                Sign Out
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+        <DriveSidebar
+          currentView="drive"
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          setShowUploadModal={setShowUploadModal}
+          setShowStorageConnector={setShowStorageConnector}
+          setShowAuthModal={setShowAuthModal}
+          connectedStorageProviders={connectedStorageProviders as unknown as Array<{ type: string; name: string; [key: string]: unknown }>}
+          storageUsed={storageUsed}
+        />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
@@ -462,7 +300,109 @@ export default function Home() {
 
           {/* Files Grid/List */}
           <div className="flex-1 p-6">
-            {/* Perforation Edge Drop Box */}
+            {/* Google Drive Files Section */}
+            {session && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--color-accent)' }}>
+                      Google Drive Files
+                    </h3>
+                    {driveLoading && (
+                      <RefreshCw size={16} className="animate-spin" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    )}
+                  </div>
+                  <button
+                    onClick={refreshDriveFiles}
+                    disabled={driveLoading}
+                    style={{
+                      padding: '6px 12px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontSize: '12px',
+                      cursor: driveLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                    Refresh
+                  </button>
+                </div>
+
+                {driveError && (
+                  <div style={{
+                    padding: '12px 16px',
+                    background: 'rgba(255, 68, 68, 0.1)',
+                    border: '1px solid rgba(255, 68, 68, 0.3)',
+                    borderRadius: '8px',
+                    color: '#ff4444',
+                    fontSize: '14px',
+                    marginBottom: '16px'
+                  }}>
+                    {driveError}
+                  </div>
+                )}
+
+                {filteredDriveFiles.length > 0 ? (
+                  <>
+                    <div style={{
+                      display: viewMode === 'grid' ? 'grid' : 'flex',
+                      flexDirection: viewMode === 'grid' ? undefined : 'column',
+                      gap: '16px',
+                      gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(280px, 1fr))' : undefined
+                    }}>
+                      {filteredDriveFiles.map(file => (
+                        <GoogleDriveFileCard
+                          key={file.id}
+                          file={file}
+                          onTokenize={handleGoogleDriveTokenization}
+                          viewMode={viewMode}
+                        />
+                      ))}
+                    </div>
+
+                    {driveHasMore && (
+                      <div className="text-center mt-6">
+                        <button
+                          onClick={loadMoreDriveFiles}
+                          disabled={driveLoading}
+                          style={{
+                            padding: '8px 16px',
+                            background: 'rgba(0, 255, 136, 0.1)',
+                            border: '1px solid rgba(0, 255, 136, 0.3)',
+                            borderRadius: '6px',
+                            color: '#00ff88',
+                            fontSize: '14px',
+                            cursor: driveLoading ? 'not-allowed' : 'pointer'
+                          }}
+                        >
+                          {driveLoading ? 'Loading...' : 'Load More Files'}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  !driveLoading && (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '40px',
+                      color: 'rgba(255, 255, 255, 0.4)'
+                    }}>
+                      <div style={{ fontSize: '16px', marginBottom: '8px' }}>No Google Drive files found</div>
+                      <div style={{ fontSize: '14px' }}>
+                        {searchQuery ? 'Try adjusting your search terms' : 'Connect to Google Drive to see your files'}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
+            {/* Upload Area */}
             <div 
               className="rounded-lg text-center relative"
               style={{ 
@@ -471,7 +411,7 @@ export default function Home() {
                 backgroundSize: '30px 30px',
                 border: '2px dashed rgba(0, 255, 136, 0.25)',
                 padding: '60px 40px',
-                minHeight: '400px',
+                minHeight: session ? '200px' : '400px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -494,7 +434,6 @@ export default function Home() {
                 e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.15)';
                 const files = Array.from(e.dataTransfer.files);
                 if (files.length > 0) {
-                  // Handle file drop
                   console.log('Files dropped:', files);
                   setShowUploadModal(true);
                 }
@@ -503,7 +442,7 @@ export default function Home() {
             >
               <Upload size={48} style={{ color: '#00ff88', marginBottom: '20px', opacity: 0.8 }} />
               <h3 className="text-xl font-light mb-3" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
-                Drop files here to upload
+                {session ? 'Upload additional files to blockchain' : 'Drop files here to upload'}
               </h3>
               <p className="mb-6" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px' }}>
                 or click to browse files
@@ -545,8 +484,7 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Show this when there are files */}
-            {searchQuery && (
+            {searchQuery && filteredDriveFiles.length === 0 && !driveLoading && (
               <div className="mt-6 text-center">
                 <p style={{ color: 'var(--color-text-muted)' }}>
                   No files matching &quot;{searchQuery}&quot;
@@ -584,17 +522,18 @@ export default function Home() {
       />
       
       {/* Tokenization Modal */}
-      {selectedFileForTokenization && (
+      {(selectedFileForTokenization || selectedGoogleDriveFile) && (
         <TokenizationModal
           isOpen={showTokenizationModal}
           onClose={() => {
             setShowTokenizationModal(false)
             setSelectedFileForTokenization(null)
+            setSelectedGoogleDriveFile(null)
           }}
-          fileName={selectedFileForTokenization.name}
-          fileSize={selectedFileForTokenization.size}
-          mimeType={selectedFileForTokenization.type}
-          onTokenize={handleTokenizationComplete}
+          fileName={selectedFileForTokenization?.name || selectedGoogleDriveFile?.name || ''}
+          fileSize={selectedFileForTokenization?.size || selectedGoogleDriveFile?.size || 0}
+          mimeType={selectedFileForTokenization?.type || selectedGoogleDriveFile?.mimeType || ''}
+          onTokenize={selectedGoogleDriveFile ? handleGoogleDriveTokenizationComplete : handleTokenizationComplete}
         />
       )}
     </div>

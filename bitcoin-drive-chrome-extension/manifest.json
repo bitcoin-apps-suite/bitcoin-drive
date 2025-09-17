@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Bitcoin Drive",
+  "version": "1.0.0",
+  "description": "Decentralized file storage on BSV blockchain with tokenization",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    },
+    "default_title": "Open Bitcoin Drive"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://bitcoin-drive.vercel.app/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icon-16.png", "icon-48.png", "icon-128.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
