@@ -44,100 +44,23 @@ export default function Taskbar() {
       ]
     },
     {
-      label: 'Share',
-      items: [
-        { label: 'Copy Link', shortcut: '⌘L', action: () => {
-          navigator.clipboard.writeText(window.location.href)
-          alert('Link copied!')
-        }},
-        { label: 'Generate QR Code', action: () => console.log('Generate QR') },
-        { divider: true },
-        { label: 'Share on X/Twitter', action: () => window.open(`https://twitter.com/intent/tweet?text=Check out my files on Bitcoin Drive&url=${window.location.href}`) },
-        { label: 'Share on LinkedIn', action: () => console.log('LinkedIn share') },
-        { label: 'Send to WhatsApp', action: () => window.open(`https://wa.me/?text=Check out my files on Bitcoin Drive: ${window.location.href}`) },
-        { label: 'Send via Email', action: () => window.location.href = `mailto:?subject=Bitcoin Drive Files&body=Check out my files: ${window.location.href}` },
-        { divider: true },
-        { label: 'Embed Code', action: () => console.log('Generate embed code') }
-      ]
-    },
-    {
-      label: 'Developers',
-      items: [
-        { label: 'API Documentation', href: '/api/docs', target: '_blank' },
-        { label: 'BSV SDK Docs', href: 'https://docs.bsvblockchain.org', target: '_blank' },
-        { label: 'HandCash SDK', href: 'https://docs.handcash.io', target: '_blank' },
-        { divider: true },
-        { label: 'GitHub Repository', href: 'https://github.com/b0ase/bitcoin-drive', target: '_blank' },
-        { divider: true },
-        { label: 'Bitcoin Writer', href: 'https://bitcoin-writer.vercel.app', target: '_blank' },
-        { label: 'Bitcoin Spreadsheets', href: 'https://bitcoin-sheets.vercel.app', target: '_blank' }
-      ]
-    },
-    {
       label: 'File',
       items: [
-        { label: 'Upload File', shortcut: '⌘U', action: () => document.getElementById('upload-btn')?.click() },
-        { label: 'Upload Folder', shortcut: '⇧⌘U', action: () => console.log('Upload folder') },
+        { label: 'New NFT Container', shortcut: '⌘N', action: () => alert('Creating .nft container for file storage') },
+        { label: 'Upload File', shortcut: '⌘O', action: () => document.getElementById('upload-btn')?.click() },
+        { label: 'Upload Folder', shortcut: '⇧⌘O', action: () => console.log('Upload folder') },
         { divider: true },
-        { label: 'Save to Blockchain', shortcut: '⌘B', action: () => console.log('Save to blockchain') },
-        { label: 'Save to IPFS', action: () => console.log('Save to IPFS') },
+        { label: 'Save to Blockchain', shortcut: '⌘S', action: () => console.log('Save to blockchain') },
+        { label: 'Save to IPFS', shortcut: '⇧⌘S', action: () => console.log('Save to IPFS') },
         { label: 'Hybrid Storage', action: () => console.log('Hybrid storage') },
         { divider: true },
         { label: 'Download', shortcut: '⌘D', action: () => console.log('Download') },
-        { label: 'Share Link', shortcut: '⌘L', action: () => {
+        { label: 'Delete', shortcut: '⌘⌫', action: () => console.log('Delete') },
+        { divider: true },
+        { label: 'Share...', shortcut: '⌘L', action: () => {
           navigator.clipboard.writeText(window.location.href)
           alert('Link copied to clipboard!')
-        }},
-        { divider: true },
-        { label: 'Delete', action: () => console.log('Delete') }
-      ]
-    },
-    {
-      label: 'NFT',
-      items: [
-        { label: 'Create NFT Container', shortcut: '⌘N', action: () => alert('Creating .nft container for file storage') },
-        { label: 'Issue FT Shares', shortcut: '⌘F', action: handleIssueShares },
-        { divider: true },
-        { label: 'Mint Collection', action: () => console.log('Mint collection') },
-        { label: 'Set Royalties', action: () => console.log('Set royalties') },
-        { label: 'Configure Dividends', action: () => console.log('Configure dividend distribution for FT token holders') },
-        { divider: true },
-        { label: 'View My NFTs', action: () => window.location.href = '/my-nfts' },
-        { label: 'NFT Marketplace', action: () => window.location.href = '/marketplace' }
-      ]
-    },
-    {
-      label: 'Blockchain',
-      items: [
-        { label: 'Encrypt File', shortcut: '⌘E', action: () => console.log('Encrypt') },
-        { label: 'Decrypt File', action: () => console.log('Decrypt') },
-        { divider: true },
-        { label: 'Set Paywall', action: () => console.log('Set paywall') },
-        { label: 'Set Timelock', action: () => console.log('Set timelock') },
-        { label: 'Multi-signature', action: () => console.log('Set multisig') },
-        { divider: true },
-        { label: 'Exchange', action: handleOpenExchange },
-        { label: 'Trading Dashboard', action: () => window.location.href = '/trading' },
-        { divider: true },
-        { label: 'Verify on Chain', action: () => console.log('Verify') },
-        { label: 'View on Explorer', href: 'https://whatsonchain.com', target: '_blank' }
-      ]
-    },
-    {
-      label: 'Storage',
-      items: [
-        { label: 'BSV Direct', action: () => console.log('BSV storage') },
-        { label: 'IPFS + BSV Hash', action: () => console.log('IPFS storage') },
-        { label: 'Hybrid Storage', action: () => console.log('Hybrid storage') },
-        { divider: true },
-        { label: 'Cloud Providers ▸', action: () => {} },
-        { label: '  Google Drive', action: () => console.log('Google Drive') },
-        { label: '  AWS S3', action: () => console.log('AWS S3') },
-        { label: '  Cloudflare R2', action: () => console.log('Cloudflare R2') },
-        { label: '  Supabase', action: () => console.log('Supabase') },
-        { divider: true },
-        { label: 'Storage Calculator', action: () => console.log('Calculator') },
-        { label: 'Usage Analytics', action: () => console.log('Analytics') }
+        }}
       ]
     },
     {
@@ -161,10 +84,10 @@ export default function Taskbar() {
         { label: 'List View', shortcut: '⌘2', action: () => console.log('List view') },
         { label: 'Gallery View', shortcut: '⌘3', action: () => console.log('Gallery view') },
         { divider: true },
-        { label: 'Toggle Sidebar', shortcut: '⌥⌘S', action: () => console.log('Toggle sidebar') },
-        { label: 'Toggle Theme', shortcut: '⌥⌘T', action: () => console.log('Toggle theme') },
+        { label: 'Show Sidebar', shortcut: '⌥⌘S', action: () => console.log('Toggle sidebar') },
+        { label: 'Show Toolbar', shortcut: '⌥⌘T', action: () => console.log('Toggle toolbar') },
         { divider: true },
-        { label: 'Full Screen', shortcut: '⌃⌘F', action: () => document.documentElement.requestFullscreen() },
+        { label: 'Enter Full Screen', shortcut: '⌃⌘F', action: () => document.documentElement.requestFullscreen() },
         { divider: true },
         { label: 'Zoom In', shortcut: '⌘+', action: () => (document.body.style as { zoom: string }).zoom = '110%' },
         { label: 'Zoom Out', shortcut: '⌘-', action: () => (document.body.style as { zoom: string }).zoom = '90%' },
@@ -172,10 +95,76 @@ export default function Taskbar() {
       ]
     },
     {
+      label: 'NFT',
+      items: [
+        { label: 'Issue FT Shares', shortcut: '⌥⌘N', action: handleIssueShares },
+        { label: 'Mint Collection', action: () => console.log('Mint collection') },
+        { divider: true },
+        { label: 'Set Royalties', action: () => console.log('Set royalties') },
+        { label: 'Configure Dividends', action: () => console.log('Configure dividend distribution for FT token holders') },
+        { divider: true },
+        { label: 'View My NFTs', action: () => window.location.href = '/my-nfts' },
+        { label: 'NFT Marketplace', action: () => window.location.href = '/marketplace' }
+      ]
+    },
+    {
+      label: 'Storage',
+      items: [
+        { label: 'BSV Direct', action: () => console.log('BSV storage') },
+        { label: 'IPFS + BSV Hash', action: () => console.log('IPFS storage') },
+        { label: 'Hybrid Storage', action: () => console.log('Hybrid storage') },
+        { divider: true },
+        { label: 'Google Drive', action: () => console.log('Google Drive') },
+        { label: 'AWS S3', action: () => console.log('AWS S3') },
+        { label: 'Cloudflare R2', action: () => console.log('Cloudflare R2') },
+        { label: 'Supabase', action: () => console.log('Supabase') },
+        { divider: true },
+        { label: 'Storage Calculator', action: () => console.log('Calculator') },
+        { label: 'Usage Analytics', action: () => console.log('Analytics') }
+      ]
+    },
+    {
+      label: 'Blockchain',
+      items: [
+        { label: 'Encrypt File', shortcut: '⌘E', action: () => console.log('Encrypt') },
+        { label: 'Decrypt File', action: () => console.log('Decrypt') },
+        { divider: true },
+        { label: 'Set Paywall', action: () => console.log('Set paywall') },
+        { label: 'Set Timelock', action: () => console.log('Set timelock') },
+        { label: 'Multi-signature', action: () => console.log('Set multisig') },
+        { divider: true },
+        { label: 'Exchange', action: handleOpenExchange },
+        { label: 'Trading Hub', action: () => window.location.href = '/trading' },
+        { divider: true },
+        { label: 'Verify on Chain', action: () => console.log('Verify') },
+        { label: 'View on Explorer', href: 'https://whatsonchain.com', target: '_blank' }
+      ]
+    },
+    {
+      label: 'Share',
+      items: [
+        { label: 'Copy Link', shortcut: '⌥⌘L', action: () => {
+          navigator.clipboard.writeText(window.location.href)
+          alert('Link copied!')
+        }},
+        { label: 'Generate QR Code', action: () => console.log('Generate QR') },
+        { divider: true },
+        { label: 'Share on X', action: () => window.open(`https://twitter.com/intent/tweet?text=Check out my files on Bitcoin Drive&url=${window.location.href}`) },
+        { label: 'Share on LinkedIn', action: () => console.log('LinkedIn share') },
+        { label: 'Send to WhatsApp', action: () => window.open(`https://wa.me/?text=Check out my files on Bitcoin Drive: ${window.location.href}`) },
+        { label: 'Send via Email', action: () => window.location.href = `mailto:?subject=Bitcoin Drive Files&body=Check out my files: ${window.location.href}` },
+        { divider: true },
+        { label: 'Embed Code', action: () => console.log('Generate embed code') }
+      ]
+    },
+    {
       label: 'Window',
       items: [
         { label: 'Minimize', shortcut: '⌘M', action: () => console.log('Minimize') },
         { label: 'Zoom', action: () => console.log('Zoom') },
+        { divider: true },
+        { label: 'Exchange', action: handleOpenExchange },
+        { label: 'Trading Hub', action: () => window.location.href = '/trading' },
         { divider: true },
         { label: 'Bring All to Front', action: () => console.log('Bring to front') }
       ]
@@ -186,9 +175,14 @@ export default function Taskbar() {
         { label: 'Bitcoin Drive Help', shortcut: '⌘?', action: () => alert('Bitcoin Drive v1.0\n\nStore files permanently on the BSV blockchain') },
         { label: 'Keyboard Shortcuts', action: () => console.log('Show shortcuts') },
         { divider: true },
+        { label: 'API Documentation', href: '/api/docs', target: '_blank' },
+        { label: 'BSV SDK Docs', href: 'https://docs.bsvblockchain.org', target: '_blank' },
+        { label: 'HandCash SDK', href: 'https://docs.handcash.io', target: '_blank' },
+        { divider: true },
         { label: 'What\'s New', action: () => alert('New Features:\n\n• NFT Containers (.nft)\n• FT Token Shares\n• Dividend Distribution\n• Multi-cloud Storage\n• Enhanced Encryption') },
         { divider: true },
         { label: 'Report Issue', href: 'https://github.com/b0ase/bitcoin-drive/issues', target: '_blank' },
+        { label: 'GitHub Repository', href: 'https://github.com/b0ase/bitcoin-drive', target: '_blank' },
         { label: 'Contact Support', href: 'https://twitter.com/b0ase', target: '_blank' }
       ]
     }
