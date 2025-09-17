@@ -290,9 +290,38 @@ export default function Home() {
             </div>
           ) : (
             <button
+              data-signin
               onClick={() => setShowAuthModal(true)}
-              style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px' }}>
-              Sign In
+              style={{ 
+                fontSize: '13px', 
+                padding: '8px 20px', 
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+                color: '#000000',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 255, 136, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 255, 136, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 255, 136, 0.3)'
+              }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12V7c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h7"/>
+                  <path d="M21 12H9"/>
+                  <path d="M7 12h.01"/>
+                  <circle cx="18" cy="16" r="3"/>
+                  <path d="M22 22l-1.5-1.5"/>
+                </svg>
+                Connect Wallet
+              </span>
             </button>
           )}
         </div>

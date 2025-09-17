@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { X, Mail, Twitter, Wallet, Shield, Check } from 'lucide-react'
+import { X, Mail, Twitter, Wallet, Shield, Check, Key, ArrowRight, Zap } from 'lucide-react'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -25,25 +25,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   
   const providers: AuthProvider[] = [
     {
-      id: 'google',
-      name: 'Google',
-      icon: <Mail size={20} />,
-      color: '#00ff88',
-      connected: connectedProviders.has('google')
-    },
-    {
-      id: 'twitter',
-      name: 'Twitter',
-      icon: <Twitter size={20} />,
-      color: '#00ff88',
-      connected: connectedProviders.has('twitter')
-    },
-    {
       id: 'handcash',
       name: 'HandCash',
       icon: <Wallet size={20} />,
       color: '#00ff88',
       connected: connectedProviders.has('handcash')
+    },
+    {
+      id: 'google',
+      name: 'Google Drive',
+      icon: <Mail size={20} />,
+      color: '#4285f4',
+      connected: connectedProviders.has('google')
+    },
+    {
+      id: 'twitter',
+      name: 'X (Twitter)',
+      icon: <Twitter size={20} />,
+      color: '#1da1f2',
+      connected: connectedProviders.has('twitter')
     }
   ]
 
@@ -111,16 +111,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           </button>
           
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary)' }}>
-              <Shield size={24} style={{ color: 'var(--bg-primary)' }} />
+            <div className="p-2 rounded-lg" style={{ 
+              background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)' 
+            }}>
+              <Wallet size={24} style={{ color: '#000000' }} />
             </div>
             <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
-              Connect Your Accounts
+              Connect Your Wallet
             </h2>
           </div>
           
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Link your accounts to unlock all features of Bitcoin Drive
+            Sign in with HandCash to access Bitcoin payments and decentralized storage
           </p>
         </div>
 
@@ -188,16 +190,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           </h3>
           <div className="space-y-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
             <div className="flex items-start gap-2">
-              <span style={{ color: 'var(--color-primary)' }}>•</span>
-              <span><strong>Google:</strong> Store files in Drive & sync across devices</span>
+              <Zap size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+              <span><strong>Instant Payments:</strong> Send & receive Bitcoin instantly</span>
             </div>
             <div className="flex items-start gap-2">
-              <span style={{ color: 'var(--color-primary)' }}>•</span>
-              <span><strong>Twitter:</strong> Share files & announce releases</span>
+              <Key size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+              <span><strong>Secure Auth:</strong> Your wallet is your identity</span>
             </div>
             <div className="flex items-start gap-2">
-              <span style={{ color: 'var(--color-primary)' }}>•</span>
-              <span><strong>HandCash:</strong> Pay with Bitcoin & receive payments</span>
+              <Shield size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+              <span><strong>Encrypted Storage:</strong> Files secured with your wallet keys</span>
             </div>
           </div>
         </div>
@@ -218,7 +220,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               border: allConnected ? 'none' : '1px solid var(--color-border)'
             }}
           >
-            {allConnected ? 'All Connected! Continue' : 'Skip for Now'}
+            {connectedProviders.has('handcash') ? 'Continue to Bitcoin Drive' : 'Skip for Now'}
           </button>
         </div>
       </div>
