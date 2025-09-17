@@ -1,7 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Upload, Hash, HardDrive, Lock, DollarSign, FileText, AlertCircle, Cloud, Coins } from 'lucide-react'
+import { X, Upload, Hash, HardDrive, Lock, DollarSign, FileText, AlertCircle, Cloud, Coins, Wallet, Database, Zap, Globe, Check } from 'lucide-react'
+import { 
+  SiGoogledrive, 
+  SiAmazon, 
+  SiCloudflare, 
+  SiGoogle, 
+  SiSupabase,
+  SiBitcoin 
+} from 'react-icons/si'
 import type { StorageProvider } from './StorageConnector'
 
 interface BlockchainUploadModalProps {
@@ -9,6 +17,8 @@ interface BlockchainUploadModalProps {
   onClose: () => void
   onUpload: (file: File, options: UploadOptions) => void
   connectedProviders?: StorageProvider[]
+  isHandCashConnected?: boolean
+  connectedServiceIds?: Set<string>
 }
 
 export interface UploadOptions {
@@ -22,9 +32,9 @@ export interface UploadOptions {
   tokenize?: boolean
 }
 
-export default function BlockchainUploadModal({ isOpen, onClose, onUpload, connectedProviders = [] }: BlockchainUploadModalProps) {
+export default function BlockchainUploadModal({ isOpen, onClose, onUpload, connectedProviders = [], isHandCashConnected = false, connectedServiceIds = new Set() }: BlockchainUploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [uploadMethod, setUploadMethod] = useState<UploadOptions['method']>('hash_drive')
+  const [uploadMethod, setUploadMethod] = useState<UploadOptions['method']>('op_return')
   const [encrypt, setEncrypt] = useState(false)
   const [enableTimelock, setEnableTimelock] = useState(false)
   const [timelockDate, setTimelockDate] = useState('')
@@ -35,6 +45,12 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
   const [estimatedCost, setEstimatedCost] = useState<number>(0)
   const [selectedCloudProvider, setSelectedCloudProvider] = useState<string>('')
   const [enableTokenization, setEnableTokenization] = useState(false)
+  
+  // Modal states for the four options
+  const [showEncryptModal, setShowEncryptModal] = useState(false)
+  const [showTimelockModal, setShowTimelockModal] = useState(false)
+  const [showPriceModal, setShowPriceModal] = useState(false)
+  const [showTokenizeModal, setShowTokenizeModal] = useState(false)
 
   const calculateCost = (file: File | null, method: UploadOptions['method']) => {
     if (!file) return 0
@@ -42,13 +58,9 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
     
     switch (method) {
       case 'op_return':
-        return sizeInKB * 0.00001 // ~220 bytes max
+        return sizeInKB * 0.00002 // Cloud storage + OP_RETURN validation
       case 'op_pushdata4':
-        return sizeInKB * 0.00005 // Up to 4GB
-      case 'full_chain':
-        return sizeInKB * 0.0001 // Full file on chain
-      case 'hash_drive':
-        return 0.00001 // Just hash on chain
+        return sizeInKB * 0.0001 // Full file on chain (permanent)
       default:
         return 0
     }
@@ -104,90 +116,96 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
             <X size={20} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
           </button>
           
+          {/* HandCash Status */}
+          <div className="absolute right-16 top-4">
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-lg ${isHandCashConnected ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
+              <SiBitcoin size={16} style={{ color: isHandCashConnected ? '#00ff88' : '#ff4444' }} />
+              <span className="text-xs font-medium" style={{ color: isHandCashConnected ? '#00ff88' : '#ff4444' }}>
+                {isHandCashConnected ? 'HandCash Connected' : 'HandCash Disconnected'}
+              </span>
+              {isHandCashConnected && <Check size={12} style={{ color: '#00ff88' }} />}
+            </div>
+          </div>
+          
           <h2 className="text-2xl font-light" style={{ color: '#ffffff', letterSpacing: '-0.02em' }}>
             Upload to Blockchain
           </h2>
           <p className="text-sm mt-2" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-            Choose how to store your file on Bitcoin SV
+            Create a paywall for your content. Users pay to stream, download, or access your files.
           </p>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* File Selection */}
+          {/* Storage & Delivery Services */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              Select File
+            <label className="block text-sm font-medium mb-3" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              Your connected Storage and delivery services
             </label>
-            <div 
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all"
-              style={{ 
-                borderColor: selectedFile ? '#00ff88' : 'rgba(255, 255, 255, 0.2)',
-                backgroundColor: selectedFile ? 'rgba(0, 255, 136, 0.05)' : 'transparent'
-              }}
-              onClick={() => document.getElementById('file-upload')?.click()}
-            >
-              <input
-                id="file-upload"
-                type="file"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-              {selectedFile ? (
-                <div>
-                  <FileText size={32} style={{ color: '#00ff88', margin: '0 auto 8px' }} />
-                  <p style={{ color: '#ffffff' }}>{selectedFile.name}</p>
-                  <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px' }}>
-                    {(selectedFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <Upload size={32} style={{ color: 'rgba(255, 255, 255, 0.4)', margin: '0 auto 8px' }} />
-                  <p style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Click to select or drag and drop
-                  </p>
-                </div>
-              )}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { id: 'googledrive', name: 'Google Drive', icon: <SiGoogledrive size={16} />, color: '#4285f4' },
+                { id: 'aws', name: 'AWS S3', icon: <SiAmazon size={16} />, color: '#ff9900' },
+                { id: 'cloudflare', name: 'Cloudflare', icon: <SiCloudflare size={16} />, color: '#f38020' },
+                { id: 'googlecloud', name: 'Google Cloud', icon: <SiGoogle size={16} />, color: '#ea4335' },
+                { id: 'azure', name: 'Azure Blob', icon: <Cloud size={16} />, color: '#0078d4' },
+                { id: 'supabase', name: 'SupaBase', icon: <SiSupabase size={16} />, color: '#3ecf8e' },
+                { id: 'dropbox', name: 'Dropbox', icon: <Database size={16} />, color: '#0061ff' },
+                { id: 'fastly', name: 'Fastly CDN', icon: <Zap size={16} />, color: '#ff282d' },
+                { id: 'netlify', name: 'Netlify', icon: <Globe size={16} />, color: '#00c7b7' }
+              ].map((service) => {
+                const isConnected = connectedServiceIds.has(service.id)
+                const isSelected = selectedCloudProvider === service.name.toLowerCase()
+                
+                return (
+                  <button
+                    key={service.name}
+                    onClick={() => isConnected ? setSelectedCloudProvider(service.name.toLowerCase()) : null}
+                    disabled={!isConnected}
+                    className={`p-3 rounded-lg border transition-all text-xs ${isConnected ? 'hover:scale-[1.02] cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+                    style={{
+                      backgroundColor: isSelected ? 'rgba(0, 255, 136, 0.1)' : isConnected ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                      borderColor: isSelected ? '#00ff88' : isConnected ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.06)',
+                      color: isConnected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.3)'
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      <div style={{ color: isConnected ? service.color : 'rgba(255, 255, 255, 0.3)' }}>
+                        {service.icon}
+                      </div>
+                      {isConnected && <Check size={12} style={{ color: service.color }} />}
+                    </div>
+                    <div>{service.name}</div>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          {/* Upload Method */}
+          {/* Storage Options */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              Storage Method
+              Storage Options
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => {
-                  setUploadMethod('hash_drive')
-                  setEstimatedCost(calculateCost(selectedFile, 'hash_drive'))
-                }}
-                className={`p-3 rounded-lg border transition-all ${uploadMethod === 'hash_drive' ? 'border-green-500' : ''}`}
-                style={{
-                  backgroundColor: uploadMethod === 'hash_drive' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                  borderColor: uploadMethod === 'hash_drive' ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
-                }}
-              >
-                <Hash size={20} style={{ color: '#00ff88', margin: '0 auto 4px' }} />
-                <div style={{ color: '#ffffff', fontSize: '13px' }}>Hash + Drive</div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Cheapest</div>
-              </button>
-
+            <div className="text-xs mb-3 p-3 rounded-lg flex items-start gap-2" style={{ color: 'rgba(255, 255, 255, 0.6)', backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
+              <FileText size={14} style={{ color: 'rgba(255, 255, 255, 0.6)', marginTop: '1px', flexShrink: 0 }} />
+              <span>Note: File hash is always stored on-chain for verification. Storage services validate ownership via blockchain proof.</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => {
                   setUploadMethod('op_return')
                   setEstimatedCost(calculateCost(selectedFile, 'op_return'))
                 }}
-                className={`p-3 rounded-lg border transition-all ${uploadMethod === 'op_return' ? 'border-green-500' : ''}`}
+                className={`p-4 rounded-lg border transition-all ${uploadMethod === 'op_return' ? 'border-green-500' : ''}`}
                 style={{
                   backgroundColor: uploadMethod === 'op_return' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
                   borderColor: uploadMethod === 'op_return' ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
                 }}
               >
-                <FileText size={20} style={{ color: '#00ff88', margin: '0 auto 4px' }} />
-                <div style={{ color: '#ffffff', fontSize: '13px' }}>OP_RETURN</div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>220 bytes</div>
+                <Cloud size={24} style={{ color: '#4285f4', margin: '0 auto 8px' }} />
+                <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: '500' }}>Cloud Storage</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>Cheaper • Uses storage services</div>
               </button>
 
               <button
@@ -195,71 +213,117 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
                   setUploadMethod('op_pushdata4')
                   setEstimatedCost(calculateCost(selectedFile, 'op_pushdata4'))
                 }}
-                className={`p-3 rounded-lg border transition-all ${uploadMethod === 'op_pushdata4' ? 'border-green-500' : ''}`}
+                className={`p-4 rounded-lg border transition-all ${uploadMethod === 'op_pushdata4' ? 'border-green-500' : ''}`}
                 style={{
                   backgroundColor: uploadMethod === 'op_pushdata4' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
                   borderColor: uploadMethod === 'op_pushdata4' ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
                 }}
               >
-                <HardDrive size={20} style={{ color: '#00ff88', margin: '0 auto 4px' }} />
-                <div style={{ color: '#ffffff', fontSize: '13px' }}>OP_PUSHDATA4</div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Up to 4GB</div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setUploadMethod('full_chain')
-                  setEstimatedCost(calculateCost(selectedFile, 'full_chain'))
-                }}
-                className={`p-3 rounded-lg border transition-all ${uploadMethod === 'full_chain' ? 'border-green-500' : ''}`}
-                style={{
-                  backgroundColor: uploadMethod === 'full_chain' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                  borderColor: uploadMethod === 'full_chain' ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
-                }}
-              >
-                <Upload size={20} style={{ color: '#00ff88', margin: '0 auto 4px' }} />
-                <div style={{ color: '#ffffff', fontSize: '13px' }}>Full Chain</div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Permanent</div>
+                <HardDrive size={24} style={{ color: '#00ff88', margin: '0 auto 8px' }} />
+                <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: '500' }}>Full Chain Storage</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '12px' }}>Permanent • Directly on blockchain</div>
               </button>
             </div>
           </div>
 
           {/* Options */}
-          <div className="space-y-3">
-            {/* Encryption */}
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={encrypt}
-                onChange={(e) => setEncrypt(e.target.checked)}
-                className="w-4 h-4"
-              />
-              <Lock size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
-              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                Encrypt file before upload
-              </span>
+          <div>
+            <label className="block text-sm font-medium mb-3" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              Upload Options
             </label>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Encryption */}
+              <button
+                onClick={() => {
+                  setEncrypt(!encrypt)
+                  setShowEncryptModal(true)
+                }}
+                className={`p-3 rounded-lg border transition-all hover:scale-[1.02] ${encrypt ? 'border-green-500' : ''}`}
+                style={{
+                  backgroundColor: encrypt ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                  borderColor: encrypt ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock size={18} style={{ color: encrypt ? '#00ff88' : 'rgba(255, 255, 255, 0.6)' }} />
+                  {encrypt && <Check size={14} style={{ color: '#00ff88' }} />}
+                </div>
+                <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>Encryption</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Secure file with password</div>
+              </button>
 
-            {/* Timelock */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer mb-2">
-                <input
-                  type="checkbox"
-                  checked={enableTimelock}
-                  onChange={(e) => setEnableTimelock(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <Lock size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
-                <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                  Set timelock (file unlocks at future date)
-                </span>
-              </label>
-              {enableTimelock && (
+              {/* Timelock */}
+              <button
+                onClick={() => {
+                  setEnableTimelock(!enableTimelock)
+                  setShowTimelockModal(true)
+                }}
+                className={`p-3 rounded-lg border transition-all hover:scale-[1.02] ${enableTimelock ? 'border-green-500' : ''}`}
+                style={{
+                  backgroundColor: enableTimelock ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                  borderColor: enableTimelock ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock size={18} style={{ color: enableTimelock ? '#00ff88' : 'rgba(255, 255, 255, 0.6)' }} />
+                  {enableTimelock && <Check size={14} style={{ color: '#00ff88' }} />}
+                </div>
+                <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>Timelock</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Release at future date</div>
+              </button>
+
+              {/* Price Gate */}
+              <button
+                onClick={() => {
+                  setEnablePrice(!enablePrice)
+                  setShowPriceModal(true)
+                }}
+                className={`p-3 rounded-lg border transition-all hover:scale-[1.02] ${enablePrice ? 'border-green-500' : ''}`}
+                style={{
+                  backgroundColor: enablePrice ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                  borderColor: enablePrice ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign size={18} style={{ color: enablePrice ? '#00ff88' : 'rgba(255, 255, 255, 0.6)' }} />
+                  {enablePrice && <Check size={14} style={{ color: '#00ff88' }} />}
+                </div>
+                <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>Paywall</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Set access price</div>
+              </button>
+
+              {/* Tokenization */}
+              <button
+                onClick={() => {
+                  setEnableTokenization(!enableTokenization)
+                  setShowTokenizeModal(true)
+                }}
+                className={`p-3 rounded-lg border transition-all hover:scale-[1.02] ${enableTokenization ? 'border-green-500' : ''}`}
+                style={{
+                  backgroundColor: enableTokenization ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                  borderColor: enableTokenization ? '#00ff88' : 'rgba(255, 255, 255, 0.12)'
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Coins size={18} style={{ color: enableTokenization ? '#00ff88' : 'rgba(255, 255, 255, 0.6)' }} />
+                  {enableTokenization && <Check size={14} style={{ color: '#00ff88' }} />}
+                </div>
+                <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>Tokenize</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px' }}>Create revenue shares</div>
+              </button>
+            </div>
+            
+            {/* Configuration panels that show when options are enabled */}
+            {enableTimelock && (
+              <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 255, 136, 0.05)', border: '1px solid rgba(0, 255, 136, 0.2)' }}>
+                <label className="block text-xs font-medium mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  Timelock Date
+                </label>
                 <input
                   type="datetime-local"
                   value={timelockDate}
                   onChange={(e) => setTimelockDate(e.target.value)}
-                  className="ml-7 px-3 py-1 rounded border"
+                  className="px-3 py-2 rounded border w-full"
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -267,31 +331,21 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
                     fontSize: '13px'
                   }}
                 />
-              )}
-            </div>
-
-            {/* Price Gate */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer mb-2">
-                <input
-                  type="checkbox"
-                  checked={enablePrice}
-                  onChange={(e) => setEnablePrice(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <DollarSign size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
-                <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                  Set access price
-                </span>
-              </label>
-              {enablePrice && (
-                <div className="ml-7 flex gap-2">
+              </div>
+            )}
+            
+            {enablePrice && (
+              <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 255, 136, 0.05)', border: '1px solid rgba(0, 255, 136, 0.2)' }}>
+                <label className="block text-xs font-medium mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  Access Price
+                </label>
+                <div className="flex gap-2">
                   <input
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="0.00"
-                    className="px-3 py-1 rounded border w-24"
+                    className="px-3 py-2 rounded border flex-1"
                     style={{
                       backgroundColor: 'rgba(255, 255, 255, 0.05)',
                       borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -302,7 +356,7 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value as 'BSV' | 'USD')}
-                    className="px-3 py-1 rounded border"
+                    className="px-3 py-2 rounded border"
                     style={{
                       backgroundColor: 'rgba(255, 255, 255, 0.05)',
                       borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -314,52 +368,8 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
                     <option value="USD">USD</option>
                   </select>
                 </div>
-              )}
-            </div>
-            
-            {/* Cloud Storage */}
-            {connectedProviders.length > 0 && (
-              <div>
-                <label className="flex items-center gap-3 cursor-pointer mb-2">
-                  <Cloud size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                    Also save to cloud storage
-                  </span>
-                </label>
-                <select
-                  value={selectedCloudProvider}
-                  onChange={(e) => setSelectedCloudProvider(e.target.value)}
-                  className="ml-7 px-3 py-1 rounded border"
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    color: '#ffffff',
-                    fontSize: '13px'
-                  }}
-                >
-                  <option value="">None</option>
-                  {connectedProviders.map(provider => (
-                    <option key={provider.type} value={provider.type}>
-                      {provider.name}
-                    </option>
-                  ))}
-                </select>
               </div>
             )}
-            
-            {/* Tokenization */}
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={enableTokenization}
-                onChange={(e) => setEnableTokenization(e.target.checked)}
-                className="w-4 h-4"
-              />
-              <Coins size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
-              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-                Tokenize this file (create revenue shares)
-              </span>
-            </label>
           </div>
 
           {/* Cost Estimate */}
