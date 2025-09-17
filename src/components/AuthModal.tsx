@@ -100,7 +100,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-lg rounded-2xl shadow-2xl"
+        className="relative w-full max-w-4xl rounded-2xl shadow-2xl"
         style={{ backgroundColor: 'var(--bg-secondary)' }}
       >
         {/* Header */}
@@ -137,7 +137,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'connect' | 'subscribe' | 'topup')}
               className="flex-1 px-4 py-3 flex items-center justify-center gap-2 transition-all"
               style={{
                 borderBottom: activeTab === tab.id ? '2px solid #00ff88' : '2px solid transparent',
@@ -265,7 +265,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           )}
 
           {activeTab === 'subscribe' && (
-            <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
               {/* Subscription Tiers */}
               {[
                 { 
@@ -293,8 +293,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               ].map(tier => (
                 <button
                   key={tier.id}
-                  onClick={() => setSubscriptionTier(tier.id as any)}
-                  className="w-full p-4 rounded-xl border transition-all text-left"
+                  onClick={() => setSubscriptionTier(tier.id as 'free' | 'pro' | 'enterprise')}
+                  className="h-full p-4 rounded-xl border transition-all text-left flex flex-col"
                   style={{
                     borderColor: subscriptionTier === tier.id ? tier.color : 'var(--color-border)',
                     background: subscriptionTier === tier.id ? `${tier.color}10` : 'var(--bg-card)',
@@ -329,7 +329,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       <Check size={20} style={{ color: tier.color }} />
                     )}
                   </div>
-                  <ul className="space-y-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  <ul className="space-y-1 text-xs flex-grow" style={{ color: 'var(--color-text-muted)' }}>
                     {tier.features.map(feature => (
                       <li key={feature} className="flex items-center gap-2">
                         <span style={{ color: tier.color }}>✓</span> {feature}
