@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Taskbar from "@/components/Taskbar"
 import DriveSidebar from "@/components/DriveSidebar"
@@ -28,6 +28,11 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [storageUsed] = useState(0) // MB
   const [selectedGoogleDriveFile, setSelectedGoogleDriveFile] = useState<GoogleDriveFile | null>(null)
+  
+  // Resizable sidebar state
+  const [sidebarWidth, setSidebarWidth] = useState(320)
+  const [isResizing, setIsResizing] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   
   // Google Drive integration
   const {
@@ -127,6 +132,53 @@ export default function Home() {
                            (activeCategory === 'nfts' && file.isTokenized)
     return matchesSearch && matchesCategory
   })
+
+  // Resize handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true)
+    e.preventDefault()
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing) return
+    const newWidth = Math.max(280, Math.min(600, e.clientX))
+    setSidebarWidth(newWidth)
+    localStorage.setItem('drive-sidebar-width', newWidth.toString())
+  }
+
+  const handleMouseUp = () => {
+    setIsResizing(false)
+  }
+
+  // useEffect hooks for mounting and resize handling
+  useEffect(() => {
+    setIsMounted(true)
+    const saved = localStorage.getItem('drive-sidebar-width')
+    if (saved) {
+      setSidebarWidth(parseInt(saved))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'ew-resize'
+      document.body.style.userSelect = 'none'
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizing])
 
   if (status === "loading") {
     return (
@@ -246,6 +298,9 @@ export default function Home() {
           setShowAuthModal={setShowAuthModal}
           connectedStorageProviders={connectedStorageProviders as unknown as Array<{ type: string; name: string; [key: string]: unknown }>}
           storageUsed={storageUsed}
+          width={isMounted ? sidebarWidth : 320}
+          isResizing={isResizing}
+          onMouseDown={handleMouseDown}
         />
 
       {/* Main Content Area */}
@@ -263,7 +318,7 @@ export default function Home() {
             </h2>
             
             {/* Search Bar */}
-            <div style={{ width: '300px' }}>
+            <div style={{ width: `${isMounted ? sidebarWidth : 320}px` }}>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
                 <input

@@ -450,8 +450,8 @@ export default function DriveSidebar({
         </div>
       </div>
 
-      {/* Resize Handle - Only show in exchange view */}
-      {currentView === 'exchange' && onMouseDown && (
+      {/* Resize Handle - Show in both views when onMouseDown is provided */}
+      {onMouseDown && (
         <div
           onMouseDown={onMouseDown}
           style={{
