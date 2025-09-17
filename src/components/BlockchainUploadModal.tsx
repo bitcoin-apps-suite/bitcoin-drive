@@ -8,7 +8,10 @@ import {
   SiCloudflare, 
   SiGoogle, 
   SiSupabase,
-  SiBitcoin 
+  SiBitcoin,
+  SiShopify,
+  SiStripe,
+  SiPaypal
 } from 'react-icons/si'
 import type { StorageProvider } from './StorageConnector'
 
@@ -142,7 +145,7 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
             <label className="block text-sm font-medium mb-3" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
               Your connected Storage and delivery services
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'googledrive', name: 'Google Drive', icon: <SiGoogledrive size={16} />, color: '#4285f4' },
                 { id: 'aws', name: 'AWS S3', icon: <SiAmazon size={16} />, color: '#ff9900' },
@@ -152,7 +155,10 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
                 { id: 'supabase', name: 'SupaBase', icon: <SiSupabase size={16} />, color: '#3ecf8e' },
                 { id: 'dropbox', name: 'Dropbox', icon: <Database size={16} />, color: '#0061ff' },
                 { id: 'fastly', name: 'Fastly CDN', icon: <Zap size={16} />, color: '#ff282d' },
-                { id: 'netlify', name: 'Netlify', icon: <Globe size={16} />, color: '#00c7b7' }
+                { id: 'netlify', name: 'Netlify', icon: <Globe size={16} />, color: '#00c7b7' },
+                { id: 'stripe', name: 'Stripe', icon: <SiStripe size={16} />, color: '#635bff' },
+                { id: 'paypal', name: 'PayPal', icon: <SiPaypal size={16} />, color: '#0070ba' },
+                { id: 'shopify', name: 'Shopify', icon: <SiShopify size={16} />, color: '#7ab55c' }
               ].map((service) => {
                 const isConnected = connectedServiceIds.has(service.id)
                 const isSelected = selectedCloudProvider === service.name.toLowerCase()

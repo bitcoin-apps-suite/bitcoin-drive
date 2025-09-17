@@ -3,13 +3,17 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { X, Shield, Check, CreditCard, DollarSign, Wallet, Cloud, Server, Database, Zap, Globe } from 'lucide-react'
+import Image from 'next/image'
 import { 
   SiGoogledrive, 
   SiAmazon, 
   SiCloudflare, 
   SiGoogle, 
   SiSupabase,
-  SiBitcoin 
+  SiBitcoin,
+  SiShopify,
+  SiStripe,
+  SiPaypal
 } from 'react-icons/si'
 
 interface AuthModalProps {
@@ -39,7 +43,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'handcash',
       name: 'HandCash',
-      icon: <SiBitcoin size={24} />,
+      icon: <Image src="/handcash-logo.png" alt="HandCash" width={24} height={24} />,
       color: '#00ff88',
       connected: connectedProviders.has('handcash')
     },
@@ -105,6 +109,27 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       icon: <Globe size={24} />,
       color: '#00c7b7',
       connected: connectedProviders.has('netlify')
+    },
+    {
+      id: 'stripe',
+      name: 'Stripe',
+      icon: <SiStripe size={24} />,
+      color: '#635bff',
+      connected: connectedProviders.has('stripe')
+    },
+    {
+      id: 'paypal',
+      name: 'PayPal',
+      icon: <SiPaypal size={24} />,
+      color: '#0070ba',
+      connected: connectedProviders.has('paypal')
+    },
+    {
+      id: 'shopify',
+      name: 'Shopify',
+      icon: <SiShopify size={24} />,
+      color: '#7ab55c',
+      connected: connectedProviders.has('shopify')
     }
   ]
 
@@ -177,7 +202,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       } finally {
         setIsConnecting(null)
       }
-    } else if (['aws', 'cloudflare', 'azure', 'supabase', 'googlecloud'].includes(providerId)) {
+    } else if (['aws', 'cloudflare', 'azure', 'supabase', 'googlecloud', 'shopify', 'stripe', 'paypal'].includes(providerId)) {
       // Simulate infrastructure provider connection
       setTimeout(() => {
         setConnectedProviders(new Set([...connectedProviders, providerId]))
@@ -257,13 +282,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   }}
                 >
                   <div className="flex items-center justify-center gap-3">
-                    <img 
-                      src="/handcash-logo.png" 
-                      alt="HandCash"
-                      width={24}
-                      height={24}
-                      style={{ filter: 'brightness(0)' }}
-                    />
+                    <div style={{ 
+                      width: '24px', 
+                      height: '24px', 
+                      background: '#f59e0b',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      color: '#000000'
+                    }}>
+                      ₿
+                    </div>
                     <span className="text-sm font-medium" style={{ color: '#000000' }}>
                       {providers[0].name}
                     </span>
@@ -278,7 +310,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </h3>
                 
                 {/* Other Services - Grid */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {providers.slice(1).map((provider) => (
                     <button
                       key={provider.id}
