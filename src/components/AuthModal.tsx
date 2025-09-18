@@ -138,7 +138,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'connect' | 'subscribe' | 'topup')}
               className="flex-1 px-4 py-3 flex items-center justify-center gap-2 transition-all"
               style={{
                 borderBottom: activeTab === tab.id ? '2px solid #00ff88' : '2px solid transparent',
@@ -294,7 +294,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               ].map(tier => (
                 <button
                   key={tier.id}
-                  onClick={() => setSubscriptionTier(tier.id as any)}
+                  onClick={() => setSubscriptionTier(tier.id as 'free' | 'pro' | 'enterprise')}
                   className="w-full p-4 rounded-xl border transition-all text-left"
                   style={{
                     borderColor: subscriptionTier === tier.id ? tier.color : 'var(--color-border)',
