@@ -469,8 +469,8 @@ export default function DriveExchangePage() {
         </div>
 
         {/* Sort */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>Sort by:</span>
+        <div className="flex gap-2 items-center">
+          <span className="hidden lg:inline text-xs" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'revenue' | 'views' | 'recent' | 'shares')}
@@ -520,11 +520,11 @@ export default function DriveExchangePage() {
             {filteredFiles.map(file => (
             <div
               key={file.id}
+              className="p-3 lg:p-5"
               style={{
                 background: 'rgba(0, 0, 0, 0.3)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
-                padding: '20px',
                 transition: 'all 0.3s',
                 cursor: 'pointer'
               }}
@@ -537,26 +537,20 @@ export default function DriveExchangePage() {
                 e.currentTarget.style.background = 'rgba(0, 0, 0, 0.3)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start">
                 {/* Left - File Info */}
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{ 
-                      width: '40px', 
-                      height: '40px',
-                      borderRadius: '8px',
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ 
                       background: 'rgba(255, 255, 255, 0.05)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
                       color: file.isTokenized ? '#00ff88' : 'rgba(255, 255, 255, 0.4)'
                     }}>
                       {getFileIcon(file.fileType)}
                     </div>
-                    <div>
-                      <div style={{ fontSize: '16px', color: '#ffffff', fontWeight: '500' }}>{file.fileName}</div>
-                      <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
-                        {formatFileSize(file.fileSize)} • Uploaded {Math.floor((Date.now() - file.uploadDate.getTime()) / (1000 * 60 * 60 * 24))} days ago
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm lg:text-base font-medium truncate" style={{ color: '#ffffff' }}>{file.fileName}</div>
+                      <div className="text-xs lg:text-xs" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                        {formatFileSize(file.fileSize)} • {Math.floor((Date.now() - file.uploadDate.getTime()) / (1000 * 60 * 60 * 24))}d ago
                       </div>
                     </div>
                   </div>
@@ -644,34 +638,34 @@ export default function DriveExchangePage() {
                   )}
 
                   {/* Stats Row */}
-                  <div className="grid grid-cols-2 lg:flex gap-4 lg:gap-8">
+                  <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-6">
                     <div>
-                      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
-                        <DollarSign size={10} style={{ display: 'inline', marginRight: '4px' }} />
-                        Total Revenue
+                      <div className="text-xs flex items-center gap-1 mb-1" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <DollarSign size={10} />
+                        <span className="hidden lg:inline">Total</span> Revenue
                       </div>
-                      <div style={{ fontSize: '16px', color: '#00ff88', fontWeight: '500' }}>₿ {file.totalRevenue.toFixed(2)}</div>
+                      <div className="text-sm lg:text-base font-medium" style={{ color: '#00ff88' }}>₿ {file.totalRevenue.toFixed(2)}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
-                        <Activity size={10} style={{ display: 'inline', marginRight: '4px' }} />
-                        Monthly Revenue
+                      <div className="text-xs flex items-center gap-1 mb-1" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <Activity size={10} />
+                        <span className="hidden lg:inline">Monthly</span> Rev
                       </div>
-                      <div style={{ fontSize: '16px', color: '#ffffff' }}>₿ {file.monthlyRevenue.toFixed(2)}</div>
+                      <div className="text-sm lg:text-base" style={{ color: '#ffffff' }}>₿ {file.monthlyRevenue.toFixed(2)}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
-                        <Download size={10} style={{ display: 'inline', marginRight: '4px' }} />
+                      <div className="text-xs flex items-center gap-1 mb-1" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <Download size={10} />
                         Downloads
                       </div>
-                      <div style={{ fontSize: '16px', color: '#ffffff' }}>{file.downloads.toLocaleString()}</div>
+                      <div className="text-sm lg:text-base" style={{ color: '#ffffff' }}>{file.downloads.toLocaleString()}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
-                        <Eye size={10} style={{ display: 'inline', marginRight: '4px' }} />
+                      <div className="text-xs flex items-center gap-1 mb-1" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <Eye size={10} />
                         Views
                       </div>
-                      <div style={{ fontSize: '16px', color: '#ffffff' }}>{file.views.toLocaleString()}</div>
+                      <div className="text-sm lg:text-base" style={{ color: '#ffffff' }}>{file.views.toLocaleString()}</div>
                     </div>
                     {file.isTokenized && (
                       <>
