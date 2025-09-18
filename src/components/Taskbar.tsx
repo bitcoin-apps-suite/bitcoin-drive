@@ -243,8 +243,18 @@ export default function Taskbar() {
     >
       {/* Left side - Bitcoin Logo and menus */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* Bitcoin Logo container */}
-        <div style={{ position: 'relative' }}>
+        {/* Mobile Bitcoin Logo (no dropdown) */}
+        <div className="sm:hidden" style={{ 
+          padding: '0 12px',
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: '#00ff88'
+        }}>
+          ₿
+        </div>
+
+        {/* Bitcoin Logo container - Desktop only with dropdown */}
+        <div className="hidden sm:block" style={{ position: 'relative' }}>
           <button
             onClick={() => {
               setShowBitcoinSuite(!showBitcoinSuite)
@@ -548,47 +558,6 @@ export default function Taskbar() {
               )}
             </div>
 
-            {/* Bitcoin Suite Apps */}
-            <div style={{
-              marginBottom: '16px',
-              padding: '12px',
-              background: 'rgba(0, 255, 136, 0.05)',
-              borderRadius: '8px',
-              border: '1px solid rgba(0, 255, 136, 0.2)'
-            }}>
-              <div style={{ 
-                fontSize: '12px', 
-                fontWeight: '600', 
-                color: '#00ff88',
-                marginBottom: '12px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}>
-                Bitcoin Suite
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                {bitcoinApps.slice(0, 8).map((app) => (
-                  <a
-                    key={app.name}
-                    href={app.url}
-                    style={{
-                      display: 'block',
-                      padding: '8px',
-                      background: app.current ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                      borderRadius: '6px',
-                      border: app.current ? '1px solid rgba(0, 255, 136, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
-                      color: app.current ? '#00ff88' : '#ffffff',
-                      textDecoration: 'none',
-                      fontSize: '12px',
-                      textAlign: 'center',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {app.name.replace('Bitcoin ', '')}
-                  </a>
-                ))}
-              </div>
-            </div>
 
             {/* Menu Sections */}
             {menus.map((menu) => (
