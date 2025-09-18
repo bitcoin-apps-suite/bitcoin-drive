@@ -277,89 +277,133 @@ export default function DriveExchangePage() {
       
       {/* Header */}
       <div className="toolbar" style={{ 
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '20px 24px',
         background: 'var(--bg-secondary)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        height: '96px'
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
-        {/* Left - Stats */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '32px' }}>
-          <div>
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Total Revenue</div>
-            <div style={{ fontSize: '18px', color: '#00ff88', fontWeight: '500' }}>₿ {totalRevenue.toFixed(2)}</div>
+        {/* Mobile Header */}
+        <div className="lg:hidden" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Package size={16} color="#000000" />
+            </div>
+            <h1 style={{ 
+              fontSize: '20px', 
+              fontWeight: '300', 
+              letterSpacing: '-0.03em',
+              margin: 0
+            }}>
+              <span style={{ color: '#00ff88' }}>Bitcoin</span>
+              <span style={{ color: '#ffffff' }}> Exchange</span>
+            </h1>
           </div>
-          <div>
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Downloads</div>
-            <div style={{ fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>{totalDownloads.toLocaleString()}</div>
+          {/* Mobile Stats Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+            <div style={{ padding: '8px', background: 'rgba(0,255,136,0.1)', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2px' }}>Revenue</div>
+              <div style={{ fontSize: '14px', color: '#00ff88', fontWeight: '500' }}>₿ {totalRevenue.toFixed(2)}</div>
+            </div>
+            <div style={{ padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2px' }}>Downloads</div>
+              <div style={{ fontSize: '14px', color: '#ffffff', fontWeight: '500' }}>{totalDownloads.toLocaleString()}</div>
+            </div>
+            <div style={{ padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2px' }}>Views</div>
+              <div style={{ fontSize: '14px', color: '#ffffff', fontWeight: '500' }}>{totalViews.toLocaleString()}</div>
+            </div>
+            <div style={{ padding: '8px', background: 'rgba(251,191,36,0.1)', borderRadius: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2px' }}>Tokenized</div>
+              <div style={{ fontSize: '14px', color: '#fbbf24', fontWeight: '500' }}>{tokenizedCount}/{userFiles.length}</div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Views</div>
-            <div style={{ fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>{totalViews.toLocaleString()}</div>
-          </div>
-        </div>
-        
-        {/* Center - Title */}
-        <div style={{ 
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Package size={20} color="#000000" />
-          </div>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: '300', 
-            letterSpacing: '-0.03em',
-            margin: 0
-          }}>
-            <span style={{ color: '#00ff88' }}>Bitcoin</span>
-            <span style={{ color: '#ffffff' }}> Drive Exchange</span>
-          </h1>
         </div>
 
-        {/* Right - User Balance */}
-        <div style={{ flex: 1, display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Tokenized Files</div>
-            <div style={{ fontSize: '18px', color: '#fbbf24', fontWeight: '500' }}>{tokenizedCount}/{userFiles.length}</div>
+        {/* Desktop Header */}
+        <div className="hidden lg:flex" style={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '20px 24px',
+          height: '96px'
+        }}>
+          {/* Left - Stats */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '32px' }}>
+            <div>
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Total Revenue</div>
+              <div style={{ fontSize: '18px', color: '#00ff88', fontWeight: '500' }}>₿ {totalRevenue.toFixed(2)}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Downloads</div>
+              <div style={{ fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>{totalDownloads.toLocaleString()}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Views</div>
+              <div style={{ fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>{totalViews.toLocaleString()}</div>
+            </div>
+          </div>
+          
+          {/* Center - Title */}
+          <div style={{ 
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Package size={20} color="#000000" />
+            </div>
+            <h1 style={{ 
+              fontSize: '28px', 
+              fontWeight: '300', 
+              letterSpacing: '-0.03em',
+              margin: 0
+            }}>
+              <span style={{ color: '#00ff88' }}>Bitcoin</span>
+              <span style={{ color: '#ffffff' }}> Drive Exchange</span>
+            </h1>
+          </div>
+
+          {/* Right - User Balance */}
+          <div style={{ flex: 1, display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Tokenized Files</div>
+              <div style={{ fontSize: '18px', color: '#fbbf24', fontWeight: '500' }}>{tokenizedCount}/{userFiles.length}</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Controls Bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '16px 24px',
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-0 lg:items-center lg:justify-between p-4 lg:px-6" style={{
         background: 'rgba(0, 0, 0, 0.3)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         {/* Search */}
-        <div style={{ position: 'relative', width: `${isMounted ? sidebarWidth : 320}px` }}>
+        <div className="relative w-full lg:w-auto" style={{ maxWidth: isMounted && window.innerWidth >= 1024 ? `${sidebarWidth}px` : undefined }}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={14} style={{ color: 'rgba(255, 255, 255, 0.4)' }} />
           <input
             type="text"
             placeholder="Search your files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
             style={{ 
-              width: '100%',
               paddingLeft: '32px',
               paddingRight: '12px',
               paddingTop: '6px',
@@ -375,7 +419,7 @@ export default function DriveExchangePage() {
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div className="flex flex-wrap gap-2 lg:gap-3 items-center">
           <Filter size={14} style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
           <button
             onClick={() => setFilterType('all')}
@@ -451,25 +495,27 @@ export default function DriveExchangePage() {
 
       {/* Main Content Area with Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <DriveSidebar
-          currentView="exchange"
-          filterType={filterType}
-          setFilterType={setFilterType}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          totalRevenue={totalRevenue}
-          totalFiles={userFiles.length}
-          tokenizedCount={tokenizedCount}
-          totalHolders={userFiles.reduce((sum, f) => sum + f.holders, 0)}
-          width={isMounted ? sidebarWidth : 320}
-          isResizing={isResizing}
-          onMouseDown={handleMouseDown}
-          setShowAuthModal={setShowAuthModal}
-        />
+        {/* Sidebar - Hidden on mobile */}
+        <div className="hidden lg:block">
+          <DriveSidebar
+            currentView="exchange"
+            filterType={filterType}
+            setFilterType={setFilterType}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            totalRevenue={totalRevenue}
+            totalFiles={userFiles.length}
+            tokenizedCount={tokenizedCount}
+            totalHolders={userFiles.reduce((sum, f) => sum + f.holders, 0)}
+            width={isMounted ? sidebarWidth : 320}
+            isResizing={isResizing}
+            onMouseDown={handleMouseDown}
+            setShowAuthModal={setShowAuthModal}
+          />
+        </div>
 
         {/* File Listings */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
+        <div className="flex-1 overflow-auto p-4 lg:p-6">
           <div style={{ display: 'grid', gap: '16px' }}>
             {filteredFiles.map(file => (
             <div
@@ -517,18 +563,14 @@ export default function DriveExchangePage() {
 
                   {/* NFT/FT Info */}
                   {file.isTokenized ? (
-                    <div style={{ 
-                      display: 'flex', 
-                      gap: '24px',
-                      padding: '12px 16px',
+                    <div className="grid grid-cols-2 lg:flex gap-3 lg:gap-6 p-3 lg:p-4 mb-3" style={{ 
                       background: 'rgba(0, 255, 136, 0.05)',
                       borderRadius: '8px',
-                      border: '1px solid rgba(0, 255, 136, 0.1)',
-                      marginBottom: '12px'
+                      border: '1px solid rgba(0, 255, 136, 0.1)'
                     }}>
                       <div>
                         <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Container</div>
-                        <div style={{ fontSize: '13px', color: '#00ff88', fontFamily: 'monospace' }}>{file.container}</div>
+                        <div style={{ fontSize: '13px', color: '#00ff88', fontFamily: 'monospace' }} className="truncate">{file.container}</div>
                       </div>
                       <div>
                         <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>Token</div>
@@ -602,7 +644,7 @@ export default function DriveExchangePage() {
                   )}
 
                   {/* Stats Row */}
-                  <div style={{ display: 'flex', gap: '32px' }}>
+                  <div className="grid grid-cols-2 lg:flex gap-4 lg:gap-8">
                     <div>
                       <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '4px' }}>
                         <DollarSign size={10} style={{ display: 'inline', marginRight: '4px' }} />
