@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
+import { Menu, X } from 'lucide-react'
 
 interface DropdownItem {
   label?: string
@@ -21,6 +22,7 @@ export default function Taskbar() {
   const { data: session } = useSession()
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [showBitcoinSuite, setShowBitcoinSuite] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const handleOpenExchange = () => {
@@ -212,6 +214,7 @@ export default function Taskbar() {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setActiveMenu(null)
         setShowBitcoinSuite(false)
+        setShowMobileMenu(false)
       }
     }
 
@@ -465,6 +468,24 @@ export default function Taskbar() {
         Bitcoin Drive
       </div>
 
+      {/* Mobile Menu Button */}
+      <button
+        className="sm:hidden"
+        onClick={() => setShowMobileMenu(!showMobileMenu)}
+        style={{
+          padding: '0 12px',
+          height: '28px',
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          cursor: 'pointer'
+        }}
+      >
+        {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
       {/* Right side - Status items */}
       <div className="hidden sm:flex" style={{
         marginLeft: 'auto',
@@ -486,6 +507,180 @@ export default function Taskbar() {
           </>
         )}
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div 
+          className="sm:hidden"
+          style={{
+            position: 'fixed',
+            top: '28px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.95)',
+            backdropFilter: 'blur(16px)',
+            zIndex: 9999,
+            overflowY: 'auto'
+          }}
+        >
+          <div style={{ padding: '16px' }}>
+            {/* User Status */}
+            <div style={{
+              padding: '12px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              {session ? (
+                <>
+                  <span style={{ color: '#ffffff', fontSize: '14px' }}>{session.user?.email || 'Connected'}</span>
+                  <span style={{ color: '#00ff88' }}>●</span>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: '#ffffff', fontSize: '14px' }}>Not Connected</span>
+                  <span style={{ color: '#ff4444', opacity: 0.6 }}>●</span>
+                </>
+              )}
+            </div>
+
+            {/* Bitcoin Suite Apps */}
+            <div style={{
+              marginBottom: '16px',
+              padding: '12px',
+              background: 'rgba(0, 255, 136, 0.05)',
+              borderRadius: '8px',
+              border: '1px solid rgba(0, 255, 136, 0.2)'
+            }}>
+              <div style={{ 
+                fontSize: '12px', 
+                fontWeight: '600', 
+                color: '#00ff88',
+                marginBottom: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                Bitcoin Suite
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                {bitcoinApps.slice(0, 8).map((app) => (
+                  <a
+                    key={app.name}
+                    href={app.url}
+                    style={{
+                      display: 'block',
+                      padding: '8px',
+                      background: app.current ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '6px',
+                      border: app.current ? '1px solid rgba(0, 255, 136, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                      color: app.current ? '#00ff88' : '#ffffff',
+                      textDecoration: 'none',
+                      fontSize: '12px',
+                      textAlign: 'center',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {app.name.replace('Bitcoin ', '')}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Menu Sections */}
+            {menus.map((menu) => (
+              <div key={menu.label} style={{
+                marginBottom: '16px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  {menu.label}
+                </div>
+                <div style={{ padding: '8px' }}>
+                  {menu.items.map((item, index) => (
+                    item.divider ? (
+                      <div 
+                        key={index}
+                        style={{
+                          height: '1px',
+                          background: 'rgba(255, 255, 255, 0.1)',
+                          margin: '8px 0'
+                        }}
+                      />
+                    ) : item.href ? (
+                      <a
+                        key={index}
+                        href={item.href}
+                        target={item.target || '_blank'}
+                        rel="noopener noreferrer"
+                        onClick={() => setShowMobileMenu(false)}
+                        style={{
+                          display: 'block',
+                          padding: '10px 12px',
+                          color: '#ffffff',
+                          textDecoration: 'none',
+                          fontSize: '13px',
+                          borderRadius: '4px',
+                          transition: 'background 0.15s ease'
+                        }}
+                        onTouchStart={(e) => {
+                          e.currentTarget.style.background = 'rgba(0, 255, 136, 0.2)'
+                        }}
+                        onTouchEnd={(e) => {
+                          e.currentTarget.style.background = 'transparent'
+                        }}
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          item.action?.()
+                          setShowMobileMenu(false)
+                        }}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '10px 12px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#ffffff',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          borderRadius: '4px',
+                          transition: 'background 0.15s ease'
+                        }}
+                        onTouchStart={(e) => {
+                          e.currentTarget.style.background = 'rgba(0, 255, 136, 0.2)'
+                        }}
+                        onTouchEnd={(e) => {
+                          e.currentTarget.style.background = 'transparent'
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    )
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
