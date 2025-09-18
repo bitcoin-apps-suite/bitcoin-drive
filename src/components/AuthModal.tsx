@@ -2,19 +2,8 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { X, Shield, Check, CreditCard, DollarSign, Wallet, Cloud, Server, Database, Zap, Globe } from 'lucide-react'
+import { X, Mail, Twitter, Wallet, Shield, Check, Key, ArrowRight, Zap, CreditCard, DollarSign, Sparkles } from 'lucide-react'
 import Image from 'next/image'
-import { 
-  SiGoogledrive, 
-  SiAmazon, 
-  SiCloudflare, 
-  SiGoogle, 
-  SiSupabase,
-  SiBitcoin,
-  SiShopify,
-  SiStripe,
-  SiPaypal
-} from 'react-icons/si'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -31,202 +20,79 @@ interface AuthProvider {
   handle?: string
 }
 
-type Tab = 'connect' | 'subscribe' | 'topup'
-
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isConnecting, setIsConnecting] = useState<string | null>(null)
   const [connectedProviders, setConnectedProviders] = useState<Set<string>>(new Set())
+  const [activeTab, setActiveTab] = useState<'connect' | 'subscribe' | 'topup'>('connect')
   const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'pro' | 'enterprise'>('free')
-  const [topupAmount, setTopupAmount] = useState<string>('25')
   
   const providers: AuthProvider[] = [
     {
       id: 'handcash',
       name: 'HandCash',
-      icon: <Image src="/handcash-logo.png" alt="HandCash" width={24} height={24} />,
+      icon: <Image src="/handcash-logo.png" alt="HandCash" width={20} height={20} />,
       color: '#00ff88',
       connected: connectedProviders.has('handcash')
     },
     {
-      id: 'googledrive',
+      id: 'google',
       name: 'Google Drive',
-      icon: <SiGoogledrive size={24} />,
+      icon: <Mail size={20} />,
       color: '#4285f4',
-      connected: connectedProviders.has('googledrive')
+      connected: connectedProviders.has('google')
     },
     {
-      id: 'aws',
-      name: 'AWS S3',
-      icon: <SiAmazon size={24} />,
-      color: '#ff9900',
-      connected: connectedProviders.has('aws')
-    },
-    {
-      id: 'cloudflare',
-      name: 'Cloudflare',
-      icon: <SiCloudflare size={24} />,
-      color: '#f38020',
-      connected: connectedProviders.has('cloudflare')
-    },
-    {
-      id: 'googlecloud',
-      name: 'Google Cloud',
-      icon: <SiGoogle size={24} />,
-      color: '#ea4335',
-      connected: connectedProviders.has('googlecloud')
-    },
-    {
-      id: 'azure',
-      name: 'Azure Blob',
-      icon: <Cloud size={24} />,
-      color: '#0078d4',
-      connected: connectedProviders.has('azure')
-    },
-    {
-      id: 'supabase',
-      name: 'SupaBase',
-      icon: <SiSupabase size={24} />,
-      color: '#3ecf8e',
-      connected: connectedProviders.has('supabase')
-    },
-    {
-      id: 'dropbox',
-      name: 'Dropbox',
-      icon: <Database size={24} />,
-      color: '#0061ff',
-      connected: connectedProviders.has('dropbox')
-    },
-    {
-      id: 'fastly',
-      name: 'Fastly CDN',
-      icon: <Zap size={24} />,
-      color: '#ff282d',
-      connected: connectedProviders.has('fastly')
-    },
-    {
-      id: 'netlify',
-      name: 'Netlify',
-      icon: <Globe size={24} />,
-      color: '#00c7b7',
-      connected: connectedProviders.has('netlify')
-    },
-    {
-      id: 'stripe',
-      name: 'Stripe',
-      icon: <SiStripe size={24} />,
-      color: '#635bff',
-      connected: connectedProviders.has('stripe')
-    },
-    {
-      id: 'paypal',
-      name: 'PayPal',
-      icon: <SiPaypal size={24} />,
-      color: '#0070ba',
-      connected: connectedProviders.has('paypal')
-    },
-    {
-      id: 'shopify',
-      name: 'Shopify',
-      icon: <SiShopify size={24} />,
-      color: '#7ab55c',
-      connected: connectedProviders.has('shopify')
+      id: 'twitter',
+      name: 'X (Twitter)',
+      icon: <Twitter size={20} />,
+      color: '#1da1f2',
+      connected: connectedProviders.has('twitter')
     }
   ]
-
-  const subscriptionPlans = [
-    {
-      id: 'free',
-      name: 'Free',
-      price: '$0',
-      period: 'forever',
-      features: ['1GB storage', 'Basic encryption', 'Community support'],
-      color: '#6b7280'
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: '$9.99',
-      period: 'per month',
-      features: ['100GB storage', 'Advanced encryption', 'Priority support', 'File sharing'],
-      color: '#00ff88',
-      popular: true
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '$29.99',
-      period: 'per month',
-      features: ['1TB storage', 'Enterprise encryption', '24/7 support', 'Team collaboration', 'API access'],
-      color: '#8b5cf6'
-    }
-  ]
-
 
   const handleProviderConnect = async (providerId: string) => {
     setIsConnecting(providerId)
     
-    if (providerId === 'handcash') {
-      const popup = window.open(
-        'https://api.handcash.io/v3/connect',
-        'HandCash Connect',
-        'width=500,height=700'
-      )
-      
-      window.addEventListener('message', (event) => {
-        if (event.origin !== 'https://app.handcash.io') return
-        
-        if (event.data.type === 'handcash-auth-success') {
-          setConnectedProviders(new Set([...connectedProviders, 'handcash']))
-          popup?.close()
+    try {
+      if (providerId === 'handcash') {
+        // HandCash OAuth flow
+        const response = await fetch('/api/handcash/connect')
+        const data = await response.json()
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl
         }
-      })
-      
-      setTimeout(() => {
-        setConnectedProviders(new Set([...connectedProviders, 'handcash']))
-        popup?.close()
-        setIsConnecting(null)
-      }, 2000)
-    } else if (providerId === 'googledrive') {
-      // Google Drive OAuth connection
-      try {
-        const result = await signIn('google', { 
+      } else if (providerId === 'twitter') {
+        // Twitter OAuth through NextAuth
+        const result = await signIn('twitter', { 
           redirect: false,
-          callbackUrl: '/api/auth/callback/google',
-          scope: 'openid email profile https://www.googleapis.com/auth/drive.file'
+          callbackUrl: window.location.href 
         })
         if (result?.ok) {
-          setConnectedProviders(new Set([...connectedProviders, 'googledrive']))
+          setConnectedProviders(prev => new Set([...prev, providerId]))
         }
-      } catch (error) {
-        console.error('Google Drive connection failed:', error)
-      } finally {
-        setIsConnecting(null)
-      }
-    } else if (['aws', 'cloudflare', 'azure', 'supabase', 'googlecloud', 'shopify', 'stripe', 'paypal'].includes(providerId)) {
-      // Simulate infrastructure provider connection
-      setTimeout(() => {
-        setConnectedProviders(new Set([...connectedProviders, providerId]))
-        setIsConnecting(null)
-      }, 1500)
-    } else {
-      // Other OAuth providers
-      try {
-        const result = await signIn(providerId, { redirect: false })
+      } else if (providerId === 'google') {
+        // Google OAuth through NextAuth
+        const result = await signIn('google', { 
+          redirect: false,
+          callbackUrl: window.location.href 
+        })
         if (result?.ok) {
-          setConnectedProviders(new Set([...connectedProviders, providerId]))
+          setConnectedProviders(prev => new Set([...prev, providerId]))
         }
-      } catch (error) {
-        console.error('Connection failed:', error)
-      } finally {
-        setIsConnecting(null)
       }
+    } catch (error) {
+      console.error(`Error connecting ${providerId}:`, error)
+    } finally {
+      setIsConnecting(null)
     }
   }
+
+  const allConnected = providers.every(p => p.connected)
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -235,7 +101,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg rounded-2xl shadow-2xl"
         style={{ backgroundColor: 'var(--bg-secondary)' }}
       >
         {/* Header */}
@@ -247,210 +113,385 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <X size={20} style={{ color: 'var(--color-text-muted)' }} />
           </button>
           
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl" style={{ 
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg" style={{ 
               background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)' 
             }}>
               <Wallet size={24} style={{ color: '#000000' }} />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
-                Welcome to Bitcoin Drive
-              </h2>
-              <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                Connect your services and set up your account
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
+              Bitcoin Drive Account
+            </h2>
           </div>
+          
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Connect, subscribe, and manage your Bitcoin Drive account
+          </p>
         </div>
 
-        {/* Content - All in One */}
-        <div className="p-6" style={{ maxHeight: 'calc(90vh - 200px)' }}>
-          <div className="grid grid-cols-12 gap-6">
-            {/* Services Column - spans 5 columns */}
-            <div className="col-span-5 space-y-3">
-              <div className="space-y-2">
-                {/* HandCash - Full Width */}
+        {/* Tab Navigation */}
+        <div className="flex border-b" style={{ borderColor: 'var(--color-border)' }}>
+          {[
+            { id: 'connect', label: 'Connect', icon: <Wallet size={16} /> },
+            { id: 'subscribe', label: 'Subscribe', icon: <Sparkles size={16} /> },
+            { id: 'topup', label: 'Top Up', icon: <DollarSign size={16} /> }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className="flex-1 px-4 py-3 flex items-center justify-center gap-2 transition-all"
+              style={{
+                borderBottom: activeTab === tab.id ? '2px solid #00ff88' : '2px solid transparent',
+                color: activeTab === tab.id ? '#00ff88' : 'var(--color-text-muted)',
+                fontWeight: activeTab === tab.id ? '600' : '400',
+                fontSize: '14px'
+              }}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-6 space-y-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+          {activeTab === 'connect' && (
+            <>
+              {/* HandCash Primary */}
+              <button
+                onClick={() => handleProviderConnect('handcash')}
+                disabled={connectedProviders.has('handcash') || isConnecting !== null}
+                className="w-full p-4 rounded-xl border-2 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ 
+                  borderColor: connectedProviders.has('handcash') ? '#00ff88' : 'transparent',
+                  background: connectedProviders.has('handcash') 
+                    ? 'linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,204,106,0.1) 100%)'
+                    : 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+                  boxShadow: connectedProviders.has('handcash') 
+                    ? 'none' 
+                    : '0 4px 12px rgba(0, 255, 136, 0.3)'
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="p-2 rounded-lg"
+                      style={{ 
+                        backgroundColor: connectedProviders.has('handcash') ? '#00ff88' : 'rgba(0,0,0,0.2)',
+                        color: connectedProviders.has('handcash') ? '#000000' : '#ffffff'
+                      }}
+                    >
+                      <Image src="/handcash-logo.png" alt="HandCash" width={20} height={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium" style={{ 
+                        color: connectedProviders.has('handcash') ? 'var(--color-accent)' : '#000000' 
+                      }}>
+                        HandCash Wallet
+                      </div>
+                      <div className="text-xs" style={{ 
+                        color: connectedProviders.has('handcash') ? 'var(--color-text-muted)' : 'rgba(0,0,0,0.7)' 
+                      }}>
+                        Required for payments
+                      </div>
+                    </div>
+                  </div>
+                  {connectedProviders.has('handcash') ? (
+                    <Check size={18} color="#00ff88" />
+                  ) : isConnecting === 'handcash' ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent"
+                      style={{ borderColor: '#000000' }}
+                    />
+                  ) : (
+                    <ArrowRight size={18} color="#000000" />
+                  )}
+                </div>
+              </button>
+
+              {/* Other Providers */}
+              {providers.slice(1).map((provider) => (
                 <button
-                  onClick={() => handleProviderConnect('handcash')}
-                  disabled={providers[0].connected || isConnecting !== null}
-                  className="w-full p-3 rounded-lg border transition-all hover:scale-[1.02] disabled:opacity-50"
+                  key={provider.id}
+                  onClick={() => handleProviderConnect(provider.id)}
+                  disabled={provider.connected || isConnecting !== null}
+                  className="w-full p-3 rounded-lg border transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ 
-                    borderColor: '#00ff88',
-                    backgroundColor: '#00ff88',
-                    color: '#000000'
+                    borderColor: provider.connected ? provider.color : 'var(--color-border)',
+                    backgroundColor: provider.connected ? `${provider.color}10` : 'var(--bg-card)'
                   }}
                 >
-                  <div className="flex items-center justify-center gap-3">
-                    <div style={{ 
-                      width: '24px', 
-                      height: '24px', 
-                      background: '#f59e0b',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      color: '#000000'
-                    }}>
-                      ₿
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="p-2 rounded-lg"
+                        style={{ 
+                          backgroundColor: provider.connected ? provider.color : 'var(--bg-primary)',
+                          color: provider.connected ? 'white' : provider.color
+                        }}
+                      >
+                        {provider.icon}
+                      </div>
+                      <div className="text-left">
+                        <div className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                          {provider.name}
+                        </div>
+                        {provider.handle && (
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            @{provider.handle}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <span className="text-sm font-medium" style={{ color: '#000000' }}>
-                      {providers[0].name}
-                    </span>
-                    {providers[0].connected && (
-                      <Check size={16} color="#000000" />
+                    
+                    {provider.connected ? (
+                      <div 
+                        className="p-1 rounded-full"
+                        style={{ backgroundColor: provider.color }}
+                      >
+                        <Check size={16} color="white" />
+                      </div>
+                    ) : isConnecting === provider.id ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent"
+                        style={{ borderColor: provider.color }}
+                      />
+                    ) : (
+                      <span className="text-sm font-medium" style={{ color: provider.color }}>
+                        Connect
+                      </span>
                     )}
                   </div>
                 </button>
-                
-                <h3 className="text-sm font-semibold" style={{ color: 'var(--color-accent)' }}>
-                  Connect your storage and delivery services
-                </h3>
-                
-                {/* Other Services - Grid */}
-                <div className="grid grid-cols-4 gap-2">
-                  {providers.slice(1).map((provider) => (
-                    <button
-                      key={provider.id}
-                      onClick={() => handleProviderConnect(provider.id)}
-                      disabled={provider.connected || isConnecting !== null}
-                      className="p-3 rounded-lg border transition-all hover:scale-[1.02] disabled:opacity-50"
-                      style={{ 
-                        borderColor: provider.connected ? provider.color : 'var(--color-border)',
-                        backgroundColor: provider.connected ? `${provider.color}10` : 'var(--bg-card)'
-                      }}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div style={{ color: provider.color }}>
-                          {provider.icon}
-                        </div>
-                        <span className="text-xs" style={{ color: 'var(--color-text)' }}>
-                          {provider.name}
-                        </span>
-                        {provider.connected && (
-                          <Check size={14} color={provider.color} />
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+              ))}
+            </>
+          )}
 
-            {/* Plans Column - spans 4 columns */}
-            <div className="col-span-4 space-y-3">
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-accent)' }}>
-                Choose Plan
-              </h3>
-              <div className="space-y-2">
-                {subscriptionPlans.map((plan) => (
-                  <div
-                    key={plan.id}
-                    className={`relative p-3 rounded-lg border cursor-pointer transition-all hover:scale-[1.01] ${
-                      subscriptionTier === plan.id ? 'ring-1 ring-green-500' : ''
-                    }`}
-                    style={{ 
-                      borderColor: subscriptionTier === plan.id ? '#00ff88' : 'var(--color-border)',
-                      backgroundColor: plan.popular ? 'rgba(0,255,136,0.05)' : 'var(--bg-card)'
-                    }}
-                    onClick={() => setSubscriptionTier(plan.id as typeof subscriptionTier)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold" style={{ color: 'var(--color-accent)' }}>
-                            {plan.name}
-                          </h4>
-                          {plan.popular && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white">
-                              POPULAR
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                          {plan.features.slice(0, 2).join(' • ')}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-lg font-bold" style={{ color: plan.color }}>
-                          {plan.price}
-                        </span>
-                        <span className="text-xs block" style={{ color: 'var(--color-text-muted)' }}>
-                          {plan.period}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Top Up Column - spans 3 columns */}
-            <div className="col-span-3 space-y-3">
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-accent)' }}>
-                Add Funds
-              </h3>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-2">
-                  {['10', '25', '50', '100'].map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => setTopupAmount(amount)}
-                      className={`py-2 px-3 rounded-lg border text-sm transition-all ${
-                        topupAmount === amount ? 'border-green-500 bg-green-500/10' : ''
-                      }`}
-                      style={{ 
-                        borderColor: topupAmount === amount ? '#00ff88' : 'var(--color-border)',
-                        backgroundColor: topupAmount === amount ? 'rgba(0,255,136,0.1)' : 'var(--bg-card)',
-                        color: 'var(--color-accent)'
-                      }}
-                    >
-                      ${amount}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="number"
-                  value={topupAmount}
-                  onChange={(e) => setTopupAmount(e.target.value)}
-                  className="w-full p-2 rounded-lg border text-sm"
-                  style={{ 
-                    borderColor: 'var(--color-border)',
-                    backgroundColor: 'var(--bg-card)',
-                    color: 'var(--color-accent)'
-                  }}
-                  placeholder="Custom amount"
-                />
+          {activeTab === 'subscribe' && (
+            <div className="space-y-4">
+              {/* Subscription Tiers */}
+              {[
+                { 
+                  id: 'free', 
+                  name: 'Free', 
+                  price: '0', 
+                  features: ['5GB Storage', 'Basic encryption', 'Public sharing'],
+                  color: '#888888'
+                },
+                { 
+                  id: 'pro', 
+                  name: 'Pro', 
+                  price: '9.99', 
+                  features: ['100GB Storage', 'Advanced encryption', 'NFT creation', 'Priority support'],
+                  color: '#00ff88',
+                  recommended: true
+                },
+                { 
+                  id: 'enterprise', 
+                  name: 'Enterprise', 
+                  price: '49.99', 
+                  features: ['Unlimited Storage', 'Multi-sig security', 'Custom domains', 'API access', 'Dedicated support'],
+                  color: '#fbbf24'
+                }
+              ].map(tier => (
                 <button
-                  className="w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-[1.02]"
+                  key={tier.id}
+                  onClick={() => setSubscriptionTier(tier.id as any)}
+                  className="w-full p-4 rounded-xl border transition-all text-left"
                   style={{
-                    background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
-                    color: '#000000'
+                    borderColor: subscriptionTier === tier.id ? tier.color : 'var(--color-border)',
+                    background: subscriptionTier === tier.id ? `${tier.color}10` : 'var(--bg-card)',
+                    position: 'relative'
                   }}
                 >
-                  <div className="flex items-center justify-center gap-2">
-                    <DollarSign size={16} />
-                    Add ${topupAmount}
+                  {tier.recommended && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-10px',
+                      right: '20px',
+                      background: tier.color,
+                      color: '#000000',
+                      padding: '2px 12px',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: '600'
+                    }}>
+                      RECOMMENDED
+                    </span>
+                  )}
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-semibold" style={{ color: 'var(--color-accent)' }}>
+                        {tier.name}
+                      </h4>
+                      <div className="text-2xl font-bold" style={{ color: tier.color }}>
+                        ${tier.price}<span className="text-sm font-normal">/month</span>
+                      </div>
+                    </div>
+                    {subscriptionTier === tier.id && (
+                      <Check size={20} style={{ color: tier.color }} />
+                    )}
                   </div>
+                  <ul className="space-y-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    {tier.features.map(feature => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <span style={{ color: tier.color }}>✓</span> {feature}
+                      </li>
+                    ))}
+                  </ul>
                 </button>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'topup' && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl" style={{ 
+                background: 'linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,204,106,0.1) 100%)',
+                border: '1px solid rgba(0,255,136,0.3)'
+              }}>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Current Balance</span>
+                  <span className="text-xl font-bold" style={{ color: '#00ff88' }}>₿ 0.00</span>
+                </div>
+                <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  Add funds to pay for storage, transactions, and premium features
+                </div>
+              </div>
+
+              {/* Quick Top-up Options */}
+              <div className="grid grid-cols-3 gap-2">
+                {['10', '25', '50'].map(amount => (
+                  <button
+                    key={amount}
+                    className="p-3 rounded-lg border transition-all hover:scale-[1.02]"
+                    style={{
+                      borderColor: 'var(--color-border)',
+                      background: 'var(--bg-card)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = '#00ff88'
+                      e.currentTarget.style.background = 'rgba(0,255,136,0.1)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border)'
+                      e.currentTarget.style.background = 'var(--bg-card)'
+                    }}
+                  >
+                    <div className="font-semibold" style={{ color: 'var(--color-accent)' }}>
+                      ${amount}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Amount */}
+              <div>
+                <label className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>
+                  Custom Amount
+                </label>
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="number"
+                    placeholder="Enter amount"
+                    className="flex-1 p-3 rounded-lg border"
+                    style={{
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--color-border)',
+                      color: 'var(--color-accent)'
+                    }}
+                  />
+                  <button
+                    className="px-6 py-3 rounded-lg font-medium transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+                      color: '#000000'
+                    }}
+                  >
+                    Add Funds
+                  </button>
+                </div>
+              </div>
+
+              {/* Payment Methods */}
+              <div className="pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+                <p className="text-xs mb-3" style={{ color: 'var(--color-text-muted)' }}>
+                  Payment Methods
+                </p>
+                <div className="flex gap-3">
+                  <div className="flex items-center gap-2 p-2 rounded border" style={{ borderColor: 'var(--color-border)' }}>
+                    <CreditCard size={16} style={{ color: '#00ff88' }} />
+                    <span className="text-xs">Card</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded border" style={{ borderColor: 'var(--color-border)' }}>
+                    <Wallet size={16} style={{ color: '#00ff88' }} />
+                    <span className="text-xs">Crypto</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Features/Footer */}
+        {activeTab === 'connect' && (
+          <div className="p-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-accent)' }}>
+              Why connect?
+            </h3>
+            <div className="space-y-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              <div className="flex items-start gap-2">
+                <Zap size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+                <span><strong>Instant Payments:</strong> Send & receive Bitcoin instantly</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Key size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+                <span><strong>Secure Auth:</strong> Your wallet is your identity</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Shield size={14} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
+                <span><strong>Encrypted Storage:</strong> Files secured with your wallet keys</span>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Footer */}
-        <div className="border-t p-6 flex justify-end" style={{ borderColor: 'var(--color-border)' }}>
+        {/* Continue Button */}
+        <div className="p-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
           <button
-            onClick={onClose}
-            className="px-6 py-2 rounded-lg font-semibold transition-all hover:scale-[1.02]"
-            style={{
-              background: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
-              color: '#000000'
+            onClick={() => {
+              if ((activeTab === 'connect' && connectedProviders.has('handcash')) || 
+                  activeTab === 'subscribe' || 
+                  activeTab === 'topup') {
+                if (onSuccess) onSuccess()
+              }
+              onClose()
+            }}
+            className="w-full py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+            style={{ 
+              backgroundColor: 
+                (activeTab === 'connect' && connectedProviders.has('handcash')) || 
+                activeTab === 'subscribe' || 
+                activeTab === 'topup' 
+                  ? 'var(--color-primary)' 
+                  : 'var(--bg-card)',
+              color: 
+                (activeTab === 'connect' && connectedProviders.has('handcash')) || 
+                activeTab === 'subscribe' || 
+                activeTab === 'topup'
+                  ? 'var(--bg-primary)' 
+                  : 'var(--color-text-muted)',
+              border: 
+                (activeTab === 'connect' && connectedProviders.has('handcash')) || 
+                activeTab === 'subscribe' || 
+                activeTab === 'topup'
+                  ? 'none' 
+                  : '1px solid var(--color-border)'
             }}
           >
-            Complete Setup
+            {activeTab === 'connect' 
+              ? (connectedProviders.has('handcash') ? 'Continue to Bitcoin Drive' : 'Skip for Now')
+              : activeTab === 'subscribe'
+              ? 'Subscribe Now'
+              : 'Continue'}
           </button>
         </div>
       </div>

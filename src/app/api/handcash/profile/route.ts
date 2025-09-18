@@ -1,18 +1,24 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession()
+    // Check for auth token in the Authorization header
+    const authHeader = request.headers.get('authorization')
+    const authToken = authHeader?.replace('Bearer ', '')
     
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // TODO: Get HandCash info from database
-    // For now, return not connected
+    // In a real app, you'd validate this token with HandCash API
+    // For now, just check if token exists
+    const connected = Boolean(authToken)
+    
     return NextResponse.json({ 
-      connected: false
+      connected,
+      profile: connected ? {
+        handle: 'user_handle',
+        displayName: 'HandCash User',
+        avatarUrl: '',
+        authToken: authToken
+      } : null
     })
   } catch (error) {
     console.error('HandCash profile error:', error)
