@@ -2,8 +2,22 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { X, Mail, Twitter, Wallet, Shield, Check, Key, ArrowRight, Zap, CreditCard, DollarSign, Sparkles } from 'lucide-react'
+import { X, Mail, Twitter, Wallet, Shield, Check, Key, ArrowRight, Zap, CreditCard, DollarSign, Sparkles, Cloud, Server, Database, Globe, Package } from 'lucide-react'
 import Image from 'next/image'
+import { 
+  SiGoogledrive, 
+  SiAmazon, 
+  SiMicrosoftazure,
+  SiCloudflare, 
+  SiGooglecloud, 
+  SiSupabase,
+  SiDropbox,
+  SiNetlify,
+  SiVercel,
+  SiDigitalocean,
+  SiOracle,
+  SiAlibaba
+} from 'react-icons/si'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -27,6 +41,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'pro' | 'enterprise'>('free')
   
   const providers: AuthProvider[] = [
+    // Primary - HandCash for payments
     {
       id: 'handcash',
       name: 'HandCash',
@@ -34,13 +49,96 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       color: '#00ff88',
       connected: connectedProviders.has('handcash')
     },
+    
+    // Cloud Storage Providers
     {
-      id: 'google',
+      id: 'googledrive',
       name: 'Google Drive',
-      icon: <Mail size={20} />,
+      icon: <SiGoogledrive size={20} />,
       color: '#4285f4',
-      connected: connectedProviders.has('google')
+      connected: connectedProviders.has('googledrive')
     },
+    {
+      id: 'aws',
+      name: 'AWS S3',
+      icon: <SiAmazon size={20} />,
+      color: '#ff9900',
+      connected: connectedProviders.has('aws')
+    },
+    {
+      id: 'azure',
+      name: 'Azure Blob',
+      icon: <SiMicrosoftazure size={20} />,
+      color: '#0078d4',
+      connected: connectedProviders.has('azure')
+    },
+    {
+      id: 'googlecloud',
+      name: 'Google Cloud',
+      icon: <SiGooglecloud size={20} />,
+      color: '#ea4335',
+      connected: connectedProviders.has('googlecloud')
+    },
+    {
+      id: 'supabase',
+      name: 'Supabase',
+      icon: <SiSupabase size={20} />,
+      color: '#3ecf8e',
+      connected: connectedProviders.has('supabase')
+    },
+    {
+      id: 'dropbox',
+      name: 'Dropbox',
+      icon: <SiDropbox size={20} />,
+      color: '#0061ff',
+      connected: connectedProviders.has('dropbox')
+    },
+    {
+      id: 'digitalocean',
+      name: 'DigitalOcean Spaces',
+      icon: <SiDigitalocean size={20} />,
+      color: '#0080ff',
+      connected: connectedProviders.has('digitalocean')
+    },
+    {
+      id: 'oracle',
+      name: 'Oracle Cloud',
+      icon: <SiOracle size={20} />,
+      color: '#f80000',
+      connected: connectedProviders.has('oracle')
+    },
+    {
+      id: 'alibaba',
+      name: 'Alibaba Cloud',
+      icon: <SiAlibaba size={20} />,
+      color: '#ff6a00',
+      connected: connectedProviders.has('alibaba')
+    },
+    
+    // CDN Providers
+    {
+      id: 'cloudflare',
+      name: 'Cloudflare R2',
+      icon: <SiCloudflare size={20} />,
+      color: '#f38020',
+      connected: connectedProviders.has('cloudflare')
+    },
+    {
+      id: 'netlify',
+      name: 'Netlify',
+      icon: <SiNetlify size={20} />,
+      color: '#00c7b7',
+      connected: connectedProviders.has('netlify')
+    },
+    {
+      id: 'vercel',
+      name: 'Vercel Edge',
+      icon: <SiVercel size={20} />,
+      color: '#000000',
+      connected: connectedProviders.has('vercel')
+    },
+    
+    // Social Auth (optional)
     {
       id: 'twitter',
       name: 'X (Twitter)',
@@ -70,14 +168,32 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         if (result?.ok) {
           setConnectedProviders(prev => new Set([...prev, providerId]))
         }
-      } else if (providerId === 'google') {
-        // Google OAuth through NextAuth
+      } else if (providerId === 'googledrive') {
+        // Google OAuth for Drive access
         const result = await signIn('google', { 
           redirect: false,
-          callbackUrl: window.location.href 
+          callbackUrl: window.location.href,
+          scope: 'openid email profile https://www.googleapis.com/auth/drive.file'
         })
         if (result?.ok) {
           setConnectedProviders(prev => new Set([...prev, providerId]))
+        }
+      } else if (['aws', 'azure', 'googlecloud', 'cloudflare', 'supabase', 'dropbox', 'digitalocean', 'oracle', 'alibaba', 'netlify', 'vercel'].includes(providerId)) {
+        // Simulate cloud provider connection (would need actual OAuth/API key setup)
+        // In production, these would have their own OAuth flows or API key configuration
+        setTimeout(() => {
+          setConnectedProviders(prev => new Set([...prev, providerId]))
+          setIsConnecting(null)
+        }, 1500)
+      } else {
+        // Generic OAuth flow
+        try {
+          const result = await signIn(providerId, { redirect: false })
+          if (result?.ok) {
+            setConnectedProviders(prev => new Set([...prev, providerId]))
+          }
+        } catch (error) {
+          console.error('Connection failed:', error)
         }
       }
     } catch (error) {
@@ -208,8 +324,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </div>
               </button>
 
-              {/* Other Providers */}
-              {providers.slice(1).map((provider) => (
+              {/* Cloud Storage Providers */}
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ 
+                  fontSize: '11px', 
+                  fontWeight: '600', 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  marginBottom: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Cloud Storage
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '20px' }}>
+                  {providers.filter(p => ['googledrive', 'aws', 'azure', 'googlecloud', 'supabase', 'dropbox', 'digitalocean', 'oracle', 'alibaba'].includes(p.id)).map((provider) => (
                 <button
                   key={provider.id}
                   onClick={() => handleProviderConnect(provider.id)}
@@ -261,8 +389,134 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     )}
                   </div>
                 </button>
-              ))}
-            </>
+                  ))}
+                </div>
+
+                {/* CDN Providers */}
+                <div style={{ 
+                  fontSize: '11px', 
+                  fontWeight: '600', 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  marginBottom: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Content Delivery Networks
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '20px' }}>
+                  {providers.filter(p => ['cloudflare', 'netlify', 'vercel'].includes(p.id)).map((provider) => (
+                    <button
+                      key={provider.id}
+                      onClick={() => handleProviderConnect(provider.id)}
+                      disabled={provider.connected || isConnecting !== null}
+                      className="w-full p-3 rounded-lg border transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ 
+                        borderColor: provider.connected ? provider.color : 'var(--color-border)',
+                        backgroundColor: provider.connected ? `${provider.color}10` : 'var(--bg-card)'
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="p-2 rounded-lg"
+                            style={{ 
+                              backgroundColor: provider.connected ? provider.color : 'var(--bg-primary)',
+                              color: provider.connected ? 'white' : provider.color
+                            }}
+                          >
+                            {provider.icon}
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                              {provider.name}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {provider.connected ? (
+                          <div 
+                            className="p-1 rounded-full"
+                            style={{ backgroundColor: provider.color }}
+                          >
+                            <Check size={16} color="white" />
+                          </div>
+                        ) : isConnecting === provider.id ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent"
+                            style={{ borderColor: provider.color }}
+                          />
+                        ) : (
+                          <span className="text-sm font-medium" style={{ color: provider.color }}>
+                            Connect
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Social Auth */}
+                <div style={{ 
+                  fontSize: '11px', 
+                  fontWeight: '600', 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  marginBottom: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Social Authentication (Optional)
+                </div>
+                <div style={{ marginBottom: '20px' }}>
+                  {providers.filter(p => p.id === 'twitter').map((provider) => (
+                    <button
+                      key={provider.id}
+                      onClick={() => handleProviderConnect(provider.id)}
+                      disabled={provider.connected || isConnecting !== null}
+                      className="w-full p-3 rounded-lg border transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ 
+                        borderColor: provider.connected ? provider.color : 'var(--color-border)',
+                        backgroundColor: provider.connected ? `${provider.color}10` : 'var(--bg-card)'
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="p-2 rounded-lg"
+                            style={{ 
+                              backgroundColor: provider.connected ? provider.color : 'var(--bg-primary)',
+                              color: provider.connected ? 'white' : provider.color
+                            }}
+                          >
+                            {provider.icon}
+                          </div>
+                          <div className="text-left">
+                            <div className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                              {provider.name}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {provider.connected ? (
+                          <div 
+                            className="p-1 rounded-full"
+                            style={{ backgroundColor: provider.color }}
+                          >
+                            <Check size={16} color="white" />
+                          </div>
+                        ) : isConnecting === provider.id ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-t-transparent"
+                            style={{ borderColor: provider.color }}
+                          />
+                        ) : (
+                          <span className="text-sm font-medium" style={{ color: provider.color }}>
+                            Connect
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            <>
           )}
 
           {activeTab === 'subscribe' && (
