@@ -4,9 +4,9 @@
   "description": "Decentralized file storage platform on BSV blockchain with NFT tokenization",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3003",
+    "dev": "next dev -p 1030",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 1030",
     "lint": "eslint"
   },
   "keywords": [
