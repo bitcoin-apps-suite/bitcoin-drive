@@ -49,6 +49,9 @@ uploads-db.json
 ehthumbs.db
 Thumbs.db
 
+# Screenshots - never commit screenshots to public repo
+Screenshot*
+
 # IDE and editor files
 .vscode/
 .idea/

@@ -32,7 +32,7 @@ A decentralized file storage platform built on the BSV blockchain with Next.js, 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/b0ase/bitcoin-drive.git
+git clone https://github.com/bitcoin-apps-suite/bitcoin-drive.git
 cd bitcoin-drive
 ```
 

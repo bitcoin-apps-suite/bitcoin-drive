@@ -183,8 +183,8 @@ export default function Taskbar() {
         { divider: true },
         { label: 'What\'s New', action: () => alert('New Features:\n\n• NFT Containers (.nft)\n• FT Token Shares\n• Dividend Distribution\n• Multi-cloud Storage\n• Enhanced Encryption') },
         { divider: true },
-        { label: 'Report Issue', href: 'https://github.com/b0ase/bitcoin-drive/issues', target: '_blank' },
-        { label: 'GitHub Repository', href: 'https://github.com/b0ase/bitcoin-drive', target: '_blank' },
+        { label: 'Report Issue', href: 'https://github.com/bitcoin-apps-suite/bitcoin-drive/issues', target: '_blank' },
+        { label: 'GitHub Repository', href: 'https://github.com/bitcoin-apps-suite/bitcoin-drive', target: '_blank' },
         { label: 'Contact Support', href: 'https://twitter.com/b0ase', target: '_blank' }
       ]
     }
@@ -260,6 +260,9 @@ export default function Taskbar() {
               setShowBitcoinSuite(!showBitcoinSuite)
               setActiveMenu(null)
             }}
+            onDoubleClick={() => {
+              window.location.href = '/'
+            }}
             style={{
               padding: '0 12px',
               fontSize: '18px',
@@ -273,7 +276,7 @@ export default function Taskbar() {
               cursor: 'pointer',
               transition: 'background 0.15s ease'
             }}
-            title="Bitcoin Suite Apps"
+            title="Bitcoin Suite Apps (double-click for home)"
           >
             ₿
           </button>
@@ -470,13 +473,24 @@ export default function Taskbar() {
       </div>
 
       {/* Mobile: Center title */}
-      <div className="sm:hidden flex-1 text-center" style={{ 
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#00ff88'
-      }}>
+      <button 
+        className="sm:hidden flex-1 text-center" 
+        onClick={() => {
+          window.location.href = '/'
+        }}
+        style={{ 
+          fontSize: '14px',
+          fontWeight: '600',
+          color: '#00ff88',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          height: '28px'
+        }}
+        title="Return to home"
+      >
         Bitcoin Drive
-      </div>
+      </button>
 
       {/* Mobile Menu Button */}
       <button

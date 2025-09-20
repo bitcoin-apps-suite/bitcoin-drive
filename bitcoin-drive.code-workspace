@@ -1,14 +1,131 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": ".",
+			"name": "Bitcoin Drive"
 		},
 		{
-			"path": "../../../../Volumes/Extreme SSD/Projects/bitcoin-writer"
+			"path": "../bitcoin-exchange"
 		},
 		{
-			"path": "../../blockchain-spreadsheet"
+			"path": "../bitcoin-music"
+		},
+		{
+			"path": "../bitcoin-wallet"
+		},
+		{
+			"path": "../bitcoin-writer"
+		},
+		{
+			"path": "../../bitcoin-spreadsheets"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit"
+		},
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"typescript.enablePromptUseWorkspaceTsdk": true,
+		"files.exclude": {
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/node_modules": true,
+			"**/.next": true,
+			"**/out": true,
+			"**/dist": true
+		},
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/.next": true,
+			"**/out": true,
+			"**/dist": true,
+			"**/.git": true,
+			"**/package-lock.json": true
+		},
+		"eslint.validate": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact"
+		],
+		"[typescript]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[typescriptreact]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[javascript]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[javascriptreact]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[json]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[css]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"emmet.includeLanguages": {
+			"javascript": "javascriptreact",
+			"typescript": "typescriptreact"
+		},
+		"tailwindCSS.experimental.classRegex": [
+			["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+		],
+		"workbench.colorCustomizations": {
+			"titleBar.activeBackground": "#002200",
+			"titleBar.activeForeground": "#00ff88",
+			"titleBar.inactiveBackground": "#001100",
+			"titleBar.inactiveForeground": "#00cc66",
+			"activityBar.background": "#001a00",
+			"activityBar.foreground": "#00ff88",
+			"sideBar.background": "#001100",
+			"editor.background": "#001a00",
+			"editorGroupHeader.tabsBackground": "#001100",
+			"tab.activeBackground": "#002200",
+			"tab.inactiveBackground": "#001100",
+			"statusBar.background": "#002200",
+			"statusBar.foreground": "#00ff88"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"dbaeumer.vscode-eslint",
+			"esbenp.prettier-vscode",
+			"bradlc.vscode-tailwindcss",
+			"prisma.prisma",
+			"ms-vscode.vscode-typescript-next"
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Next.js: debug server-side",
+				"type": "node-terminal",
+				"request": "launch",
+				"command": "npm run dev"
+			},
+			{
+				"name": "Next.js: debug client-side",
+				"type": "chrome",
+				"request": "launch",
+				"url": "http://localhost:1030",
+				"webRoot": "${workspaceFolder}"
+			},
+			{
+				"name": "Next.js: debug full stack",
+				"type": "node-terminal",
+				"request": "launch",
+				"command": "npm run dev",
+				"serverReadyAction": {
+					"pattern": "- Local:.+(https?://\\S+|[0-9]+)",
+					"uriFormat": "http://localhost:1030",
+					"action": "debugWithChrome"
+				}
+			}
+		]
+	}
 }

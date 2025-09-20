@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { 
   SiGoogledrive, 
   SiAmazon, 
-  SiMicrosoftazure,
+  SiMicrosoft,
   SiCloudflare, 
   SiGooglecloud, 
   SiSupabase,
@@ -68,7 +68,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'azure',
       name: 'Azure Blob',
-      icon: <SiMicrosoftazure size={20} />,
+      icon: <SiMicrosoft size={20} />,
       color: '#0078d4',
       connected: connectedProviders.has('azure')
     },
@@ -516,7 +516,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   ))}
                 </div>
               </div>
-            <>
+            </>
           )}
 
           {activeTab === 'subscribe' && (
