@@ -7,7 +7,6 @@ import Image from 'next/image'
 import { 
   SiGoogledrive, 
   SiAmazon, 
-  SiMicrosoft,
   SiCloudflare, 
   SiGooglecloud, 
   SiSupabase,
@@ -16,7 +15,7 @@ import {
   SiVercel,
   SiDigitalocean,
   SiOracle,
-  SiAlibaba
+  SiAlibabacloud
 } from 'react-icons/si'
 
 interface AuthModalProps {
@@ -68,7 +67,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'azure',
       name: 'Azure Blob',
-      icon: <SiMicrosoft size={20} />,
+      icon: <Cloud size={20} />,
       color: '#0078d4',
       connected: connectedProviders.has('azure')
     },
@@ -110,7 +109,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'alibaba',
       name: 'Alibaba Cloud',
-      icon: <SiAlibaba size={20} />,
+      icon: <SiAlibabacloud size={20} />,
       color: '#ff6a00',
       connected: connectedProviders.has('alibaba')
     },

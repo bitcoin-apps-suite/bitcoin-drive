@@ -437,7 +437,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
                       style={{ width: '18px', height: '18px' }}
                     />
                     <span style={{ fontSize: '14px', color: '#ffffff' }}>
-                      Private mode (don't record activity)
+                      Private mode (don&apos;t record activity)
                     </span>
                   </label>
                 </div>
