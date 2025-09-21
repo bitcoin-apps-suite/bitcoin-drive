@@ -1,7 +1,20 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { X, Upload, HardDrive, Cloud } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { X, Upload, HardDrive, Cloud, Check, Globe, Package, Server, Database } from 'lucide-react'
+import { 
+  SiGoogledrive, 
+  SiAmazon, 
+  SiCloudflare, 
+  SiGooglecloud, 
+  SiSupabase,
+  SiDropbox,
+  SiNetlify,
+  SiVercel,
+  SiDigitalocean,
+  SiOracle,
+  SiAlibabacloud
+} from 'react-icons/si'
 
 interface UploadModalProps {
   isOpen: boolean
@@ -11,21 +24,119 @@ interface UploadModalProps {
 
 export interface UploadOptions {
   storageMode: 'full-bsv' | 'hybrid'
+  cloudProvider?: string
   price?: number
   currency: 'USD' | 'BSV'
   description?: string
   encryptFile: boolean
 }
 
+interface CloudProvider {
+  id: string
+  name: string
+  icon: React.ReactNode
+  color: string
+  connected?: boolean
+}
+
 export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [storageMode, setStorageMode] = useState<'full-bsv' | 'hybrid'>('hybrid')
+  const [selectedProvider, setSelectedProvider] = useState<string>('googledrive')
   const [price, setPrice] = useState('')
   const [currency, setCurrency] = useState<'USD' | 'BSV'>('USD')
   const [description, setDescription] = useState('')
   const [encryptFile, setEncryptFile] = useState(false)
   const [estimatedCost, setEstimatedCost] = useState<string>('')
+  const [connectedProviders, setConnectedProviders] = useState<Set<string>>(new Set())
+
+  // Cloud storage providers configuration
+  const cloudProviders: CloudProvider[] = [
+    {
+      id: 'googledrive',
+      name: 'Google Drive',
+      icon: <SiGoogledrive size={20} />,
+      color: '#4285f4'
+    },
+    {
+      id: 'aws',
+      name: 'AWS S3',
+      icon: <SiAmazon size={20} />,
+      color: '#ff9900'
+    },
+    {
+      id: 'azure',
+      name: 'Azure Blob',
+      icon: <Cloud size={20} />,
+      color: '#0078d4'
+    },
+    {
+      id: 'googlecloud',
+      name: 'Google Cloud',
+      icon: <SiGooglecloud size={20} />,
+      color: '#ea4335'
+    },
+    {
+      id: 'supabase',
+      name: 'Supabase',
+      icon: <SiSupabase size={20} />,
+      color: '#3ecf8e'
+    },
+    {
+      id: 'dropbox',
+      name: 'Dropbox',
+      icon: <SiDropbox size={20} />,
+      color: '#0061ff'
+    },
+    {
+      id: 'digitalocean',
+      name: 'DigitalOcean',
+      icon: <SiDigitalocean size={20} />,
+      color: '#0080ff'
+    },
+    {
+      id: 'oracle',
+      name: 'Oracle Cloud',
+      icon: <SiOracle size={20} />,
+      color: '#f80000'
+    },
+    {
+      id: 'alibaba',
+      name: 'Alibaba Cloud',
+      icon: <SiAlibabacloud size={20} />,
+      color: '#ff6a00'
+    }
+  ]
+
+  // CDN providers configuration
+  const cdnProviders: CloudProvider[] = [
+    {
+      id: 'cloudflare',
+      name: 'Cloudflare R2',
+      icon: <SiCloudflare size={20} />,
+      color: '#f38020'
+    },
+    {
+      id: 'netlify',
+      name: 'Netlify',
+      icon: <SiNetlify size={20} />,
+      color: '#00c7b7'
+    },
+    {
+      id: 'vercel',
+      name: 'Vercel Edge',
+      icon: <SiVercel size={20} />,
+      color: '#000000'
+    }
+  ]
+
+  // Simulate connected providers (in production, this would come from auth state)
+  useEffect(() => {
+    // For demo purposes, mark some providers as connected
+    // In production, this would check actual connection status
+    setConnectedProviders(new Set(['googledrive', 'aws', 'cloudflare']))
+  }, [])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -43,7 +154,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
       setEstimatedCost(`~$${costInUSD.toFixed(4)} USD`)
     } else {
       // Hybrid mode: just metadata cost
-      setEstimatedCost('~$0.0001 USD (metadata only)')
+      const provider = [...cloudProviders, ...cdnProviders].find(p => p.id === selectedProvider)
+      setEstimatedCost(`~$0.0001 USD (metadata only, stored on ${provider?.name || 'Cloud'})`)
     }
   }
 
@@ -52,6 +164,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
     
     onUpload(selectedFile, {
       storageMode,
+      cloudProvider: storageMode === 'hybrid' ? selectedProvider : undefined,
       price: price ? parseFloat(price) : undefined,
       currency,
       description,
@@ -116,7 +229,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
           <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-accent)' }}>
             Storage Mode
           </label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <button
               onClick={() => {
                 setStorageMode('full-bsv')
@@ -150,13 +263,126 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
               <Cloud className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--color-accent)' }} />
               <p className="font-medium" style={{ color: 'var(--color-accent)' }}>Hybrid</p>
               <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                Google Drive + BSV metadata
+                Cloud Storage + BSV metadata
               </p>
               <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Lower cost</p>
             </button>
           </div>
+
+          {/* Cloud Provider Selection - Only show when hybrid is selected */}
+          {storageMode === 'hybrid' && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+                Select Cloud Provider
+              </p>
+              
+              {/* Cloud Storage Options */}
+              <div>
+                <p className="text-xs mb-2" style={{ color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Cloud Storage
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {cloudProviders.map(provider => {
+                    const isConnected = connectedProviders.has(provider.id)
+                    const isSelected = selectedProvider === provider.id
+                    return (
+                      <button
+                        key={provider.id}
+                        onClick={() => {
+                          if (isConnected) {
+                            setSelectedProvider(provider.id)
+                            if (selectedFile) calculateEstimatedCost(selectedFile)
+                          }
+                        }}
+                        disabled={!isConnected}
+                        className="p-2 rounded-lg border transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{
+                          borderColor: isSelected ? provider.color : 'var(--color-border)',
+                          backgroundColor: isSelected ? `${provider.color}15` : 'transparent',
+                          position: 'relative'
+                        }}
+                      >
+                        <div className="flex flex-col items-center gap-1">
+                          <div style={{ color: isConnected ? provider.color : 'var(--color-text-muted)' }}>
+                            {provider.icon}
+                          </div>
+                          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            {provider.name}
+                          </span>
+                          {isConnected && (
+                            <div className="absolute top-1 right-1">
+                              {isSelected ? (
+                                <Check size={12} style={{ color: provider.color }} />
+                              ) : (
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: provider.color }} />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* CDN Options */}
+              <div>
+                <p className="text-xs mb-2" style={{ color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Content Delivery Networks
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {cdnProviders.map(provider => {
+                    const isConnected = connectedProviders.has(provider.id)
+                    const isSelected = selectedProvider === provider.id
+                    return (
+                      <button
+                        key={provider.id}
+                        onClick={() => {
+                          if (isConnected) {
+                            setSelectedProvider(provider.id)
+                            if (selectedFile) calculateEstimatedCost(selectedFile)
+                          }
+                        }}
+                        disabled={!isConnected}
+                        className="p-2 rounded-lg border transition-all hover:scale-[1.02] disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{
+                          borderColor: isSelected ? provider.color : 'var(--color-border)',
+                          backgroundColor: isSelected ? `${provider.color}15` : 'transparent',
+                          position: 'relative'
+                        }}
+                      >
+                        <div className="flex flex-col items-center gap-1">
+                          <div style={{ color: isConnected ? (provider.id === 'vercel' ? 'var(--color-accent)' : provider.color) : 'var(--color-text-muted)' }}>
+                            {provider.icon}
+                          </div>
+                          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            {provider.name}
+                          </span>
+                          {isConnected && (
+                            <div className="absolute top-1 right-1">
+                              {isSelected ? (
+                                <Check size={12} style={{ color: provider.color === '#000000' ? 'var(--color-accent)' : provider.color }} />
+                              ) : (
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: provider.color === '#000000' ? 'var(--color-accent)' : provider.color }} />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Info message for unconnected providers */}
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                💡 Connect more providers in the Account settings to enable them
+              </p>
+            </div>
+          )}
+
           {estimatedCost && (
-            <p className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="text-sm mt-3" style={{ color: 'var(--color-text-muted)' }}>
               Estimated cost: {estimatedCost}
             </p>
           )}

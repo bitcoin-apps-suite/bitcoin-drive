@@ -75,9 +75,9 @@
 			["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
 		],
 		"workbench.colorCustomizations": {
-			"titleBar.activeBackground": "#002200",
+			"titleBar.activeBackground": "#004400",
 			"titleBar.activeForeground": "#00ff88",
-			"titleBar.inactiveBackground": "#001100",
+			"titleBar.inactiveBackground": "#003300",
 			"titleBar.inactiveForeground": "#00cc66",
 			"activityBar.background": "#001a00",
 			"activityBar.foreground": "#00ff88",
@@ -86,7 +86,7 @@
 			"editorGroupHeader.tabsBackground": "#001100",
 			"tab.activeBackground": "#002200",
 			"tab.inactiveBackground": "#001100",
-			"statusBar.background": "#002200",
+			"statusBar.background": "#004400",
 			"statusBar.foreground": "#00ff88"
 		}
 	},

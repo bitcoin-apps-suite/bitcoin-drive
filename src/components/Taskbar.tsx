@@ -137,6 +137,7 @@ export default function Taskbar() {
         { divider: true },
         { label: 'Exchange', action: handleOpenExchange },
         { label: 'Trading Hub', action: () => window.location.href = '/trading' },
+        { label: '$BDRIVE Token', action: () => window.location.href = '/token' },
         { divider: true },
         { label: 'Verify on Chain', action: () => console.log('Verify') },
         { label: 'View on Explorer', href: 'https://whatsonchain.com', target: '_blank' }
@@ -178,6 +179,7 @@ export default function Taskbar() {
         { label: 'Keyboard Shortcuts', action: () => console.log('Show shortcuts') },
         { divider: true },
         { label: 'API Documentation', href: '/api/docs', target: '_blank' },
+        { label: '$BDRIVE Token', action: () => window.location.href = '/token' },
         { label: 'BSV SDK Docs', href: 'https://docs.bsvblockchain.org', target: '_blank' },
         { label: 'HandCash SDK', href: 'https://docs.handcash.io', target: '_blank' },
         { divider: true },
@@ -494,7 +496,7 @@ export default function Taskbar() {
 
       {/* Mobile Menu Button */}
       <button
-        className="sm:hidden"
+        className="block sm:hidden"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
         style={{
           padding: '0 12px',
@@ -519,6 +521,32 @@ export default function Taskbar() {
         fontSize: '12px',
         color: 'rgba(255, 255, 255, 0.8)'
       }}>
+        <button
+          onClick={() => window.location.href = '/token'}
+          style={{
+            background: 'linear-gradient(90deg, #00ff88, #00cc66)',
+            color: '#000',
+            border: 'none',
+            padding: '4px 12px',
+            borderRadius: '100px',
+            fontSize: '11px',
+            fontWeight: '500',
+            letterSpacing: '0.5px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 255, 136, 0.3)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
+          title="View $BDRIVE Token Information"
+        >
+          $BDRIVE
+        </button>
         {session ? (
           <>
             <span>{session.user?.email || 'Connected'}</span>
