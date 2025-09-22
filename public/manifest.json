@@ -1,9 +1,9 @@
 {
   "name": "Bitcoin Drive",
-  "short_name": "BTC Drive",
-  "description": "Decentralized file storage on the BSV blockchain",
-  "theme_color": "#00ff00",
-  "background_color": "#0a0a0a",
+  "short_name": "BitcoinDrive",
+  "description": "Decentralized cloud storage powered by BSV blockchain with multi-provider support",
+  "theme_color": "#00ff88",
+  "background_color": "#000000",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",

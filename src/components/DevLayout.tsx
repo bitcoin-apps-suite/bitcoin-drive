@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import DevSidebar from './DevSidebar';
+import Taskbar from './Taskbar';
 
 interface DevLayoutProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ const DevLayout: React.FC<DevLayoutProps> = ({ children }) => {
 
   return (
     <>
+      <Taskbar />
       <DevSidebar onCollapsedChange={handleCollapsedChange} />
       <div className={`app-container ${isCollapsed ? 'with-dev-sidebar-collapsed' : 'with-dev-sidebar'}`}>
         {children}

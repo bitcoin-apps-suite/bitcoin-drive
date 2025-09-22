@@ -88,9 +88,9 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ paddingTop: '32px' }}
+        style={{ paddingTop: '40px' }}
       >
-        <PocBar color="#22c55e" />
+        <PocBar color="#00ff88" />
         <Providers>
           <DevLayout>
             <div style={{ minHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' }}>

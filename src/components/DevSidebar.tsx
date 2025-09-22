@@ -20,7 +20,8 @@ import {
   HardDrive,
   Cloud,
   Shield,
-  Database
+  Database,
+  Home
 } from 'lucide-react';
 import './DevSidebar.css';
 
@@ -66,6 +67,8 @@ const DevSidebar: React.FC<DevSidebarProps> = ({ onCollapsedChange }) => {
     divider?: boolean;
     external?: boolean;
   }> = [
+    { path: '/', icon: Home, label: 'Home' },
+    { divider: true },
     { path: '/storage', icon: HardDrive, label: 'Storage', badge: 'BETA' },
     { path: '/cloud', icon: Cloud, label: 'Cloud Sync' },
     { path: '/encryption', icon: Shield, label: 'Encryption' },

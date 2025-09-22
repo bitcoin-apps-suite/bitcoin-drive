@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Kill any process on port 1030
-echo "Killing port 1030..."
-lsof -ti:1030 | xargs kill -9 2>/dev/null || echo "No process on port 1030"
+# Kill any process on port 2030
+echo "Killing port 2030..."
+lsof -ti:2030 | xargs kill -9 2>/dev/null || echo "No process on port 2030"
 
 # Wait a moment
 sleep 2
@@ -13,4 +13,4 @@ osascript -e 'tell application "Terminal" to do script "cd /Users/b0ase/Projects
 
 # Wait and open browser
 sleep 4
-open http://localhost:1030
+open http://localhost:2030

@@ -1,21 +1,21 @@
 #!/usr/bin/osascript
 
 (*
-Bitcoin Drive - Kill Port 1030
-This script kills any process running on port 1030
+Bitcoin Drive - Kill Port 2030
+This script kills any process running on port 2030
 To use: Save as an Application and add to dock with Bitcoin Drive icon
 *)
 
 on run
 	try
-		-- Kill any process on port 1030
-		set killResult to do shell script "lsof -ti:1030 | xargs kill -9 2>/dev/null || echo 'No process found on port 1030'"
+		-- Kill any process on port 2030
+		set killResult to do shell script "lsof -ti:2030 | xargs kill -9 2>/dev/null || echo 'No process found on port 2030'"
 		
 		-- Show notification
 		if killResult contains "No process" then
-			display notification "No Bitcoin Drive server was running on port 1030" with title "Bitcoin Drive" sound name "Pop"
+			display notification "No Bitcoin Drive server was running on port 2030" with title "Bitcoin Drive" sound name "Pop"
 		else
-			display notification "Successfully stopped Bitcoin Drive server on port 1030" with title "Bitcoin Drive" sound name "Glass"
+			display notification "Successfully stopped Bitcoin Drive server on port 2030" with title "Bitcoin Drive" sound name "Glass"
 			
 			-- Optional: Wait a moment then offer to restart
 			delay 1
@@ -26,7 +26,7 @@ on run
 					activate
 					do script "cd ~/Projects/bitcoin-drive && npm run dev"
 				end tell
-				display notification "Starting Bitcoin Drive on port 1030..." with title "Bitcoin Drive" sound name "Blow"
+				display notification "Starting Bitcoin Drive on port 2030..." with title "Bitcoin Drive" sound name "Blow"
 			end if
 		end if
 		

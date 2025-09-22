@@ -7,7 +7,7 @@ interface PocBarProps {
   color?: string;
 }
 
-export default function PocBar({ color = '#22c55e' }: PocBarProps) {
+export default function PocBar({ color = '#00cc66' }: PocBarProps) {
   return (
     <div 
       className="poc-banner"
@@ -16,7 +16,7 @@ export default function PocBar({ color = '#22c55e' }: PocBarProps) {
         top: 0, // Above taskbar
         left: 0,
         right: 0,
-        height: '32px',
+        height: '40px',
         backgroundColor: color,
         display: 'flex',
         alignItems: 'center',
@@ -24,7 +24,7 @@ export default function PocBar({ color = '#22c55e' }: PocBarProps) {
         zIndex: 9999,
         fontSize: '13px',
         fontWeight: '500',
-        color: 'white',
+        color: 'black',
         letterSpacing: '0.5px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         borderBottom: '1px solid rgba(0,0,0,0.2)',
@@ -39,7 +39,7 @@ export default function PocBar({ color = '#22c55e' }: PocBarProps) {
           <Link 
             href="/token" 
             style={{ 
-              color: 'white', 
+              color: 'black', 
               textDecoration: 'underline',
               opacity: 0.9,
               fontWeight: '400'
@@ -50,7 +50,7 @@ export default function PocBar({ color = '#22c55e' }: PocBarProps) {
           <Link 
             href="/admin" 
             style={{ 
-              color: 'white', 
+              color: 'black', 
               textDecoration: 'underline',
               opacity: 0.9,
               fontWeight: '400'
@@ -63,7 +63,7 @@ export default function PocBar({ color = '#22c55e' }: PocBarProps) {
             target="_blank"
             rel="noopener noreferrer"
             style={{ 
-              color: 'white', 
+              color: 'black', 
               textDecoration: 'underline',
               opacity: 0.9,
               fontWeight: '400'

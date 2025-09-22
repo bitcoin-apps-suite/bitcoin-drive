@@ -37,7 +37,29 @@ export default function Taskbar() {
     {
       label: 'Bitcoin Drive',
       items: [
-        { label: 'About Bitcoin Drive', action: () => alert('Bitcoin Drive v1.0\n\nDecentralized file storage on BSV blockchain\n\nBuilt with Next.js and BSV SDK') },
+        { label: 'Home', shortcut: '⌘H', action: () => window.location.href = '/' },
+        { divider: true },
+        { label: 'About Bitcoin Drive', action: () => alert(
+          'Bitcoin Drive v1.0.0\n\n' +
+          'Decentralized Storage & Tokenization Platform\n\n' +
+          '© 2025 The Bitcoin Corporation LTD.\n' +
+          'Registered in England and Wales\n' +
+          'Company No. 16735102\n\n' +
+          'Built with:\n' +
+          '• Next.js 15.5\n' +
+          '• Bitcoin SV (BSV) Blockchain\n' +
+          '• Google Drive API Integration\n' +
+          '• NFT & FT Token Support\n\n' +
+          'Features:\n' +
+          '• Store files permanently on-chain\n' +
+          '• Hybrid cloud storage options\n' +
+          '• File tokenization with dividend shares\n' +
+          '• End-to-end encryption\n' +
+          '• Multi-signature support\n\n' +
+          'License: Open BSV License Version 5\n\n' +
+          'Website: https://bitcoin-drive.vercel.app\n' +
+          'GitHub: github.com/bitcoin-apps-suite/bitcoin-drive'
+        ) },
         { divider: true },
         { label: 'Preferences...', shortcut: '⌘,', action: () => console.log('Preferences') },
         { label: 'Storage Settings...', action: () => console.log('Storage settings') },
@@ -175,7 +197,27 @@ export default function Taskbar() {
     {
       label: 'Help',
       items: [
-        { label: 'Bitcoin Drive Help', shortcut: '⌘?', action: () => alert('Bitcoin Drive v1.0\n\nStore files permanently on the BSV blockchain') },
+        { label: 'Bitcoin Drive Help', shortcut: '⌘?', action: () => alert(
+          'Bitcoin Drive Help\n\n' +
+          'Quick Start:\n' +
+          '1. Connect your Google Drive account\n' +
+          '2. Select files to upload or tokenize\n' +
+          '3. Choose storage method (on-chain, hybrid, or cloud)\n' +
+          '4. Set encryption and access controls\n' +
+          '5. Pay with BSV to store permanently\n\n' +
+          'Storage Methods:\n' +
+          '• OP_RETURN: Small files (<220 bytes)\n' +
+          '• OP_PUSHDATA4: Large files on-chain\n' +
+          '• Hash + Drive: Hybrid cloud storage\n\n' +
+          'Tokenization:\n' +
+          '• Create NFT containers for file collections\n' +
+          '• Issue FT shares for dividend distribution\n' +
+          '• Set royalties and trading parameters\n\n' +
+          'Support:\n' +
+          '• Documentation: /docs\n' +
+          '• GitHub Issues: github.com/bitcoin-apps-suite/bitcoin-drive/issues\n' +
+          '• Twitter: @b0ase'
+        ) },
         { label: 'Keyboard Shortcuts', action: () => console.log('Show shortcuts') },
         { divider: true },
         { label: 'API Documentation', href: '/api/docs', target: '_blank' },
@@ -229,17 +271,20 @@ export default function Taskbar() {
       ref={menuRef}
       className="taskbar"
       style={{
+        position: 'fixed',
+        top: '40px', // Below PocBar
+        left: 0,
+        right: 0,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         height: '28px',
-        background: 'linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%)',
-        borderBottom: '1px solid #1a1a1a',
+        background: 'linear-gradient(180deg, rgba(0, 40, 15, 0.95) 0%, rgba(0, 30, 10, 0.95) 100%)',
+        borderBottom: '1px solid rgba(0, 255, 136, 0.2)',
         fontSize: '13px',
         fontWeight: '500',
         color: '#ffffff',
         userSelect: 'none',
-        position: 'relative',
         zIndex: 10000
       }}
     >

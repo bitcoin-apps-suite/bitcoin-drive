@@ -1,13 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Bitcoin Drive",
-  "short_name": "BitcoinDrive",
   "version": "1.0.0",
   "description": "Decentralized cloud storage powered by BSV blockchain with multi-provider support",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00ff88",
   "icons": [
     {
       "src": "/bitcoin-drive-icon-512.png",
@@ -36,27 +31,27 @@
     }
   ],
   "chrome_settings_overrides": {
-    "homepage": "http://localhost:1030"
+    "homepage": "http://localhost:2030"
   },
   "chrome_url_overrides": {
-    "newtab": "http://localhost:1030"
+    "newtab": "http://localhost:2030"
   },
   "theme": {
     "colors": {
-      "frame": [0, 68, 0],
-      "frame_inactive": [0, 51, 0],
-      "frame_incognito": [0, 34, 0],
-      "frame_incognito_inactive": [0, 26, 0],
+      "frame": [0, 26, 0],
+      "frame_inactive": [0, 17, 0],
+      "frame_incognito": [0, 17, 0],
+      "frame_incognito_inactive": [0, 17, 0],
       "bookmark_text": [0, 255, 136],
-      "tab_background_text": [0, 204, 102],
+      "tab_background_text": [255, 255, 255],
       "tab_text": [0, 255, 136],
-      "toolbar": [0, 26, 0],
+      "toolbar": [0, 0, 0],
       "toolbar_text": [0, 255, 136],
       "ntp_background": [0, 0, 0],
       "ntp_text": [0, 255, 136],
-      "ntp_link": [0, 204, 102],
-      "ntp_header": [0, 17, 0],
-      "button_background": [0, 68, 0]
+      "ntp_link": [0, 255, 136],
+      "ntp_header": [0, 26, 0],
+      "button_background": [0, 26, 0]
     },
     "tints": {
       "buttons": [0.33, 1, 0.5],
@@ -83,6 +78,6 @@
     "tabs"
   ],
   "host_permissions": [
-    "http://localhost:1030/*"
+    "http://localhost:2030/*"
   ]
 } 

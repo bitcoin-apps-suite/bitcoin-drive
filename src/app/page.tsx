@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import Taskbar from "@/components/Taskbar"
 import DriveSidebar from "@/components/DriveSidebar"
 import BlockchainUploadModal, { UploadOptions } from "@/components/BlockchainUploadModal"
 import AuthModal from "@/components/AuthModal"
@@ -188,9 +187,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      {/* macOS-style Taskbar */}
-      <Taskbar />
-      
       {/* App Toolbar */}
       <div className="toolbar px-4 sm:px-6" style={{ 
         padding: '16px',

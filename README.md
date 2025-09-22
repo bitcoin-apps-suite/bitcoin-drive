@@ -45,7 +45,7 @@ npm install
 Create a `.env.local` file in the root directory:
 ```env
 # NextAuth Configuration
-NEXTAUTH_URL=http://localhost:3003
+NEXTAUTH_URL=http://localhost:2030
 NEXTAUTH_SECRET=your-secret-key-here
 
 # Google OAuth
@@ -65,10 +65,10 @@ npx prisma db push
 
 ### 5. Run the development server
 ```bash
-npm run dev -- --port 3003
+npm run dev
 ```
 
-Open [http://localhost:3003](http://localhost:3003) in your browser.
+Open [http://localhost:2030](http://localhost:2030) in your browser.
 
 ## 📂 Project Structure
 
@@ -95,8 +95,7 @@ bitcoin-drive/
 
 ## 🔧 Available Scripts
 
-- `npm run dev` - Start development server on port 3000
-- `npm run dev -- --port 3003` - Start on custom port
+- `npm run dev` - Start development server on port 2030
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
@@ -140,15 +139,15 @@ The app auto-deploys to [bitcoin-drive.vercel.app](https://bitcoin-drive.vercel.
 ### Docker
 ```bash
 docker build -t bitcoin-drive .
-docker run -p 3003:3003 bitcoin-drive
+docker run -p 2030:2030 bitcoin-drive
 ```
 
 ## 🛠 Development Tools
 
-### Kill Port 3003 App
-A macOS utility app is included to quickly free port 3003:
+### Kill Port 2030 App
+A macOS utility app is included to quickly free port 2030:
 ```bash
-open "Kill Port 3003.app"
+open "Kill Port 2030.app"
 ```
 Add it to your dock for quick access.
 
