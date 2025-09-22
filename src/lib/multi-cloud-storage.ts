@@ -1,6 +1,9 @@
 /**
  * Multi-Cloud Storage Service
  * Supports AWS S3, Supabase, Google Drive, Azure, and IPFS
+ * 
+ * Copyright © 2025 The Bitcoin Corporation LTD.
+ * Licensed under the Open BSV License Version 5
  */
 
 import crypto from 'crypto'

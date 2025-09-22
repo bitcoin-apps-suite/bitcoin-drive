@@ -1,6 +1,9 @@
 /**
  * Provider Health Monitoring System
  * Tracks performance, costs, and reliability of storage providers
+ * 
+ * Copyright © 2025 The Bitcoin Corporation LTD.
+ * Licensed under the Open BSV License Version 5
  */
 
 import { STORAGE_PROVIDERS, StorageProvider } from './storage-economics'

@@ -2,6 +2,9 @@
  * Storage Economics Engine
  * Calculates optimal storage allocation across providers
  * and manages profit margins for Bitcoin Drive
+ * 
+ * Copyright © 2025 The Bitcoin Corporation LTD.
+ * Licensed under the Open BSV License Version 5
  */
 
 export interface StorageProvider {

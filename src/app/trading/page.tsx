@@ -946,6 +946,29 @@ export default function TradingDashboard() {
           window.location.reload()
         }}
       />
+
+      {/* Legal Disclaimer */}
+      <div style={{
+        padding: '20px',
+        margin: '20px',
+        background: 'rgba(0, 0, 0, 0.2)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '8px',
+        fontSize: '12px',
+        color: 'rgba(255, 255, 255, 0.7)',
+        textAlign: 'center'
+      }}>
+        <p style={{ marginBottom: '8px' }}>
+          <strong>Trading Platform Disclaimer:</strong> All trading services and digital asset offerings are provided by The Bitcoin Corporation LTD (Company No. 16735102).
+        </p>
+        <p style={{ marginBottom: '8px' }}>
+          Trading digital assets involves substantial risk of loss and may not be suitable for all investors. 
+          Please ensure you understand the risks before trading.
+        </p>
+        <p>
+          Licensed under the Open BSV License Version 5 • © 2025 The Bitcoin Corporation LTD • Registered in England and Wales
+        </p>
+      </div>
     </div>
   )
 }

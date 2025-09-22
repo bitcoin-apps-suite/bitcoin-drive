@@ -169,7 +169,10 @@ Add it to your dock for quick access.
 
 ## 📝 License
 
-This project is licensed under the MIT License.
+This project is licensed under the Open BSV License Version 5.
+
+© 2025 The Bitcoin Corporation LTD.
+Registered in England and Wales • Company No. 16735102
 
 ## 🙏 Acknowledgments
 
@@ -183,5 +186,9 @@ This project is licensed under the MIT License.
 For questions or support, please open an issue on GitHub.
 
 ---
+
+---
+
+© 2025 The Bitcoin Corporation LTD. All rights reserved.
 
 Built with ❤️ using Next.js and BSV# Auto-deploy test

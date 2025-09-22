@@ -1,6 +1,9 @@
 /**
  * .NFT Container Format for Bitcoin Drive
  * Wraps any file in a tokenizable container with metadata
+ * 
+ * Copyright © 2025 The Bitcoin Corporation LTD.
+ * Licensed under the Open BSV License Version 5
  */
 
 import crypto from 'crypto'

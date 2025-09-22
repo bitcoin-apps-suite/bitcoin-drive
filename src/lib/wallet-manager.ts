@@ -1,6 +1,9 @@
 /**
  * Wallet Manager for Bitcoin Drive
  * Handles native wallets, HandCash integration, and BSV credit system
+ * 
+ * Copyright © 2025 The Bitcoin Corporation LTD.
+ * Licensed under the Open BSV License Version 5
  */
 
 import crypto from 'crypto'

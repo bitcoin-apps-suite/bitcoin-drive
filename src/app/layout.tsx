@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import PocBar from "@/components/PocBar";
+import DevLayout from "@/components/DevLayout";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,7 +91,14 @@ export default function RootLayout({
         style={{ paddingTop: '32px' }}
       >
         <PocBar color="#22c55e" />
-        <Providers>{children}</Providers>
+        <Providers>
+          <DevLayout>
+            <div style={{ minHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' }}>
+              {children}
+              <Footer />
+            </div>
+          </DevLayout>
+        </Providers>
       </body>
     </html>
   );
