@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
-import { CheckCircle, Circle, Clock, Star, TrendingUp, Users, Zap, Award } from 'lucide-react'
+import { CheckCircle, Circle, Clock, Star, TrendingUp, Users, Award } from 'lucide-react'
 
 export default function TasksPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

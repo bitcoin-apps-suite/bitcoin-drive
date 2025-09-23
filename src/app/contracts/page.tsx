@@ -27,7 +27,7 @@ export default function ContractsPage() {
       .catch(err => console.error(err))
   }, [])
 
-  const getPriorityColor = (labels: Array<{ id: number; name: string; color: string }>) => {
+  const getPriorityColor = (labels?: Array<{ id: number; name: string; color: string }>) => {
     if (labels?.some(l => l.name === 'priority: high')) return '#ff4444'
     if (labels?.some(l => l.name === 'priority: medium')) return '#ffaa00'
     return '#00ff88'
