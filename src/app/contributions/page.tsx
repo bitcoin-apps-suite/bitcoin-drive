@@ -1,15 +1,95 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
 import { GitBranch, GitCommit, GitMerge, GitPullRequest, Star, TrendingUp, Award, ExternalLink, Calendar } from 'lucide-react'
 
 export default function ContributionsPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
   const [timeFilter, setTimeFilter] = useState('all')
+  const [userContributions, setUserContributions] = useState<any[]>([])
+  const [userStats, setUserStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Fetch user's contributions if they're signed in
+    if (session?.user?.name) {
+      const username = session.user.name
+      
+      // Fetch user's events/activity
+      Promise.all([
+        fetch(`https://api.github.com/users/${username}/events/public`).then(r => r.json()),
+        fetch(`https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/pulls?state=all&creator=${username}`).then(r => r.json()),
+        fetch(`https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/issues?state=all&creator=${username}`).then(r => r.json())
+      ])
+        .then(([events, pulls, issues]) => {
+          // Process and combine the data
+          const contributions: any[] = []
+          
+          // Add pull requests
+          if (Array.isArray(pulls)) {
+            pulls.forEach((pr: any) => {
+              contributions.push({
+                id: pr.id,
+                type: 'pull_request',
+                title: pr.title,
+                description: pr.body?.substring(0, 200) || '',
+                date: new Date(pr.created_at).toLocaleDateString(),
+                status: pr.merged_at ? 'merged' : pr.state,
+                points: pr.merged_at ? 500 : 0,
+                tokens: pr.merged_at ? 1000 : 0,
+                pr: `#${pr.number}`,
+                url: pr.html_url
+              })
+            })
+          }
+
+          // Add issues
+          if (Array.isArray(issues)) {
+            issues.forEach((issue: any) => {
+              if (!issue.pull_request) { // Skip if it's a PR
+                contributions.push({
+                  id: issue.id,
+                  type: 'issue',
+                  title: issue.title,
+                  description: issue.body?.substring(0, 200) || '',
+                  date: new Date(issue.created_at).toLocaleDateString(),
+                  status: issue.state,
+                  points: 100,
+                  tokens: 0,
+                  issue: `#${issue.number}`,
+                  url: issue.html_url
+                })
+              }
+            })
+          }
+
+          setUserContributions(contributions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()))
+          
+          // Calculate stats
+          const stats = {
+            totalContributions: contributions.length,
+            pullRequests: pulls?.length || 0,
+            issues: issues?.filter((i: any) => !i.pull_request).length || 0,
+            reviews: 0, // Would need different API endpoint
+            totalPoints: contributions.reduce((sum, c) => sum + c.points, 0),
+            totalTokens: contributions.reduce((sum, c) => sum + c.tokens, 0),
+            currentStreak: 0, // Would need to calculate from events
+            longestStreak: 0
+          }
+          setUserStats(stats)
+          setLoading(false)
+        })
+        .catch(err => {
+          console.error('Failed to fetch contributions:', err)
+          setLoading(false)
+        })
+    } else {
+      setLoading(false)
+    }
+  }, [session])
 
   const contributions = [
     {
@@ -69,16 +149,18 @@ export default function ContributionsPage() {
     }
   ]
 
-  const stats = {
-    totalContributions: 47,
-    pullRequests: 12,
-    issues: 23,
-    reviews: 12,
-    totalPoints: 8450,
-    totalTokens: 25000,
-    currentStreak: 7,
-    longestStreak: 14
+  const defaultStats = {
+    totalContributions: 0,
+    pullRequests: 0,
+    issues: 0,
+    reviews: 0,
+    totalPoints: 0,
+    totalTokens: 0,
+    currentStreak: 0,
+    longestStreak: 0
   }
+  
+  const stats = userStats || defaultStats
 
   const getTypeIcon = (type: string) => {
     switch(type) {
@@ -208,7 +290,36 @@ export default function ContributionsPage() {
             </div>
 
             <div className="contributions-list">
-              {contributions.map(contribution => (
+              {!session ? (
+                <div style={{ 
+                  padding: '60px 20px', 
+                  textAlign: 'center', 
+                  background: 'rgba(255,255,255,0.02)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <h3 style={{ fontSize: '20px', marginBottom: '12px', color: '#00ff88' }}>Sign in to View Your Contributions</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '20px' }}>
+                    Connect your GitHub account to track your contributions and earn rewards
+                  </p>
+                  <Link href="/api/auth/signin" style={{
+                    display: 'inline-block',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(90deg, #00ff88, #00cc66)',
+                    color: '#000',
+                    borderRadius: '100px',
+                    textDecoration: 'none',
+                    fontWeight: '500'
+                  }}>
+                    Sign In with GitHub
+                  </Link>
+                </div>
+              ) : loading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+                  Loading your contributions...
+                </div>
+              ) : userContributions.length > 0 ? (
+                userContributions.map(contribution => (
                 <div key={contribution.id} className="contribution-card">
                   <div className="contribution-icon">
                     {getTypeIcon(contribution.type)}
@@ -268,7 +379,70 @@ export default function ContributionsPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              ) : (
+                contributions.map(contribution => (
+                  <div key={contribution.id} className="contribution-card">
+                    <div className="contribution-icon">
+                      {getTypeIcon(contribution.type)}
+                    </div>
+                    
+                    <div className="contribution-content">
+                      <div className="contribution-header">
+                        <h3>{contribution.title}</h3>
+                        <span 
+                          className="status"
+                          style={{ color: getStatusColor(contribution.status) }}
+                        >
+                          {contribution.status}
+                        </span>
+                      </div>
+                      
+                      <p className="contribution-description">
+                        {contribution.description}
+                      </p>
+                      
+                      <div className="contribution-meta">
+                        <div className="meta-left">
+                          <Calendar size={14} />
+                          <span>{contribution.date}</span>
+                          {contribution.pr && (
+                            <>
+                              <span className="separator">•</span>
+                              <a href={`https://github.com/bitcoin-apps-suite/bitcoin-drive/pull/${contribution.pr.slice(1)}`} className="pr-link">
+                                {contribution.pr} <ExternalLink size={12} />
+                              </a>
+                            </>
+                          )}
+                          {contribution.issue && (
+                            <>
+                              <span className="separator">•</span>
+                              <a href={`https://github.com/bitcoin-apps-suite/bitcoin-drive/issues/${contribution.issue.slice(1)}`} className="pr-link">
+                                {contribution.issue} <ExternalLink size={12} />
+                              </a>
+                            </>
+                          )}
+                        </div>
+                        
+                        <div className="rewards">
+                          {contribution.points > 0 && (
+                            <span className="points">
+                              <Star size={14} />
+                              {contribution.points} pts
+                            </span>
+                          )}
+                          {contribution.tokens > 0 && (
+                            <span className="tokens">
+                              <Award size={14} />
+                              {contribution.tokens.toLocaleString()} $BDRIVE
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="load-more">

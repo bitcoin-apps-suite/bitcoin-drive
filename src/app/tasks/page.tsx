@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
@@ -10,6 +10,19 @@ export default function TasksPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
   const [filter, setFilter] = useState('all')
+  const [contributors, setContributors] = useState<Array<{login: string, contributions: number}>>([])
+
+  useEffect(() => {
+    // Fetch real contributors from GitHub
+    fetch('https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/contributors')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setContributors(data.slice(0, 10)) // Top 10 contributors
+        }
+      })
+      .catch(err => console.error('Failed to fetch contributors:', err))
+  }, [])
 
   const tasks = [
     { id: 1, title: 'Complete HandCash OAuth integration', points: 500, status: 'in-progress', difficulty: 'medium', category: 'backend' },
@@ -73,7 +86,7 @@ export default function TasksPage() {
               </div>
               <div className="stat">
                 <Users size={20} />
-                <span className="stat-value">142</span>
+                <span className="stat-value">{contributors.length || '-'}</span>
                 <span className="stat-label">Active Contributors</span>
               </div>
               <div className="stat">
@@ -146,31 +159,19 @@ export default function TasksPage() {
               <div className="leaderboard">
                 <h3>Top Contributors</h3>
                 <div className="leader-list">
-                  <div className="leader-item">
-                    <span className="rank">1</span>
-                    <span className="name">$alice</span>
-                    <span className="points">2,450</span>
-                  </div>
-                  <div className="leader-item">
-                    <span className="rank">2</span>
-                    <span className="name">$bob_dev</span>
-                    <span className="points">1,890</span>
-                  </div>
-                  <div className="leader-item">
-                    <span className="rank">3</span>
-                    <span className="name">$charlie</span>
-                    <span className="points">1,520</span>
-                  </div>
-                  <div className="leader-item">
-                    <span className="rank">4</span>
-                    <span className="name">$diana</span>
-                    <span className="points">980</span>
-                  </div>
-                  <div className="leader-item">
-                    <span className="rank">5</span>
-                    <span className="name">$eve_coder</span>
-                    <span className="points">750</span>
-                  </div>
+                  {contributors.length > 0 ? (
+                    contributors.slice(0, 5).map((contributor, index) => (
+                      <div key={contributor.login} className="leader-item">
+                        <span className="rank">{index + 1}</span>
+                        <span className="name">@{contributor.login}</span>
+                        <span className="points">{contributor.contributions}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ padding: '20px', textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
+                      Loading contributors...
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
