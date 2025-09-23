@@ -6,11 +6,58 @@ import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
 import { GitBranch, GitCommit, GitMerge, GitPullRequest, Star, TrendingUp, Award, ExternalLink, Calendar } from 'lucide-react'
 
+interface Contribution {
+  id: number
+  type: string
+  title: string
+  description: string
+  date: string
+  status: string
+  points: number
+  tokens: number
+  pr?: string
+  issue?: string
+  url?: string
+}
+
+interface UserStats {
+  totalContributions: number
+  pullRequests: number
+  issues: number
+  reviews: number
+  totalPoints: number
+  totalTokens: number
+  currentStreak: number
+  longestStreak: number
+}
+
+interface GitHubPR {
+  id: number
+  number: number
+  title: string
+  body?: string
+  created_at: string
+  merged_at?: string
+  state: string
+  html_url: string
+}
+
+interface GitHubIssue {
+  id: number
+  number: number
+  title: string
+  body?: string
+  created_at: string
+  state: string
+  html_url: string
+  pull_request?: unknown
+}
+
 export default function ContributionsPage() {
   const { data: session } = useSession()
   const [timeFilter, setTimeFilter] = useState('all')
-  const [userContributions, setUserContributions] = useState<any[]>([])
-  const [userStats, setUserStats] = useState<any>(null)
+  const [userContributions, setUserContributions] = useState<Contribution[]>([])
+  const [userStats, setUserStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -24,13 +71,13 @@ export default function ContributionsPage() {
         fetch(`https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/pulls?state=all&creator=${username}`).then(r => r.json()),
         fetch(`https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/issues?state=all&creator=${username}`).then(r => r.json())
       ])
-        .then(([events, pulls, issues]) => {
+        .then(([ , pulls, issues]) => {
           // Process and combine the data
-          const contributions: any[] = []
+          const contributions: Contribution[] = []
           
           // Add pull requests
           if (Array.isArray(pulls)) {
-            pulls.forEach((pr: any) => {
+            (pulls as GitHubPR[]).forEach((pr) => {
               contributions.push({
                 id: pr.id,
                 type: 'pull_request',
@@ -48,7 +95,7 @@ export default function ContributionsPage() {
 
           // Add issues
           if (Array.isArray(issues)) {
-            issues.forEach((issue: any) => {
+            (issues as GitHubIssue[]).forEach((issue) => {
               if (!issue.pull_request) { // Skip if it's a PR
                 contributions.push({
                   id: issue.id,
@@ -72,7 +119,7 @@ export default function ContributionsPage() {
           const stats = {
             totalContributions: contributions.length,
             pullRequests: pulls?.length || 0,
-            issues: issues?.filter((i: any) => !i.pull_request).length || 0,
+            issues: Array.isArray(issues) ? issues.filter((i: GitHubIssue) => !i.pull_request).length : 0,
             reviews: 0, // Would need different API endpoint
             totalPoints: contributions.reduce((sum, c) => sum + c.points, 0),
             totalTokens: contributions.reduce((sum, c) => sum + c.tokens, 0),
