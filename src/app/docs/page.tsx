@@ -655,6 +655,7 @@ Add screenshots here`}
           color: #ffffff;
           min-height: 100vh;
           font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          overflow-x: hidden;
         }
 
         .docs-container {

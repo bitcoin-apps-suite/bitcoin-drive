@@ -264,6 +264,7 @@ export default function ContractsPage() {
           min-height: 100vh;
           font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           padding-top: 24px;
+          overflow-x: hidden;
         }
 
         .contracts-container {
@@ -276,8 +277,7 @@ export default function ContractsPage() {
           text-align: center;
           padding: 60px 20px;
           background: #000000;
-          margin: -24px calc(-50vw + 50%) 40px;
-          width: 100vw;
+          margin: -24px -40px 40px -40px;
         }
 
         .contracts-hero h1 {
