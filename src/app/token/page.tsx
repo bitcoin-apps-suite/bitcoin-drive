@@ -68,7 +68,7 @@ export default function TokenPage() {
                   who contribute meaningful code that gets merged into production
                 </li>
                 <li>
-                  <strong>Revenue Sharing:</strong> The Bitcoin Software Company intends to distribute 
+                  <strong>Revenue Sharing:</strong> The Bitcoin Corporation LTD intends to distribute 
                   dividends to token holders from storage subscription revenues and platform fees
                 </li>
                 <li>
@@ -96,7 +96,7 @@ export default function TokenPage() {
                   capital raising. $BDRIVE tokens are rewards for contribution, not investment instruments
                 </li>
                 <li>
-                  <strong>Future Equity:</strong> The Bitcoin Software Company may incorporate and offer 
+                  <strong>Future Equity:</strong> The Bitcoin Corporation LTD may incorporate and offer 
                   regulated equity shares separately from the token system
                 </li>
               </ul>
@@ -105,7 +105,7 @@ export default function TokenPage() {
 
           {/* Business Model Section */}
           <section className="business-section">
-            <h2>The Bitcoin Software Company</h2>
+            <h2>The Bitcoin Corporation LTD</h2>
             <div className="business-content">
               <p className="intro">
                 Our vision is to create sustainable open-source software through a hybrid model that 
@@ -160,7 +160,7 @@ export default function TokenPage() {
                     <span className="arrow">→</span>
                   </div>
                   <div className="flow-item">
-                    <span>Revenue to Bitcoin Software Ltd</span>
+                    <span>Revenue to Bitcoin Corporation Ltd</span>
                     <span className="arrow">→</span>
                   </div>
                   <div className="flow-item">

@@ -17,11 +17,6 @@ import {
   Package,
   Terminal,
   Activity,
-  HardDrive,
-  Cloud,
-  Shield,
-  Database,
-  Home
 } from 'lucide-react';
 import './DevSidebar.css';
 
@@ -67,15 +62,9 @@ const DevSidebar: React.FC<DevSidebarProps> = ({ onCollapsedChange }) => {
     divider?: boolean;
     external?: boolean;
   }> = [
-    { path: '/', icon: Home, label: 'Home' },
-    { divider: true },
-    { path: '/storage', icon: HardDrive, label: 'Storage', badge: 'BETA' },
-    { path: '/cloud', icon: Cloud, label: 'Cloud Sync' },
-    { path: '/encryption', icon: Shield, label: 'Encryption' },
-    { path: '/database', icon: Database, label: 'Database' },
-    { path: '/contracts', icon: FileText, label: 'Contracts' },
+    { path: '/contracts', icon: FileText, label: 'Contracts', badge: issueCount > 0 ? String(issueCount) : '0' },
     { path: '/tasks', icon: Terminal, label: 'Tasks', badge: issueCount > 0 ? String(issueCount) : '0' },
-    { path: '/contributions', icon: Users, label: 'Contributors' },
+    { path: '/contributions', icon: Users, label: 'Contributors', badge: '2' },
     { path: '/docs', icon: BookOpen, label: 'Documentation' },
     { path: '/token', icon: DollarSign, label: '$BDRIVE', badge: 'NEW' },
     { divider: true },
@@ -89,10 +78,10 @@ const DevSidebar: React.FC<DevSidebarProps> = ({ onCollapsedChange }) => {
   ];
 
   const stats = {
-    totalStorage: '10TB',
-    activeNodes: '42',
-    contributors: '5',
-    openTasks: '15+'
+    totalTokens: '1,000,000,000',
+    distributed: '650,000',
+    contributors: '2',
+    openTasks: '30+'
   };
 
   return (
@@ -164,14 +153,14 @@ const DevSidebar: React.FC<DevSidebarProps> = ({ onCollapsedChange }) => {
 
       {!isCollapsed && (
         <div className="dev-sidebar-stats">
-          <h4>Network Stats</h4>
+          <h4>Token Stats</h4>
           <div className="dev-stat">
-            <span className="dev-stat-label">Total Storage</span>
-            <span className="dev-stat-value">{stats.totalStorage}</span>
+            <span className="dev-stat-label">Total Supply</span>
+            <span className="dev-stat-value">{stats.totalTokens}</span>
           </div>
           <div className="dev-stat">
-            <span className="dev-stat-label">Active Nodes</span>
-            <span className="dev-stat-value">{stats.activeNodes}</span>
+            <span className="dev-stat-label">Distributed</span>
+            <span className="dev-stat-value">{stats.distributed}</span>
           </div>
           <div className="dev-stat">
             <span className="dev-stat-label">Contributors</span>
