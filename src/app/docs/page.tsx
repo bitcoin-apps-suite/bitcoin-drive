@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
-import { Book, Code, FileText, GitBranch, Rocket, Shield, Terminal, Zap, ChevronRight, ExternalLink, Copy, Check } from 'lucide-react'
+import { Book, Code, FileText, GitBranch, Rocket, Shield, Terminal, ChevronRight, ExternalLink, Copy, Check } from 'lucide-react'
 
 export default function DocsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
   const [activeSection, setActiveSection] = useState('getting-started')
   const [copiedCode, setCopiedCode] = useState('')

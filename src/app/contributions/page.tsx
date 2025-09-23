@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
-import { GitBranch, GitCommit, GitMerge, GitPullRequest, Star, TrendingUp, Award, ExternalLink, Calendar, Code } from 'lucide-react'
+import { GitBranch, GitCommit, GitMerge, GitPullRequest, Star, TrendingUp, Award, ExternalLink, Calendar } from 'lucide-react'
 
 export default function ContributionsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
   const [timeFilter, setTimeFilter] = useState('all')
 

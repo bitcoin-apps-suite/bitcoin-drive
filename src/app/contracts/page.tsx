@@ -4,11 +4,21 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
-import { ExternalLink, DollarSign, Clock, Users, Code, Shield, Zap } from 'lucide-react'
+import { ExternalLink, DollarSign, Code, Zap } from 'lucide-react'
 
 export default function ContractsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
-  const [contracts, setContracts] = useState<any[]>([])
+  interface GitHubIssue {
+    id: number
+    number: number
+    title: string
+    body?: string
+    html_url: string
+    labels?: Array<{ id: number; name: string; color: string }>
+  }
+
+  const [contracts, setContracts] = useState<GitHubIssue[]>([])
 
   useEffect(() => {
     fetch('https://api.github.com/repos/bitcoin-apps-suite/bitcoin-drive/issues')
@@ -17,13 +27,13 @@ export default function ContractsPage() {
       .catch(err => console.error(err))
   }, [])
 
-  const getPriorityColor = (labels: any[]) => {
+  const getPriorityColor = (labels: Array<{ id: number; name: string; color: string }>) => {
     if (labels?.some(l => l.name === 'priority: high')) return '#ff4444'
     if (labels?.some(l => l.name === 'priority: medium')) return '#ffaa00'
     return '#00ff88'
   }
 
-  const getEstimatedReward = (title: string, body: string) => {
+  const getEstimatedReward = (title: string) => {
     if (title.toLowerCase().includes('smart contract') || title.toLowerCase().includes('blockchain')) return '5000-10000'
     if (title.toLowerCase().includes('integration') || title.toLowerCase().includes('api')) return '2000-5000'
     if (title.toLowerCase().includes('ui') || title.toLowerCase().includes('frontend')) return '1000-3000'
@@ -116,7 +126,7 @@ export default function ContractsPage() {
                   </p>
 
                   <div className="contract-tags">
-                    {issue.labels?.map((label: any) => (
+                    {issue.labels?.map((label) => (
                       <span key={label.id} className="tag" style={{ 
                         backgroundColor: `#${label.color}20`,
                         borderColor: `#${label.color}40`
@@ -129,7 +139,7 @@ export default function ContractsPage() {
                   <div className="contract-footer">
                     <div className="reward">
                       <DollarSign size={14} />
-                      <span>{getEstimatedReward(issue.title, issue.body || '')} $BDRIVE</span>
+                      <span>{getEstimatedReward(issue.title)} $BDRIVE</span>
                     </div>
                     <div className="actions">
                       <a 

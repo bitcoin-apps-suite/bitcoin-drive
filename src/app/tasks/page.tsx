@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { CheckCircle, Circle, Clock, Star, TrendingUp, Users, Zap, Award } from 'lucide-react'
 
 export default function TasksPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession()
   const [filter, setFilter] = useState('all')
 
