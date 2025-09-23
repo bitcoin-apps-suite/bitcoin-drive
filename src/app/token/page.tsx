@@ -101,6 +101,32 @@ export default function TokenPage() {
                 </li>
               </ul>
             </div>
+
+            <div className="model-card warning">
+              <h3>⚠️ KYC & Vesting Requirements</h3>
+              <ul>
+                <li>
+                  <strong>Mandatory KYC:</strong> All contributors must complete full KYC verification 
+                  to receive tokens. No exceptions will be made for regulatory compliance
+                </li>
+                <li>
+                  <strong>Cap Table Registration:</strong> Contributors must be registered on The Bitcoin 
+                  Corporation LTD cap table before any token distribution
+                </li>
+                <li>
+                  <strong>Multisig Lock-up:</strong> All tokens distributed for work are locked in a 
+                  multisig wallet jointly controlled by the contributor and The Bitcoin Corporation LTD
+                </li>
+                <li>
+                  <strong>Vesting Schedule:</strong> Tokens are subject to vesting conditions and cannot 
+                  be freely transferred until vesting requirements are met
+                </li>
+                <li>
+                  <strong>Regulatory Compliance:</strong> The company reserves the right to refuse token 
+                  distribution to any contributor who does not meet regulatory requirements
+                </li>
+              </ul>
+            </div>
           </section>
 
           {/* Business Model Section */}
@@ -200,8 +226,13 @@ export default function TokenPage() {
               </div>
               <div className="step">
                 <div className="step-number">4</div>
-                <h3>Receive Tokens</h3>
-                <p>Tokens allocated based on contribution impact and quality</p>
+                <h3>Complete KYC</h3>
+                <p>Submit KYC documents and get registered on cap table</p>
+              </div>
+              <div className="step">
+                <div className="step-number">5</div>
+                <h3>Receive Vested Tokens</h3>
+                <p>Tokens locked in multisig with vesting schedule</p>
               </div>
             </div>
 
@@ -255,9 +286,19 @@ export default function TokenPage() {
                 based on platform revenues from storage subscriptions and platform fees.
               </p>
               <p>
-                <strong>Trading & Liquidity:</strong> The $BDRIVE token is intended to be freely tradable 
-                on the Bitcoin Drive platform and associated exchanges. We encourage an active secondary 
-                market to provide liquidity and price discovery for contributors&apos; work.
+                <strong>KYC & Cap Table Requirements:</strong> All token recipients must complete KYC 
+                verification and be registered on The Bitcoin Corporation LTD cap table. Tokens are 
+                distributed only to verified contributors who meet regulatory compliance requirements.
+              </p>
+              <p>
+                <strong>Multisig & Vesting:</strong> Tokens distributed for work performed are locked in 
+                multisig wallets with joint control between the contributor and The Bitcoin Corporation LTD. 
+                Tokens are subject to vesting schedules and cannot be freely transferred until conditions are met.
+              </p>
+              <p>
+                <strong>Trading & Liquidity:</strong> Vested $BDRIVE tokens may become tradable on the 
+                Bitcoin Drive platform and associated exchanges after vesting conditions are satisfied. 
+                The company does not guarantee liquidity or price discovery mechanisms.
               </p>
               <p>
                 <strong>$BSHARE Fundraising:</strong> The Bitcoin Corporation LTD intends to issue $BSHARE 
@@ -638,7 +679,7 @@ export default function TokenPage() {
 
         .contribute-steps {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 20px;
           max-width: 100%;
           margin: 0 auto 40px;

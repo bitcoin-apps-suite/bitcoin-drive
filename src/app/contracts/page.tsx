@@ -87,8 +87,57 @@ export default function ContractsPage() {
               </div>
               <div className="info-card">
                 <DollarSign size={24} />
-                <h3>Earn Tokens</h3>
-                <p>Receive $BDRIVE tokens when your code is reviewed and merged to production</p>
+                <h3>Complete KYC & Earn</h3>
+                <p>Submit KYC details to be registered on cap table and receive vested tokens</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="legal-notice">
+            <h2>⚠️ Important Legal Requirements</h2>
+            <div className="legal-content">
+              <div className="requirement-card">
+                <h3>KYC Required for Token Distribution</h3>
+                <p>
+                  To receive $BDRIVE tokens for successful pull requests, contributors must:
+                </p>
+                <ul>
+                  <li>Complete full KYC (Know Your Customer) verification</li>
+                  <li>Be registered on The Bitcoin Corporation LTD cap table</li>
+                  <li>Provide valid government-issued identification</li>
+                  <li>Pass regulatory compliance checks</li>
+                </ul>
+              </div>
+              
+              <div className="requirement-card">
+                <h3>Token Vesting & Multisig Lock</h3>
+                <p>
+                  All tokens distributed for work completed are subject to:
+                </p>
+                <ul>
+                  <li>Mandatory lock-up period in multisig wallet</li>
+                  <li>Joint control between contributor and The Bitcoin Corporation LTD</li>
+                  <li>Vesting schedule to ensure long-term alignment</li>
+                  <li>Release conditions as determined by the company</li>
+                </ul>
+              </div>
+
+              <div className="requirement-card warning">
+                <h3>Regulatory Compliance</h3>
+                <p>
+                  <strong>No tokens will be distributed without:</strong>
+                </p>
+                <ul>
+                  <li>Completed KYC verification</li>
+                  <li>Cap table registration</li>
+                  <li>Signed contributor agreement</li>
+                  <li>Multisig wallet setup</li>
+                </ul>
+                <p className="disclaimer">
+                  The Bitcoin Corporation LTD reserves the right to refuse token distribution
+                  to any contributor who does not meet regulatory requirements. Tokens are
+                  not transferable until vesting conditions are met.
+                </p>
               </div>
             </div>
           </section>
@@ -357,6 +406,92 @@ export default function ContractsPage() {
           font-size: 15px;
           color: rgba(255, 255, 255, 0.7);
           line-height: 1.6;
+        }
+
+        .legal-notice {
+          padding: 40px 0;
+          border-top: 1px solid rgba(255, 0, 0, 0.2);
+          border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+          background: rgba(255, 0, 0, 0.02);
+          margin: 40px 0;
+        }
+
+        .legal-notice h2 {
+          text-align: center;
+          font-size: 28px;
+          font-weight: 300;
+          margin: 0 0 40px 0;
+          color: #ffaa00;
+        }
+
+        .legal-content {
+          display: grid;
+          gap: 30px;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+
+        .requirement-card {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 30px;
+        }
+
+        .requirement-card.warning {
+          background: rgba(255, 170, 0, 0.05);
+          border-color: rgba(255, 170, 0, 0.3);
+        }
+
+        .requirement-card h3 {
+          font-size: 20px;
+          font-weight: 400;
+          margin: 0 0 16px 0;
+          color: #00ff88;
+        }
+
+        .requirement-card.warning h3 {
+          color: #ffaa00;
+        }
+
+        .requirement-card p {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.6;
+          margin-bottom: 16px;
+        }
+
+        .requirement-card ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .requirement-card li {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          padding: 8px 0 8px 24px;
+          position: relative;
+        }
+
+        .requirement-card li:before {
+          content: '•';
+          position: absolute;
+          left: 8px;
+          color: #00ff88;
+        }
+
+        .requirement-card.warning li:before {
+          color: #ffaa00;
+        }
+
+        .disclaimer {
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
         }
 
         .contracts-list {
