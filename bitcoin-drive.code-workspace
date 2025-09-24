@@ -75,11 +75,16 @@
 			["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
 		],
 		"workbench.colorCustomizations": {
-			"sideBar.background": "#001100",
-			"editor.background": "#001a00",
-			"editorGroupHeader.tabsBackground": "#001100",
-			"tab.activeBackground": "#002200",
-			"tab.inactiveBackground": "#001100"
+			"statusBar.noFolderBackground": "#4a7c59",
+			"activityBar.inactiveBackground": "#1e3025",
+			"sideBar.background": "#1e2e24",
+			"sideBarTitle.foreground": "#8fbf9f",
+			"editor.background": "#0e1610",
+			"editorGroupHeader.tabsBackground": "#1a2a20",
+			"tab.activeBackground": "#2d4a37",
+			"tab.inactiveBackground": "#1a2a20",
+			"panel.background": "#1a2a20",
+			"terminal.background": "#0e1610"
 		}
 	},
 	"extensions": {

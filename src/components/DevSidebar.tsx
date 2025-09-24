@@ -25,7 +25,14 @@ interface DevSidebarProps {
 }
 
 const DevSidebar: React.FC<DevSidebarProps> = ({ onCollapsedChange }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    // Default to collapsed if no preference is saved
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('devSidebarCollapsed');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
   const [issueCount, setIssueCount] = useState<number>(0);
   const pathname = usePathname();
 

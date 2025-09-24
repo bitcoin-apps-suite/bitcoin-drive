@@ -5,6 +5,8 @@ import Providers from "@/components/Providers";
 import PocBar from "@/components/PocBar";
 import DevLayout from "@/components/DevLayout";
 import Footer from "@/components/Footer";
+import BitcoinOSWrapper from "@/components/BitcoinOSWrapper";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,41 +65,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Unregister all service workers and clear caches
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  for(let registration of registrations) {
-                    registration.unregister();
-                    console.log('SW unregistered: ', registration);
-                  }
-                });
-                caches.keys().then(function(names) {
-                  for (let name of names) {
-                    caches.delete(name);
-                    console.log('Cache deleted: ', name);
-                  }
-                });
-              }
-            `,
-          }}
-        />
-      </head>
+      <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ paddingTop: '40px' }}
       >
-        <PocBar color="#00ff88" />
+        <ServiceWorkerRegistration />
         <Providers>
-          <DevLayout>
-            <div style={{ minHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' }}>
-              {children}
-              <Footer />
-            </div>
-          </DevLayout>
+          <BitcoinOSWrapper>
+            <DevLayout>
+              <div style={{ minHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column' }}>
+                {children}
+                <Footer />
+              </div>
+            </DevLayout>
+          </BitcoinOSWrapper>
         </Providers>
       </body>
     </html>
