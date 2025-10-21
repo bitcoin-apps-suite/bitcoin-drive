@@ -7,6 +7,7 @@ import DevLayout from "@/components/DevLayout";
 import Footer from "@/components/Footer";
 import BitcoinOSWrapper from "@/components/BitcoinOSWrapper";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import DockManager from "@/components/bitcoin-dock/components/DockManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,6 +79,7 @@ export default function RootLayout({
                 <Footer />
               </div>
             </DevLayout>
+            <DockManager currentApp="bitcoin-drive" />
           </BitcoinOSWrapper>
         </Providers>
       </body>
