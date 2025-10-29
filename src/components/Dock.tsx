@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, Mail, Music, FileText, HardDrive, Calendar, Search, Table, Share2, Briefcase, Store, Wifi, Battery, Clock, TrendingUp, Building2, Shield, Video, Code2, Camera, MapPin, MessageCircle, Users, Gamepad2, BookOpen, Globe, Box, Monitor, GraduationCap, Paintbrush, UserCheck, Maximize2, Home, Sparkles } from 'lucide-react';
-import './MinimalDock.css';
+import { Wallet, Mail, Music, FileText, HardDrive, Calendar, Search, Table, Share2, Briefcase, Store, Wifi, Volume2, Battery, Clock, TrendingUp, Building2, Shield, Video, Code2, Camera, MapPin, MessageCircle, Users, Gamepad2, BookOpen, Globe, Box, Monitor, GraduationCap, Paintbrush, UserCheck, Minimize2, Sparkles } from 'lucide-react';
+import './Dock.css';
 
 interface DockApp {
   id?: string;
@@ -13,15 +13,14 @@ interface DockApp {
   isImage?: boolean;
 }
 
-interface MinimalDockProps {
+interface DockProps {
   currentApp?: string;
 }
 
-const MinimalDock: React.FC<MinimalDockProps> = ({ currentApp = 'bitcoin-drive' }) => {
+const Dock: React.FC<DockProps> = ({ currentApp = 'bitcoin-drive' }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mounted, setMounted] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [expandTimeout, setExpandTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [minimizeTimeout, setMinimizeTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -69,8 +68,7 @@ const MinimalDock: React.FC<MinimalDockProps> = ({ currentApp = 'bitcoin-drive' 
       'text-cyan-500': '#06b6d4',
       'text-cyan-400': '#22d3ee',
       'text-emerald-500': '#10b981',
-      'text-blue-600': '#2563eb',
-      'text-white': '#ffffff'
+      'text-blue-600': '#2563eb'
     };
     return colorMap[colorClass] || '#ffffff';
   };
@@ -103,8 +101,7 @@ const MinimalDock: React.FC<MinimalDockProps> = ({ currentApp = 'bitcoin-drive' 
     { name: 'Bitcoin Identity', icon: UserCheck, color: 'rainbow', url: 'https://bitcoin-identity.vercel.app/' },
   ];
 
-  // Special right-side mini icons
-  const rightSideApps: DockApp[] = [
+  const specialApps: DockApp[] = [
     { id: 'corp', name: 'Corp', icon: Building2, color: 'text-bitcoin-orange', url: 'https://bitcoin-corp.vercel.app/' },
     { id: 'trust', name: 'Trust', icon: Shield, color: 'text-blue-500', url: 'https://bitcoin-corp.vercel.app/trust' },
     { id: 'bapps-mini', name: 'BAPPS', icon: Store, color: 'text-orange-500', url: 'https://www.bitcoinapps.store/' },
@@ -120,133 +117,135 @@ const MinimalDock: React.FC<MinimalDockProps> = ({ currentApp = 'bitcoin-drive' 
   };
 
   const toggleDockSize = () => {
-    const newDockStyle = 'large';
+    const newDockStyle = 'minimal';
     localStorage.setItem('dockStyle', newDockStyle);
     window.dispatchEvent(new CustomEvent('dockStyleChanged', { detail: newDockStyle }));
   };
 
-  const handleMouseEnter = () => {
-    if (expandTimeout) {
-      clearTimeout(expandTimeout);
-      setExpandTimeout(null);
+  const handleMouseLeave = () => {
+    if (minimizeTimeout) {
+      clearTimeout(minimizeTimeout);
     }
-    setIsHovered(true);
-    // Expand after 150ms of hovering
+    // Minimize after 300ms of not hovering
     const timeout = setTimeout(() => {
       toggleDockSize();
-    }, 150);
-    setExpandTimeout(timeout);
+    }, 300);
+    setMinimizeTimeout(timeout);
   };
 
-  const handleMouseLeave = () => {
-    if (expandTimeout) {
-      clearTimeout(expandTimeout);
-      setExpandTimeout(null);
+  const handleMouseEnter = () => {
+    if (minimizeTimeout) {
+      clearTimeout(minimizeTimeout);
+      setMinimizeTimeout(null);
     }
-    setIsHovered(false);
   };
 
   return (
     <div 
-      className={`minimal-dock ${isHovered ? 'hovered' : ''}`}
+      className="dock" 
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="minimal-dock-container">
-        {/* All apps on the left */}
-        <div className="minimal-dock-apps">
+      <div className="dock-container">
+        {/* Main apps */}
+        <div className="dock-apps">
           {dockApps.map((app, index) => {
             const Icon = app.icon;
             return (
               <button
                 key={app.name}
-                className={`minimal-dock-app ${app.current ? 'active' : ''} ${app.disabled ? 'disabled' : ''}`}
+                className={`dock-app ${app.current ? 'active' : ''} ${app.disabled ? 'disabled' : ''}`}
                 onClick={() => handleAppClick(app)}
                 title={app.name}
                 disabled={app.disabled}
               >
                 {app.id === 'bapps-store' ? (
-                  <img src="/bapps-icon.jpg" alt="BAPPS" className="minimal-dock-icon-image" />
+                  <img src="/bapps-icon.jpg" alt="BAPPS" className="dock-icon-image" />
                 ) : app.id === 'cashboard' ? (
-                  <svg className="minimal-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
+                  <svg className="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
                     <circle cx="12" cy="12" r="10" />
                     <path d="M15.5 9.5C14.815 8.574 13.743 8 12.5 8c-2.21 0-4 1.79-4 4s1.79 4 4 4c1.243 0 2.315-.574 3-1.5" />
                   </svg>
                 ) : app.id === 'senseii' ? (
-                  <svg className="minimal-dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
+                  <svg className="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
                     <path d="M3 5h18" />
                     <path d="M6 5v14" />
                     <path d="M18 5v14" />
                     <path d="M3 9h18" />
                   </svg>
                 ) : (
-                  <Icon className="minimal-dock-icon" style={{ color: getIconColor(app.color, index) }} />
+                  <Icon className="dock-icon" style={{ color: getIconColor(app.color, index) }} />
                 )}
-                {app.current && <span className="minimal-dock-indicator" />}
+                {app.current && <span className="dock-indicator" />}
               </button>
             );
           })}
         </div>
-        
-        {/* Status on the right */}
-        <div className="minimal-dock-status">
-          {/* Special mini icons */}
-          <div className="minimal-dock-right-apps">
-            {rightSideApps.map((app, index) => {
-              const Icon = app.icon;
-              return (
-                <button
-                  key={app.name}
-                  className="minimal-dock-app-mini"
-                  onClick={() => handleAppClick(app)}
-                  title={app.name}
-                >
-                  {app.id === 'cashboard' ? (
-                    <svg className="minimal-dock-icon-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M15.5 9.5C14.815 8.574 13.743 8 12.5 8c-2.21 0-4 1.79-4 4s1.79 4 4 4c1.243 0 2.315-.574 3-1.5" />
-                    </svg>
-                  ) : app.id === 'senseii' ? (
-                    <svg className="minimal-dock-icon-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
-                      <path d="M3 5h18" />
-                      <path d="M6 5v14" />
-                      <path d="M18 5v14" />
-                      <path d="M3 9h18" />
-                    </svg>
-                  ) : (
-                    <Icon className="minimal-dock-icon-mini" style={{ color: getIconColor(app.color, index) }} />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          
-          {/* Expand toggle */}
-          <div className="minimal-dock-expand-toggle">
-            <button 
-              className="minimal-dock-app-mini" 
-              title="Switch to Large Dock" 
-              onClick={toggleDockSize}
-            >
-              <Maximize2 className="minimal-dock-icon-mini" style={{ color: '#6b7280' }} />
-            </button>
-          </div>
-          
-          {/* System status */}
-          <div className="minimal-status-item" title="Connected">
-            <Wifi className="minimal-status-icon connected" />
-          </div>
-          <div className="minimal-status-item" title="Battery: 100%">
-            <Battery className="minimal-status-icon connected" />
-          </div>
-          <div className="minimal-status-time" title={mounted ? currentTime.toLocaleDateString() : ''}>
-            <Clock className="minimal-status-icon" />
+
+        {/* Divider */}
+        <div className="dock-divider" />
+
+        {/* Special apps */}
+        <div className="dock-special-apps">
+          {specialApps.map((app, index) => {
+            const Icon = app.icon;
+            return (
+              <button
+                key={app.name}
+                className="dock-app dock-app-special"
+                onClick={() => handleAppClick(app)}
+                title={app.name}
+              >
+                {app.id === 'cashboard' ? (
+                  <svg className="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M15.5 9.5C14.815 8.574 13.743 8 12.5 8c-2.21 0-4 1.79-4 4s1.79 4 4 4c1.243 0 2.315-.574 3-1.5" />
+                  </svg>
+                ) : app.id === 'senseii' ? (
+                  <svg className="dock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} style={{ color: getIconColor(app.color, index) }}>
+                    <path d="M3 5h18" />
+                    <path d="M6 5v14" />
+                    <path d="M18 5v14" />
+                    <path d="M3 9h18" />
+                  </svg>
+                ) : (
+                  <Icon className="dock-icon" style={{ color: getIconColor(app.color, index) }} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* System status */}
+        <div className="dock-status">
+          <button className="dock-status-button" title="Connected">
+            <Wifi className="dock-status-icon connected" />
+          </button>
+          <button className="dock-status-button" title="Volume">
+            <Volume2 className="dock-status-icon" />
+          </button>
+          <button className="dock-status-button" title="Battery: 100%">
+            <Battery className="dock-status-icon connected" />
+          </button>
+          <div className="dock-status-time" title={mounted ? currentTime.toLocaleDateString() : ''}>
+            <Clock className="dock-status-icon" />
             <span>{mounted ? currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:00'}</span>
           </div>
+        </div>
+
+        {/* Minimize button */}
+        <div className="dock-minimize">
+          <button 
+            className="dock-app dock-app-control" 
+            title="Switch to Minimal Dock" 
+            onClick={toggleDockSize}
+          >
+            <Minimize2 className="dock-icon" style={{ color: '#6b7280' }} />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default MinimalDock;
+export default Dock;

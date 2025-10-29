@@ -3,7 +3,7 @@
 import React from 'react';
 import { useBitcoinOS } from '@/lib/utils/useBitcoinOS';
 import PocBar from './PocBar';
-import MinimalDock from './MinimalDock';
+import DockManager from './DockManager';
 
 interface BitcoinOSWrapperProps {
   children: React.ReactNode;
@@ -15,10 +15,10 @@ export default function BitcoinOSWrapper({ children }: BitcoinOSWrapperProps) {
   return (
     <>
       {!isInOS && <PocBar color="#00ff88" />}
-      <div style={{ paddingTop: isInOS ? '0px' : '40px' }}>
+      <div style={{ paddingTop: isInOS ? '0px' : '40px', paddingBottom: isInOS ? '0px' : '120px' }}>
         {children}
       </div>
-      {!isInOS && <MinimalDock />}
+      {!isInOS && <DockManager currentApp="bitcoin-drive" />}
     </>
   );
 }

@@ -1,5 +1,5 @@
 # Environment Variables
-.env
+.env*
 .env.local
 .env.production
 
@@ -87,3 +87,11 @@ config.local.json
 
 .vercel
 .next/
+
+# Environment files - NEVER commit these!
+.env
+.env.*
+.env*
+*.env
+.env copy.local
+.env.deployment

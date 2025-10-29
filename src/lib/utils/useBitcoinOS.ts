@@ -8,7 +8,7 @@ import { useEffect, useState, useCallback } from 'react'
 interface BitcoinOSConfig {
   theme?: 'light' | 'dark'
   appName?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export function useBitcoinOS() {
@@ -62,7 +62,7 @@ export function useBitcoinOS() {
     }
   }, [])
 
-  const sendToOS = useCallback((type: string, data: any = {}) => {
+  const sendToOS = useCallback((type: string, data: Record<string, unknown> = {}) => {
     if (!isInOS) return
     
     window.parent.postMessage({
