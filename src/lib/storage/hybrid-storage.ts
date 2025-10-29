@@ -1,5 +1,8 @@
 import { google } from 'googleapis'
 import crypto from 'crypto'
+import { DropBlocksFile, uploadToDropBlocks, getDropBlocksFile } from '../dropblocks'
+
+export type StorageProvider = 'google-drive' | 'dropblocks' | 'local' | 'ipfs'
 
 export interface StorageMetadata {
   fileId: string
@@ -7,12 +10,15 @@ export interface StorageMetadata {
   fileSize: number
   mimeType: string
   sha256Hash: string
+  storageProvider: StorageProvider
   googleDriveId?: string
+  dropBlocksHash?: string
   blockchainTxId?: string
   timelockUntil?: Date
   encryptionKey?: string
   createdAt: Date
   updatedAt: Date
+  dropBlocksMetadata?: DropBlocksFile
 }
 
 export interface TimelockConfig {
@@ -34,7 +40,7 @@ export class HybridStorage {
   }
 
   /**
-   * Upload file to Google Drive and store hash on blockchain
+   * Upload file using specified storage provider
    */
   async uploadFile(
     file: Buffer,
@@ -44,6 +50,8 @@ export class HybridStorage {
       timelock?: TimelockConfig
       encrypt?: boolean
       folder?: string
+      storageProvider?: StorageProvider
+      retentionDays?: number
     }
   ): Promise<StorageMetadata> {
     const fileId = crypto.randomBytes(16).toString('hex')
@@ -59,28 +67,50 @@ export class HybridStorage {
       encryptionKey = result.key
     }
     
-    // Upload to Google Drive
-    const driveResponse = await this.drive.files.create({
-      requestBody: {
-        name: `${fileId}_${fileName}`,
-        parents: options?.folder ? [options.folder] : undefined
-      },
-      media: {
+    const storageProvider = options?.storageProvider || 'google-drive'
+    let googleDriveId: string | undefined
+    let dropBlocksHash: string | undefined
+    let dropBlocksMetadata: DropBlocksFile | undefined
+    
+    // Upload based on storage provider
+    if (storageProvider === 'dropblocks') {
+      // Upload to DropBlocks
+      dropBlocksMetadata = await uploadToDropBlocks(
+        processedFile,
+        fileName,
         mimeType,
-        body: processedFile
-      },
-      fields: 'id, name, size'
-    })
+        {
+          encrypt: !!options?.encrypt,
+          retentionDays: options?.retentionDays || 365,
+          folder: options?.folder
+        }
+      )
+      dropBlocksHash = dropBlocksMetadata.hash
+    } else {
+      // Upload to Google Drive (default)
+      const driveResponse = await this.drive.files.create({
+        requestBody: {
+          name: `${fileId}_${fileName}`,
+          parents: options?.folder ? [options.folder] : undefined
+        },
+        media: {
+          mimeType,
+          body: processedFile
+        },
+        fields: 'id, name, size'
+      })
+      googleDriveId = driveResponse.data.id
+    }
     
-    const googleDriveId = driveResponse.data.id
-    
-    // Store hash on blockchain (stub for now)
+    // Store hash on blockchain (for all providers)
     const blockchainTxId = await this.storeHashOnBlockchain(
       sha256Hash,
       {
         fileId,
         fileName,
         googleDriveId,
+        dropBlocksHash,
+        storageProvider,
         timelock: options?.timelock
       }
     )
@@ -91,12 +121,15 @@ export class HybridStorage {
       fileSize: processedFile.length,
       mimeType,
       sha256Hash,
+      storageProvider,
       googleDriveId: googleDriveId || undefined,
+      dropBlocksHash: dropBlocksHash || undefined,
       blockchainTxId,
       timelockUntil: options?.timelock?.unlockDate,
       encryptionKey,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      dropBlocksMetadata: dropBlocksMetadata || undefined
     }
     
     return metadata

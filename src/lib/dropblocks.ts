@@ -438,3 +438,57 @@ export const DEFAULT_DROPBLOCKS_CONFIG: DropBlocksConfig = {
   maxFileSize: 100 * 1024 * 1024, // 100MB
   allowedMimeTypes: undefined // Allow all types
 }
+
+// Global DropBlocks manager instance
+const dropBlocksManager = new DropBlocksManager(DEFAULT_DROPBLOCKS_CONFIG)
+
+// Export utility functions for easy integration
+export async function uploadToDropBlocks(
+  fileData: ArrayBuffer | Buffer,
+  fileName: string,
+  mimeType: string,
+  options?: {
+    encrypt?: boolean
+    retentionDays?: number
+    folder?: string
+    tags?: string[]
+  }
+): Promise<DropBlocksFile> {
+  const buffer = fileData instanceof Buffer ? fileData : Buffer.from(fileData)
+  
+  return await dropBlocksManager.uploadFile(
+    buffer,
+    fileName,
+    mimeType,
+    options?.retentionDays || DEFAULT_DROPBLOCKS_CONFIG.defaultRetention,
+    {
+      encrypt: options?.encrypt || false,
+      folder: options?.folder,
+      tags: options?.tags
+    }
+  )
+}
+
+export async function getDropBlocksFile(fileId: string): Promise<DropBlocksFile | null> {
+  return dropBlocksManager.getFile(fileId)
+}
+
+export async function downloadFromDropBlocks(fileId: string, password?: string): Promise<ArrayBuffer> {
+  return await dropBlocksManager.downloadFile(fileId, password)
+}
+
+export async function renewDropBlocksFile(fileId: string, additionalDays: number): Promise<void> {
+  await dropBlocksManager.renewFile(fileId, additionalDays)
+}
+
+export async function deleteDropBlocksFile(fileId: string): Promise<void> {
+  await dropBlocksManager.deleteFile(fileId)
+}
+
+export function listDropBlocksFiles(folder?: string): DropBlocksFile[] {
+  return dropBlocksManager.listFiles(folder)
+}
+
+export function getDropBlocksManager(): DropBlocksManager {
+  return dropBlocksManager
+}
