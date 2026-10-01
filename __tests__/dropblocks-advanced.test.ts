@@ -32,6 +32,8 @@ Object.defineProperty(global, 'crypto', {
   }
 })
 
+type Permission = CollaborativeAccess['collaborators'][number]['permissions'][number]
+
 describe('DropBlocks Advanced Features', () => {
   let advanced: DropBlocksAdvanced
 
@@ -235,7 +237,7 @@ describe('DropBlocks Advanced Features', () => {
       const fileId = 'collab-file'
       const owner = 'owner@example.com'
       const collaborator = 'collaborator@example.com'
-      const permissions = ['read', 'write'] as const
+      const permissions: Permission[] = ['read', 'write']
 
       await advanced.setupCollaborativeAccess(fileId, owner)
       await advanced.addCollaborator(fileId, collaborator, permissions, owner)
@@ -265,7 +267,7 @@ describe('DropBlocks Advanced Features', () => {
       const fileId = 'request-access-file'
       const owner = 'owner@example.com'
       const requester = 'requester@example.com'
-      const requestedPermissions = ['read', 'write'] as const
+      const requestedPermissions: Permission[] = ['read', 'write']
 
       await advanced.setupCollaborativeAccess(fileId, owner)
       await advanced.requestAccess(fileId, requester, requestedPermissions)

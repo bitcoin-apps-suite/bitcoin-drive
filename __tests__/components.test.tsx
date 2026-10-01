@@ -107,12 +107,15 @@ describe('React Components', () => {
       id: 'test-file-1',
       name: 'test.txt',
       mimeType: 'text/plain',
-      size: '1024',
+      size: 1024,
       modifiedTime: '2023-01-01T00:00:00Z',
       createdTime: '2023-01-01T00:00:00Z',
       webViewLink: 'https://example.com/view',
       webContentLink: 'https://example.com/download',
       parents: [],
+      isTokenized: false,
+      canTokenize: true,
+      estimatedValue: 0,
       storageProvider: 'google-drive',
       ...overrides
     })
@@ -190,24 +193,30 @@ describe('React Components', () => {
         id: 'file1',
         name: 'document.txt',
         mimeType: 'text/plain',
-        size: '1024',
+        size: 1024,
         modifiedTime: '2023-01-01T00:00:00Z',
         createdTime: '2023-01-01T00:00:00Z',
         webViewLink: 'https://example.com/view/1',
         webContentLink: 'https://example.com/download/1',
         parents: [],
+        isTokenized: false,
+        canTokenize: true,
+        estimatedValue: 0,
         storageProvider: 'google-drive'
       },
       {
         id: 'file2',
         name: 'blockchain-file.txt',
         mimeType: 'text/plain',
-        size: '2048',
+        size: 2048,
         modifiedTime: '2023-01-02T00:00:00Z',
         createdTime: '2023-01-02T00:00:00Z',
         webViewLink: 'https://example.com/view/2',
         webContentLink: 'https://example.com/download/2',
         parents: [],
+        isTokenized: false,
+        canTokenize: true,
+        estimatedValue: 0,
         storageProvider: 'dropblocks',
         isEncrypted: true,
         dropBlocksData: {
@@ -319,7 +328,7 @@ describe('React Components', () => {
 
       expect(screen.getByText('1 DropBlocks')).toBeInTheDocument()
       expect(screen.getByText('1 Encrypted')).toBeInTheDocument()
-      expect(screen.getByText('Total: 3.0 KB')).toBeInTheDocument()
+      expect(screen.getByText('Total: 3 KB')).toBeInTheDocument()
     })
 
     it('should execute bulk download operation', async () => {

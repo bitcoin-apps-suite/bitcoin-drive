@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 2030",
     "lint": "eslint",
+    "test": "vitest run",
     "kill:3000": "lsof -ti:3000 | xargs kill -9",
     "kill:dev": "lsof -ti:3000 | xargs kill -9 && lsof -ti:3001 | xargs kill -9",
     "kill:all": "for port in {3000..3010}; do lsof -ti:$port | xargs kill -9 2>/dev/null || true; done",
@@ -48,13 +49,18 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.27",
+    "jsdom": "^30.1.1",
     "nodemon": "^3.1.10",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

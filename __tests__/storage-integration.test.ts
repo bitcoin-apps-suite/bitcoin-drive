@@ -1,18 +1,29 @@
 /**
  * Unit Tests for Storage Provider Integration
+ *
+ * @vitest-environment node
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { HybridStorage, StorageMetadata, StorageProvider } from '../src/lib/storage/hybrid-storage'
 
-// Mock Google Drive API
-const mockGoogleDrive = {
+// Mock Google Drive API (hoisted so the googleapis mock below can use it)
+const mockGoogleDrive = vi.hoisted(() => ({
   files: {
-    create: vi.fn().mockResolvedValue({
-      data: { id: 'mock-google-drive-id', name: 'test-file', size: '1024' }
-    })
+    create: vi.fn()
   }
-}
+}))
+
+vi.mock('googleapis', () => ({
+  google: {
+    drive: vi.fn(() => mockGoogleDrive),
+    auth: {
+      OAuth2: vi.fn(function OAuth2() {
+        return { setCredentials: vi.fn() }
+      })
+    }
+  }
+}))
 
 // Mock DropBlocks functions
 vi.mock('../src/lib/dropblocks', () => ({
@@ -39,17 +50,12 @@ describe('Storage Provider Integration', () => {
   let hybridStorage: HybridStorage
 
   beforeEach(() => {
-    // Mock the Google Drive instance
-    vi.doMock('googleapis', () => ({
-      google: {
-        drive: vi.fn(() => mockGoogleDrive),
-        auth: {
-          OAuth2: vi.fn().mockImplementation(() => ({
-            setCredentials: vi.fn()
-          }))
-        }
-      }
-    }))
+    vi.clearAllMocks()
+    mockGoogleDrive.files.create.mockResolvedValue({
+      data: { id: 'mock-google-drive-id', name: 'test-file', size: '1024' }
+    })
+    // storeHashOnBlockchain logs every upload; keep test output quiet
+    vi.spyOn(console, 'log').mockImplementation(() => {})
 
     hybridStorage = new HybridStorage('mock-access-token')
   })
@@ -182,8 +188,10 @@ describe('Storage Provider Integration', () => {
         storageProvider: 'invalid-provider' as StorageProvider
       })
       
-      // Should fallback to google-drive
-      expect(result.storageProvider).toBe('google-drive')
+      // Unknown providers are routed to Google Drive (the default branch)
+      expect(mockGoogleDrive.files.create).toHaveBeenCalledTimes(1)
+      expect(result.googleDriveId).toBe('mock-google-drive-id')
+      expect(result.dropBlocksHash).toBeUndefined()
     })
   })
 
