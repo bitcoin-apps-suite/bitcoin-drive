@@ -34,8 +34,11 @@ export default function ServiceWorkerRegistration() {
     }
 
     // Handle protocol launches
-    if ('launchQueue' in window) {
-      window.launchQueue.setConsumer((launchParams) => {
+    const launchQueue = (window as Window & {
+      launchQueue?: { setConsumer: (consumer: (params: { targetURL?: string }) => void) => void }
+    }).launchQueue
+    if (launchQueue) {
+      launchQueue.setConsumer((launchParams) => {
         if (launchParams.targetURL) {
           console.log('Bitcoin Drive launched with URL:', launchParams.targetURL);
           

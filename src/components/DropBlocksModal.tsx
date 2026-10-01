@@ -10,7 +10,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { X, Upload, FolderPlus, Tag, Calendar, Shield, HardDrive, FileText, Progress, CheckCircle, AlertCircle } from 'lucide-react'
+import { X, Upload, FolderPlus, Tag, Calendar, Shield, HardDrive, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { DropBlocksManager, UploadProgress, type DropBlocksFile } from '@/lib/dropblocks'
 
 interface DropBlocksModalProps {
@@ -135,7 +135,7 @@ export default function DropBlocksModal({ isOpen, onClose, onUploadComplete, dro
     switch (uploadProgress.phase) {
       case 'error': return <AlertCircle size={16} />
       case 'complete': return <CheckCircle size={16} />
-      default: return <Progress size={16} />
+      default: return <Loader2 size={16} className="animate-spin" />
     }
   }
 

@@ -135,7 +135,7 @@ export default function BulkOperations({
   }
 
   const getSelectedStats = () => {
-    const totalSize = selectedFileObjects.reduce((acc, file) => acc + parseInt(file.size || '0'), 0)
+    const totalSize = selectedFileObjects.reduce((acc, file) => acc + (file.size || 0), 0)
     const dropBlocksCount = dropBlocksFiles.length
     const encryptedCount = selectedFileObjects.filter(file => file.isEncrypted).length
     const expiringCount = selectedFileObjects.filter(file => {
@@ -312,7 +312,7 @@ export default function BulkOperations({
                 {file.name}
               </div>
               <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                {formatBytes(parseInt(file.size || '0'))} • {file.storageProvider}
+                {formatBytes((file.size || 0))} • {file.storageProvider}
               </div>
             </div>
             

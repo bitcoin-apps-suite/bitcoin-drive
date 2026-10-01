@@ -6,7 +6,6 @@ import { X, Mail, Twitter, Wallet, Shield, Check, Key, ArrowRight, Zap, CreditCa
 import Image from 'next/image'
 import { 
   SiGoogledrive, 
-  SiAmazon, 
   SiCloudflare, 
   SiGooglecloud, 
   SiSupabase,
@@ -14,9 +13,9 @@ import {
   SiNetlify,
   SiVercel,
   SiDigitalocean,
-  SiOracle,
   SiAlibabacloud
 } from 'react-icons/si'
+import { FaAws, FaDatabase } from 'react-icons/fa'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -60,7 +59,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'aws',
       name: 'AWS S3',
-      icon: <SiAmazon size={20} />,
+      icon: <FaAws size={20} />,
       color: '#ff9900',
       connected: connectedProviders.has('aws')
     },
@@ -102,7 +101,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     {
       id: 'oracle',
       name: 'Oracle Cloud',
-      icon: <SiOracle size={20} />,
+      icon: <FaDatabase size={20} />,
       color: '#f80000',
       connected: connectedProviders.has('oracle')
     },

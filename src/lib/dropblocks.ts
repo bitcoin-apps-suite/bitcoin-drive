@@ -63,10 +63,8 @@ export class DropBlocksManager {
 
   constructor(config: DropBlocksConfig) {
     this.config = {
-      walletHost: 'localhost',
-      defaultRetention: 30,
-      maxFileSize: 100 * 1024 * 1024, // 100MB
-      ...config
+      ...config,
+      walletHost: config.walletHost ?? 'localhost'
     }
     this.loadLocalCatalog()
   }
@@ -199,6 +197,22 @@ export class DropBlocksManager {
     await this.recordRenewal(file.hash, additionalDays)
 
     this.saveLocalCatalog()
+  }
+
+  /**
+   * Get a single file by ID
+   */
+  getFile(fileId: string): DropBlocksFile | null {
+    return this.files.get(fileId) ?? null
+  }
+
+  /**
+   * List files, newest first. With no folder, returns every file.
+   */
+  listFiles(folder?: string): DropBlocksFile[] {
+    return Array.from(this.files.values())
+      .filter(file => folder === undefined || file.folder === folder)
+      .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime())
   }
 
   /**
@@ -399,6 +413,7 @@ export class DropBlocksManager {
   }
 
   private loadLocalCatalog(): void {
+    if (typeof localStorage === 'undefined') return // server-side: no local catalog
     try {
       const saved = localStorage.getItem('dropblocks-catalog')
       if (saved) {
@@ -418,6 +433,7 @@ export class DropBlocksManager {
   }
 
   private saveLocalCatalog(): void {
+    if (typeof localStorage === 'undefined') return
     try {
       const catalog = {
         version: '1.0',
@@ -454,19 +470,14 @@ export async function uploadToDropBlocks(
     tags?: string[]
   }
 ): Promise<DropBlocksFile> {
-  const buffer = fileData instanceof Buffer ? fileData : Buffer.from(fileData)
-  
-  return await dropBlocksManager.uploadFile(
-    buffer,
-    fileName,
-    mimeType,
-    options?.retentionDays || DEFAULT_DROPBLOCKS_CONFIG.defaultRetention,
-    {
-      encrypt: options?.encrypt || false,
-      folder: options?.folder,
-      tags: options?.tags
-    }
-  )
+  const file = new File([new Uint8Array(fileData)], fileName, { type: mimeType })
+
+  return await dropBlocksManager.uploadFile(file, {
+    encrypt: options?.encrypt || false,
+    folder: options?.folder,
+    tags: options?.tags,
+    retentionDays: options?.retentionDays || DEFAULT_DROPBLOCKS_CONFIG.defaultRetention
+  })
 }
 
 export async function getDropBlocksFile(fileId: string): Promise<DropBlocksFile | null> {
@@ -474,7 +485,8 @@ export async function getDropBlocksFile(fileId: string): Promise<DropBlocksFile 
 }
 
 export async function downloadFromDropBlocks(fileId: string, password?: string): Promise<ArrayBuffer> {
-  return await dropBlocksManager.downloadFile(fileId, password)
+  const blob = await dropBlocksManager.downloadFile(fileId, password)
+  return await blob.arrayBuffer()
 }
 
 export async function renewDropBlocksFile(fileId: string, additionalDays: number): Promise<void> {

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Wallet, Sync, Key, Users, CheckCircle, AlertCircle, Clock } from 'lucide-react'
+import { Wallet, RefreshCw, Key, Users, CheckCircle, AlertCircle, Clock } from 'lucide-react'
 import { getDropBlocksManager } from '@/lib/dropblocks'
 
 interface WalletSyncProps {
@@ -108,7 +108,7 @@ export default function WalletSync({ className = '' }: WalletSyncProps) {
 
   const getStatusIcon = () => {
     if (syncStatus.syncInProgress) {
-      return <Sync size={16} className="animate-spin" style={{ color: '#fbbf24' }} />
+      return <RefreshCw size={16} className="animate-spin" style={{ color: '#fbbf24' }} />
     }
     if (syncStatus.isConnected) {
       return <CheckCircle size={16} style={{ color: '#10b981' }} />
@@ -159,7 +159,7 @@ export default function WalletSync({ className = '' }: WalletSyncProps) {
               >
                 {syncStatus.syncInProgress ? (
                   <>
-                    <Sync size={16} className="animate-spin" />
+                    <RefreshCw size={16} className="animate-spin" />
                     Connecting...
                   </>
                 ) : (
@@ -219,7 +219,7 @@ export default function WalletSync({ className = '' }: WalletSyncProps) {
                 disabled={syncStatus.syncInProgress}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-white transition-colors"
               >
-                <Sync size={16} />
+                <RefreshCw size={16} />
                 Sync Now
               </button>
             </div>

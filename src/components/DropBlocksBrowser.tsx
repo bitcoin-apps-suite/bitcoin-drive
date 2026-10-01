@@ -362,7 +362,7 @@ export default function DropBlocksBrowser({ className = '' }: DropBlocksBrowserP
                             {file.name}
                           </h3>
                           {file.isEncrypted && (
-                            <Shield size={14} style={{ color: '#00ff88' }} title="Encrypted" />
+                            <Shield size={14} style={{ color: "#00ff88" }} aria-label="Encrypted"><title>Encrypted</title></Shield>
                           )}
                         </div>
                         
