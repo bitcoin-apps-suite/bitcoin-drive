@@ -4,7 +4,8 @@ import { GoogleDriveFile, DriveFilesResponse } from '@/types/drive'
 import { DropBlocksFile, listDropBlocksFiles } from '@/lib/dropblocks'
 import { StorageProvider } from '@/lib/storage/hybrid-storage'
 
-export interface UnifiedFile extends Omit<GoogleDriveFile, 'id'> {
+export interface UnifiedFile extends Omit<GoogleDriveFile, 'id' | 'source'> {
+  source?: GoogleDriveFile['source']
   id: string
   storageProvider: StorageProvider
   dropBlocksData?: DropBlocksFile
@@ -80,7 +81,7 @@ export function useDriveFiles({
             id: file.id,
             name: file.name,
             mimeType: file.mimeType,
-            size: file.size.toString(),
+            size: file.size,
             modifiedTime: file.uploadDate.toISOString(),
             createdTime: file.uploadDate.toISOString(),
             webViewLink: file.url || `#dropblocks/${file.id}`,
@@ -90,7 +91,11 @@ export function useDriveFiles({
             dropBlocksData: file,
             isEncrypted: file.isEncrypted,
             expiryDate: file.expiryDate,
-            blockchainTxId: file.metadata.txid
+            blockchainTxId: file.metadata.txid,
+            // DropBlocks files are not tokenizable via the Google Drive flow
+            isTokenized: false,
+            canTokenize: false,
+            estimatedValue: 0
           }))
           
           allFiles.push(...unifiedDropBlocksFiles)

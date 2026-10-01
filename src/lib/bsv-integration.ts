@@ -316,10 +316,10 @@ export class BSVDesktopIntegration {
 
     // In a real implementation, use proper message signing
     const crypto = await import('crypto')
-    const messageHash = crypto.createHash('sha256').update(message).digest()
-    const signature = this.wallet.privateKey.sign(messageHash)
-    
-    return signature.toString('hex')
+    const messageHash = crypto.createHash('sha256').update(message).digest('hex')
+    const signature = this.wallet.privateKey.sign(messageHash, 'hex')
+
+    return signature.toDER('hex') as string
   }
 
   private verifySignature(record: BRC1000FileRecord, address: string): boolean {
@@ -425,6 +425,6 @@ export async function initializeBSVIntegration(): Promise<boolean> {
 }
 
 export function isBSVAvailable(): boolean {
-  return typeof window !== 'undefined' && 
-         ((window as unknown as { bsvWallet?: unknown }).bsvWallet || (window as unknown as { bitcoin?: unknown }).bitcoin)
+  return typeof window !== 'undefined' &&
+         Boolean((window as unknown as { bsvWallet?: unknown }).bsvWallet || (window as unknown as { bitcoin?: unknown }).bitcoin)
 }

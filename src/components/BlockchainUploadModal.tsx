@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { X, Upload, Hash, HardDrive, Lock, DollarSign, FileText, AlertCircle, Cloud, Coins, Wallet, Database, Zap, Globe, Check } from 'lucide-react'
 import { 
   SiGoogledrive, 
-  SiAmazon, 
   SiCloudflare, 
   SiGoogle, 
   SiSupabase,
@@ -13,6 +12,7 @@ import {
   SiStripe,
   SiPaypal
 } from 'react-icons/si'
+import { FaAws } from 'react-icons/fa'
 import type { StorageProvider } from './StorageConnector'
 
 interface BlockchainUploadModalProps {
@@ -148,7 +148,7 @@ export default function BlockchainUploadModal({ isOpen, onClose, onUpload, conne
             <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'googledrive', name: 'Google Drive', icon: <SiGoogledrive size={16} />, color: '#4285f4' },
-                { id: 'aws', name: 'AWS S3', icon: <SiAmazon size={16} />, color: '#ff9900' },
+                { id: 'aws', name: 'AWS S3', icon: <FaAws size={16} />, color: '#ff9900' },
                 { id: 'cloudflare', name: 'Cloudflare', icon: <SiCloudflare size={16} />, color: '#f38020' },
                 { id: 'googlecloud', name: 'Google Cloud', icon: <SiGoogle size={16} />, color: '#ea4335' },
                 { id: 'azure', name: 'Azure Blob', icon: <Cloud size={16} />, color: '#0078d4' },

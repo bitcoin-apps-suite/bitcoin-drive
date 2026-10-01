@@ -11,9 +11,8 @@ import type { StorageProvider } from '@/components/StorageConnector'
 import TokenizationModal, { TokenizationSettings } from '@/components/TokenizationModal'
 import InstallAppButton from '@/components/InstallAppButton'
 import { Search, Upload, Grid, List, RefreshCw } from 'lucide-react'
-import { useDriveFiles } from '@/hooks/useDriveFiles'
+import { useDriveFiles, type UnifiedFile } from '@/hooks/useDriveFiles'
 import GoogleDriveFileCard from '@/components/GoogleDriveFileCard'
-import { GoogleDriveFile } from '@/types/drive'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -27,7 +26,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [storageUsed] = useState(0) // MB
-  const [selectedGoogleDriveFile, setSelectedGoogleDriveFile] = useState<GoogleDriveFile | null>(null)
+  const [selectedGoogleDriveFile, setSelectedGoogleDriveFile] = useState<UnifiedFile | null>(null)
   
   // Resizable sidebar state
   const [sidebarWidth, setSidebarWidth] = useState(320)
@@ -108,7 +107,7 @@ export default function Home() {
     setSelectedFileForTokenization(null)
   }
 
-  const handleGoogleDriveTokenization = (file: GoogleDriveFile) => {
+  const handleGoogleDriveTokenization = (file: UnifiedFile) => {
     setSelectedGoogleDriveFile(file)
     setShowTokenizationModal(true)
   }

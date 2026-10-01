@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { GoogleDriveFile } from '@/types/drive'
+import type { UnifiedFile } from '@/hooks/useDriveFiles'
 import { 
   FileText, 
   Video, 
@@ -20,8 +20,8 @@ import {
 } from 'lucide-react'
 
 interface GoogleDriveFileCardProps {
-  file: GoogleDriveFile
-  onTokenize: (file: GoogleDriveFile) => void
+  file: UnifiedFile
+  onTokenize: (file: UnifiedFile) => void
   viewMode?: 'grid' | 'list'
 }
 

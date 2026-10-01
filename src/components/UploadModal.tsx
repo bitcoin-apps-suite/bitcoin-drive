@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import { X, Upload, HardDrive, Cloud, Check, Globe, Package, Server, Database } from 'lucide-react'
 import { 
   SiGoogledrive, 
-  SiAmazon, 
   SiCloudflare, 
   SiGooglecloud, 
   SiSupabase,
@@ -12,9 +11,9 @@ import {
   SiNetlify,
   SiVercel,
   SiDigitalocean,
-  SiOracle,
   SiAlibabacloud
 } from 'react-icons/si'
+import { FaAws, FaDatabase } from 'react-icons/fa'
 
 interface UploadModalProps {
   isOpen: boolean
@@ -62,7 +61,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
     {
       id: 'aws',
       name: 'AWS S3',
-      icon: <SiAmazon size={20} />,
+      icon: <FaAws size={20} />,
       color: '#ff9900'
     },
     {
@@ -98,7 +97,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }: UploadModalPr
     {
       id: 'oracle',
       name: 'Oracle Cloud',
-      icon: <SiOracle size={20} />,
+      icon: <FaDatabase size={20} />,
       color: '#f80000'
     },
     {

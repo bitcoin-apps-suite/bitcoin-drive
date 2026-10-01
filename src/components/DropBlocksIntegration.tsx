@@ -55,7 +55,7 @@ export default function DropBlocksIntegration({
     
     const newStats: DropBlocksStats = {
       totalFiles: dropBlocksFiles.length,
-      totalSize: dropBlocksFiles.reduce((acc, file) => acc + parseInt(file.size || '0'), 0),
+      totalSize: dropBlocksFiles.reduce((acc, file) => acc + (file.size || 0), 0),
       encryptedFiles: dropBlocksFiles.filter(file => file.isEncrypted).length,
       expiringFiles: dropBlocksFiles.filter(file => {
         if (!file.expiryDate) return false
@@ -86,7 +86,7 @@ export default function DropBlocksIntegration({
     { key: 'bulk', label: 'Bulk Operations', icon: Settings },
     { key: 'sync', label: 'Wallet Sync', icon: Zap },
     { key: 'analytics', label: 'Analytics', icon: BarChart3 }
-  ]
+  ] as const
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -114,7 +114,7 @@ export default function DropBlocksIntegration({
           return (
             <button
               key={item.key}
-              onClick={() => setActiveView(item.key as any)}
+              onClick={() => setActiveView(item.key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${
                 isActive 
                   ? 'bg-white/10 border border-white/20' 
@@ -222,7 +222,7 @@ export default function DropBlocksIntegration({
                         {file.name}
                       </div>
                       <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                        {new Date(file.modifiedTime).toLocaleDateString()} • {formatBytes(parseInt(file.size || '0'))}
+                        {new Date(file.modifiedTime).toLocaleDateString()} • {formatBytes((file.size || 0))}
                       </div>
                     </div>
                     <FileStatusIndicator file={file} />

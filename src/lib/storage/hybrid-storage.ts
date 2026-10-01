@@ -99,7 +99,7 @@ export class HybridStorage {
         },
         fields: 'id, name, size'
       })
-      googleDriveId = driveResponse.data.id
+      googleDriveId = driveResponse.data.id ?? undefined
     }
     
     // Store hash on blockchain (for all providers)
