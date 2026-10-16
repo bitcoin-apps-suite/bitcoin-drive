@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession, signOut, signIn } from '@/lib/session'
 import { Menu, X } from 'lucide-react'
 
 interface DropdownItem {
@@ -64,7 +64,7 @@ export default function Taskbar() {
         { label: 'Preferences...', shortcut: '⌘,', action: () => console.log('Preferences') },
         { label: 'Storage Settings...', action: () => console.log('Storage settings') },
         { divider: true },
-        { label: session ? 'Sign Out' : 'Sign In', shortcut: '⌘Q', action: session ? () => signOut() : () => document.querySelector<HTMLButtonElement>('[data-signin]')?.click() }
+        { label: session ? 'Sign Out' : 'Sign In', shortcut: '⌘Q', action: session ? () => signOut() : () => { void signIn().catch(() => alert('No BRC-100 wallet found. Open Bitcoin Drive inside bWalletX, or run bWalletX on this computer.')) } }
       ]
     },
     {
@@ -599,7 +599,7 @@ export default function Taskbar() {
           </>
         ) : (
           <>
-            <span>Not Connected</span>
+            <button onClick={() => { void signIn().catch(() => alert('No BRC-100 wallet found. Open Bitcoin Drive inside bWalletX, or run bWalletX on this computer.')) }} style={{ background: '#F5B800', color: '#1a1300', border: 0, borderRadius: 4, padding: '2px 8px', fontWeight: 700, cursor: 'pointer', fontSize: 12 }}>Sign in with bWalletX</button>
             <span style={{ color: '#ff4444', opacity: 0.6 }}>●</span>
           </>
         )}
@@ -639,7 +639,7 @@ export default function Taskbar() {
                 </>
               ) : (
                 <>
-                  <span style={{ color: '#ffffff', fontSize: '14px' }}>Not Connected</span>
+                  <button onClick={() => { void signIn().catch(() => alert('No BRC-100 wallet found. Open Bitcoin Drive inside bWalletX, or run bWalletX on this computer.')) }} style={{ background: '#F5B800', color: '#1a1300', border: 0, borderRadius: 4, padding: '4px 10px', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>Sign in with bWalletX</button>
                   <span style={{ color: '#ff4444', opacity: 0.6 }}>●</span>
                 </>
               )}

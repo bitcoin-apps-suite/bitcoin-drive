@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession } from '@/lib/session'
 import Taskbar from '@/components/Taskbar'
 import Link from 'next/link'
 import { ExternalLink, DollarSign, Code, Zap } from 'lucide-react'
